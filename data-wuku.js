@@ -184,7 +184,6 @@ const DATA_WUKU = {
         • Baik untuk: Melihat calon mantu, rencana bangun rumah.<br>
         • Tidak baik untuk: Mengobati penyakit, menanam jagung.`,
 
-
     "Marakeh": `<b>Wuku MARAKEH: SONYA</b><br><br>
         Hari Naas: Selasa, Jumat<br>
         • Dewa Bumi: Bethara Surenggana.<br>
@@ -286,17 +285,7 @@ const DATA_WUKU = {
         • Baik untuk: Belajar kesenian, meditasi, berderma.<br>
         • Tidak baik untuk: Memulai peperangan atau perselisihan.`,
 
-    "Kulawu": `<b>Wuku KULAWU: DONYO</b><br><br>
-        • Dewa Bumi: Bethara Sadana (Dewa Harta).<br>
-        • Sifat: Pandai mencari uang, teliti, namun terkadang pelit.<br>
-        • Baik untuk: Menyimpan harta, berdagang.`,
-
-    "Dukut": `<b>Wuku DUKUT: MALIHAN</b><br><br>
-        • Dewa Bumi: Bethara Sakri.<br>
-        • Sifat: Tajam pikirannya, waspada, namun sering ragu.<br>
-        • Baik untuk: Mencari ilmu, berdiplomasi.`
-
-      "Kulawu": `<b>Wuku KULAWU: MALIHAN</b><br><br>
+    "Kulawu": `<b>Wuku KULAWU: MALIHAN</b><br><br>
         Hari Naas: Senin, Kamis<br>
         • Dewa Bumi: Bethara Sadana.<br>
         • Pohon: Tal (Panjang umurnya).<br>
@@ -318,8 +307,7 @@ const DATA_WUKU = {
         • Baik untuk: Memperbaiki rumah, membuka kebun, mencari jodoh, membuat obat.<br>
         • Tidak baik untuk: Menghindari bepergian ke arah Barat Daya.`,
 
-
-  "Watugunung": `<b>Wuku WATUGUNUNG: SONYA</b><br><br>
+    "Watugunung": `<b>Wuku WATUGUNUNG: SONYA</b><br><br>
         Hari Naas: Selasa, Jumat<br>
         • Dewa Bumi: Bethara Anataboga.<br>
         • Pohon: Wijaya Kusuma (Hidup sebagai pendeta).<br>
