@@ -239,3 +239,17 @@ window.shareWhatsApp = () => {
 
 generateCalendar();
 updateDetail(TODAY, getPasaran(TODAY));
+
+// Fungsi di main.js menjadi sangat pendek
+function getMangsaInfo(date) {
+    const d = date.getDate();
+    const m = date.getMonth() + 1;
+    let id = 1;
+
+    // Logika penentuan ID Mangsa
+    if ((d >= 22 && m == 6) || (m == 7) || (d <= 1 && m == 8)) id = 1;
+    else if (d >= 2 && m == 8 && d <= 25) id = 2;
+    // ... dan seterusnya untuk 12 mangsa
+
+    return DATA_MANGSA[id]; // Mengambil data dari file sebelah
+}
