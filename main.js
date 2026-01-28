@@ -1,24 +1,38 @@
-// Impor database tabel rejeki dari file terpisah
-import { TABEL_SRIJATI } from './data-srijati.js';
+// DATA SRI JATI LANGSUNG DI DALAM MAIN.JS AGAR TIDAK ERROR IMPORT
+const TABEL_SRIJATI = {
+    12: [
+        { usia: "0 - 6", nilai: 2, ket: "Kekurangan" },
+        { usia: "6 - 12", nilai: 3, ket: "Cukup" },
+        { usia: "12 - 18", nilai: 5, ket: "Maju" },
+        { usia: "18 - 24", nilai: 1, ket: "Sangat Kurang" },
+        { usia: "24 - 30", nilai: 7, ket: "Sangat Baik" },
+        { usia: "30 - 36", nilai: 1, ket: "Sangat Kurang" }
+    ],
+    10: [
+        { usia: "0 - 6", nilai: 5, ket: "Maju" },
+        { usia: "6 - 12", nilai: 2, ket: "Kurang" },
+        { usia: "12 - 18", nilai: 1, ket: "Sangat Kurang" },
+        { usia: "18 - 24", nilai: 3, ket: "Cukup" },
+        { usia: "24 - 30", nilai: 5, ket: "Maju" },
+        { usia: "30 - 36", nilai: 2, ket: "Kurang" }
+    ],
+    // Anda bisa menambahkan neptu lain (7-18) di sini nanti
+};
 
 const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 const PASARAN = ['Legi', 'Pahing', 'Pon', 'Wage', 'Kliwon'];
-
-// Definisi Neptu untuk perhitungan Sri Jati
 const NEPTU_HARI = { 'Minggu': 5, 'Senin': 4, 'Selasa': 3, 'Rabu': 7, 'Kamis': 8, 'Jumat': 6, 'Sabtu': 9 };
 const NEPTU_PASARAN = { 'Pahing': 9, 'Pon': 7, 'Wage': 4, 'Kliwon': 8, 'Legi': 5 };
 
 let current = new Date();
 const TODAY = new Date();
 
-// --- Fungsi Pendukung ---
 function getPasaran(date) {
-    const base = new Date(1900, 0, 1); // Patokan 1 Jan 1900 adalah Senin Pahing
+    const base = new Date(1900, 0, 1);
     const diff = Math.floor((date.getTime() - base.getTime()) / (1000 * 60 * 60 * 24));
     return PASARAN[(((diff + 1) % 5) + 5) % 5];
 }
 
-// --- Fungsi Render Kalender ---
 function generateCalendar() {
     const grid = document.getElementById('calendar');
     const mNav = document.getElementById('monthYearNav');
@@ -31,7 +45,6 @@ function generateCalendar() {
     
     mNav.innerText = `${namaBulan[m]} ${y}`;
 
-    // Render Header Hari
     HARI.forEach((h, i) => {
         const el = document.createElement('div');
         el.innerText = h.substring(0, 3);
@@ -60,77 +73,49 @@ function generateCalendar() {
     }
 }
 
-// --- Fungsi Detail & Ramalan Sri Jati ---
 function updateDetail(date, pasaran) {
     const detailDiv = document.getElementById('detail');
     const h = HARI[date.getDay()];
-    const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    
-    // Hitung Neptu
     const neptu = NEPTU_HARI[h] + NEPTU_PASARAN[pasaran];
-    
-    // Ambil data Sri Jati dari module yang di-import
     const dataRejeki = TABEL_SRIJATI[neptu] || [];
     
-    let tabelHtml = `
-        <table style="width:100%; border-collapse: collapse; margin-top:10px; font-size:0.85rem; border: 1px solid #ddd;">
-            <thead>
-                <tr style="background:#f8f8f8;">
-                    <th style="border:1px solid #ddd; padding:8px;">Usia</th>
-                    <th style="border:1px solid #ddd; padding:8px;">Nilai</th>
-                    <th style="border:1px solid #ddd; padding:8px;">Nasib</th>
-                </tr>
-            </thead>
-            <tbody>`;
+    let tabelHtml = `<table style="width:100%; border-collapse: collapse; margin-top:10px; font-size:0.8rem; border:1px solid #ddd;">
+        <tr style="background:#eee;"><th>Usia</th><th>Nilai</th><th>Nasib</th></tr>`;
 
     dataRejeki.forEach(item => {
-        tabelHtml += `
-            <tr>
-                <td style="border:1px solid #ddd; padding:8px; text-align:center;">${item.usia}</td>
-                <td style="border:1px solid #ddd; padding:8px; text-align:center; font-weight:bold; color:#D30000;">${item.nilai}</td>
-                <td style="border:1px solid #ddd; padding:8px;">${item.ket}</td>
-            </tr>`;
+        tabelHtml += `<tr><td style="border:1px solid #ddd;padding:4px;text-align:center;">${item.usia}</td>
+            <td style="border:1px solid #ddd;padding:4px;text-align:center;color:red;font-weight:bold;">${item.nilai}</td>
+            <td style="border:1px solid #ddd;padding:4px;">${item.ket}</td></tr>`;
     });
-    tabelHtml += `</tbody></table>`;
+    tabelHtml += `</table>`;
 
     detailDiv.style.display = 'block';
     detailDiv.innerHTML = `
         <div class="card-result">
-            <h3 style="color:#D30000; margin-bottom:5px;">Detail Weton & Sri Jati</h3>
-            <p style="font-size:0.9rem;"><strong>Tanggal:</strong> ${date.getDate()} ${namaBulan[date.getMonth()]} ${date.getFullYear()}</p>
-            <p style="font-size:0.9rem;"><strong>Weton:</strong> ${h} ${pasaran} (Neptu: ${neptu})</p>
-            
-            <div class="info-section">
-                <h4 style="color:#D30000; margin-top:15px; border-bottom: 1px solid #eee; padding-bottom:5px;">📈 Siklus Rejeki (Pal Sriti)</h4>
-                ${dataRejeki.length > 0 ? tabelHtml : "<p style='font-style:italic; color:#666;'>Data untuk Neptu ini sedang diproses...</p>"}
+            <h3>Detail Neptu: ${neptu}</h3>
+            <p><strong>Weton:</strong> ${h} ${pasaran}</p>
+            <div style="margin-top:10px;">
+                <h4 style="color:#D30000;">📈 Siklus Sri Jati (Rejeki)</h4>
+                ${dataRejeki.length > 0 ? tabelHtml : "<p>Data neptu ini belum diinput.</p>"}
             </div>
         </div>
     `;
-    detailDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    detailDiv.scrollIntoView({ behavior: 'smooth' });
 }
 
-// --- Fungsi Cari Weton & Pindah View ---
 window.searchWeton = () => {
     const val = document.getElementById('dateInput').value;
     if (val) {
         const targetDate = new Date(val);
-        // Validasi jika tanggal valid
-        if (!isNaN(targetDate.getTime())) {
-            // Pindahkan tampilan kalender ke bulan dan tahun tersebut
-            current = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
-            generateCalendar();
-            
-            // Tampilkan detailnya
-            updateDetail(targetDate, getPasaran(targetDate));
-        }
+        // BERPINDAH KE TAHUN/BULAN YANG DICARI
+        current = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
+        generateCalendar();
+        updateDetail(targetDate, getPasaran(targetDate));
     }
 };
 
-// --- Event Navigasi ---
 document.getElementById('prevMonth').onclick = () => { current.setMonth(current.getMonth() - 1); generateCalendar(); };
 document.getElementById('nextMonth').onclick = () => { current.setMonth(current.getMonth() + 1); generateCalendar(); };
 
-// --- Inisialisasi ---
 generateCalendar();
-// Tampilkan detail hari ini secara otomatis saat pertama buka
 updateDetail(TODAY, getPasaran(TODAY));
