@@ -1,11 +1,20 @@
 // data-srijati.js
-export const DATA_SRIJATI = {
-    "Minggu Legi": "Sifat: Tekun, mandiri, dan memiliki rasa kasih sayang yang tinggi. Rezeki: Cukup stabil dan cenderung meningkat seiring usaha.",
-    "Senin Pahing": "Sifat: Pekerja keras, berani, dan jujur. Namun cenderung kaku. Rezeki: Melimpah jika dikelola dengan baik.",
-    "Selasa Pon": "Sifat: Berwibawa, setia, dan pandai bicara. Rezeki: Tergolong lancar dalam usaha dagang.",
-    "Rabu Kliwon": "Sifat: Cerdas, berjiwa pemimpin, dan sangat waspada. Rezeki: Memiliki keberuntungan yang kuat dalam karier.",
-    "Kamis Wage": "Sifat: Tahan uji, pendiam, dan setia pada janji. Rezeki: Stabil melalui kerja keras yang konsisten.",
-    "Jumat Kaliwon": "Sifat: Enerjik, pandai bergaul, dan memiliki aura positif. Rezeki: Mudah mendapatkan peluang baru.",
-    "Sabtu Pahing": "Sifat: Ambisius, berani, dan memiliki tekad baja. Rezeki: Besar namun perlu pengendalian emosi dalam bisnis.",
-    // Tambahkan 35 kombinasi weton lainnya di sini sesuai kebutuhan Anda
+export const TABEL_SRIJATI = {
+    12: [
+        { usia: "0 - 6", nilai: 2, ket: "Kekurangan" },
+        { usia: "6 - 12", nilai: 3, ket: "Cukup" },
+        { usia: "12 - 18", nilai: 5, ket: "Maju" },
+        { usia: "18 - 24", nilai: 1, ket: "Sangat Kurang" },
+        { usia: "24 - 30", nilai: 7, ket: "Sangat Baik" },
+        { usia: "30 - 36", nilai: 1, ket: "Sangat Kurang" }
+    ],
+    10: [
+        { usia: "0 - 6", nilai: 5, ket: "Maju" },
+        { usia: "6 - 12", nilai: 2, ket: "Kurang" },
+        { usia: "12 - 18", nilai: 1, ket: "Sangat Kurang" },
+        { usia: "18 - 24", nilai: 3, ket: "Cukup" },
+        { usia: "24 - 30", nilai: 5, ket: "Maju" },
+        { usia: "30 - 36", nilai: 2, ket: "Kurang" }
+    ]
+    // Anda bisa meneruskan hingga neptu 18
 };
