@@ -184,7 +184,121 @@ const DATA_WUKU = {
         • Baik untuk: Melihat calon mantu, rencana bangun rumah.<br>
         • Tidak baik untuk: Mengobati penyakit, menanam jagung.`,
 
-    "Watugunung": `<b>Wuku WATUGUNUNG: SONYA</b><br><br>
+
+    "Marakeh": `<b>Wuku MARAKEH: SONYA</b><br><br>
+        Hari Naas: Selasa, Jumat<br>
+        • Dewa Bumi: Bethara Surenggana.<br>
+        • Pohon: Trengguli (Tidak bisa jauh, jadi pusat perhatian).<br>
+        • Sifat: Damar agung marapit (Daya ingat kuat). Umbul-umbul terbalik (Cepat sukses).<br>
+        • Aral: Dianiaya.<br>
+        • Kala Jaya Bumi: Utara menghadap ke Selatan.<br>
+        • Baik untuk: Menanam padi, pasang tumbal, memperbaiki rumah.<br>
+        • Tidak baik untuk: Bekerja sambilan, berkasih-kasihan, pindah tempat.`,
+
+    "Tambir": `<b>Wuku TAMBIR: NYAWA</b><br><br>
+        Hari Naas: Selasa (Anggara Kasih)<br>
+        • Dewa Bumi: Bethara Siwah (Baik di lahir, pamrih di batin).<br>
+        • Pohon: Upas (Tidak bisa jadi pelindung).<br>
+        • Burung: Prenjak (Tinggi cita-citanya).<br>
+        • Sifat: Lesu sarirane (Sering kehilangan gairah/semangat). Suka membual.<br>
+        • Aral: Dijahili/dikerjai orang.<br>
+        • Kala Jaya Bumi: Barat Daya menghadap ke Timur Laut.<br>
+        • Baik untuk: Mencari nafkah, menanam buah, berguru ilmu kebatinan, berperang.<br>
+        • Tidak baik untuk: Menghindari bepergian ke arah Barat Daya.`,
+
+    "Medangkungan": `<b>Wuku MEDANGKUNGAN: SONYA</b><br><br>
+        Hari Naas: Rabu, Sabtu, Minggu<br>
+        • Dewa Bumi: Bethara Basuki.<br>
+        • Pohon: Plasa (Terkenal).<br>
+        • Burung: Pelung (Suka tempat berair, kebaikan di belakang).<br>
+        • Sifat: Periang, banyak bicara, banyak yang bersimpati.<br>
+        • Aral: Disalahi di waktu malam.<br>
+        • Kala Jaya Bumi: Timur menghadap ke Barat.<br>
+        • Baik untuk: Menikah, mendirikan rumah, mencari solusi (srana).<br>
+        • Tidak baik untuk: Bertengkar dan berkhianat.`,
+
+    "Maktal": `<b>Wuku MAKTAL: DONYA</b><br><br>
+        Hari Naas: Selasa, Jumat<br>
+        • Dewa Bumi: Bethara Sakri.<br>
+        • Pohon: Nagasari & Burung Ayam Alas (Banyak simpati, pandai berbakti).<br>
+        • Sifat: Pancawara amor angin (Besar hati, tersohor). Sukses harta & kehormatan.<br>
+        • Aral: Berkelahi.<br>
+        • Kala Jaya Bumi: Timur Laut menghadap Barat Daya.<br>
+        • Baik untuk: Menikahkan, mengundang kerabat, memperbaiki barang.<br>
+        • Tidak baik untuk: Bepergian jauh, pindah rumah, meminjamkan uang.`,
+
+    "Wuye": `<b>Wuku WUYE: MALIHAN</b><br><br>
+        Hari Naas: Senin, Kamis<br>
+        • Dewa Bumi: Bethara Kuwera.<br>
+        • Pohon: Tal (Panjang umur). Burung: Gogik (Ambisius).<br>
+        • Sifat: Tajam intuisi (menyandang keris), dermawan, memberi keteduhan.<br>
+        • Aral: Sanjabaya (Bahaya saat berkunjung ke kerabat).<br>
+        • Kala Jaya Bumi: Barat menghadap ke Timur.<br>
+        • Baik untuk: Menangkap burung, menjalin persaudaraan, mencari rejeki.<br>
+        • Tidak baik untuk: Pergi jauh dan menipu.`,
+
+    "Manahil": `<b>Wuku MANAIL: SONYA</b><br><br>
+        Hari Naas: Rabu, Sabtu, Minggu<br>
+        • Pohon: Tigaron (Pemalas). Burung: Sepahan (Baik nafkahnya).<br>
+        • Sifat: Tajam intuisi batin, emosi dingin, pencemburu.<br>
+        • Aral: Kena besi.<br>
+        • Kala Jaya Bumi: Tenggara menghadap ke Barat Laut.<br>
+        • Baik untuk: Mencari obat, buat bendungan, selesaikan pertengkaran.<br>
+        • Tidak baik untuk: Menikahkan anak (mantu), menjatuhkan biji.`,
+
+    "Prangbakat": `<b>Wuku PRANGBAKAT: NYAWA</b><br><br>
+        Hari Naas: Selasa, Jumat<br>
+        • Dewa Bumi: Bethara Bisma.<br>
+        • Pohon: Tirisan (Panjang umur, sombong). Burung: Urang-urangan (Cekatan).<br>
+        • Sifat: Keras hati (Wesi katen), lembut di depan panas di belakang.<br>
+        • Aral: Saat memanjat.<br>
+        • Kala Jaya Bumi: Di bawah menghadap ke Atas.<br>
+        • Baik untuk: Mencari nafkah sambilan, perdagangan, menjatuhkan hukuman.<br>
+        • Tidak baik untuk: Bepergian, mengobati penyakit.`,
+
+    "Bala": `<b>Wuku BALA: RINGKEL</b><br><br>
+        Hari Naas: Senin, Kamis<br>
+        • Dewa Bumi: Bethari Durga (Tidak punya rasa takut).<br>
+        • Pohon: Cemara (Suka menyombongkan kedudukan).<br>
+        • Sifat: Sering membuat keributan, pendeta kelaparan (jauh rejeki).<br>
+        • Aral: Kena santet, bisa/racun.<br>
+        • Kala Jaya Bumi: Barat Laut menghadap ke Tenggara.<br>
+        • Baik untuk: Mengunjungi teman, menjadi utusan/perantara.<br>
+        • Tidak baik untuk: Mengajarkan ilmu kebatinan, memperbaiki barang.`,
+
+    "Wugu": `<b>Wuku WUGU: SONYA</b><br><br>
+        Hari Naas: Rabu, Sabtu, Minggu<br>
+        • Dewa Bumi: Singajanma.<br>
+        • Pohon: Wuni (Dicemburui soal rejeki). Burung: Kepodhang (Menyendiri).<br>
+        • Sifat: Luas wawasan, gampang tersinggung, setia kawan tinggi.<br>
+        • Aral: Terkena bisa.<br>
+        • Kala Jaya Bumi: Selatan menghadap ke Utara.<br>
+        • Baik untuk: Memperbaiki rumah, mantu, mencari rejeki, tanam ubi.<br>
+        • Tidak baik untuk: Membangun pertemanan baru.`,
+
+    "Wayang": `<b>Wuku WAYANG: SONYA</b><br><br>
+        Hari Naas: Selasa, Jumat<br>
+        • Dewa Bumi: Bethari Sri (Rupawan dan berkecukupan).<br>
+        • Pohon: Cempaka (Berwibawa). Burung: Ayam Alas (Disenangi pejabat).<br>
+        • Sifat: Tulus ikhlas, penyabar, pemberi pencerahan.<br>
+        • Aral: Sering dicurigai/difitnah.<br>
+        • Kala Jaya Bumi: Di Timur.<br>
+        • Baik untuk: Belajar kesenian, meditasi, berderma.<br>
+        • Tidak baik untuk: Memulai peperangan atau perselisihan.`,
+
+    "Kulawu": `<b>Wuku KULAWU: DONYO</b><br><br>
+        • Dewa Bumi: Bethara Sadana (Dewa Harta).<br>
+        • Sifat: Pandai mencari uang, teliti, namun terkadang pelit.<br>
+        • Baik untuk: Menyimpan harta, berdagang.`,
+
+    "Dukut": `<b>Wuku DUKUT: MALIHAN</b><br><br>
+        • Dewa Bumi: Bethara Sakri.<br>
+        • Sifat: Tajam pikirannya, waspada, namun sering ragu.<br>
+        • Baik untuk: Mencari ilmu, berdiplomasi.`
+
+  
+
+  "Watugunung": `<b>Wuku WATUGUNUNG: SONYA</b><br><br>
         Hari Naas: Selasa, Jumat<br>
         • Dewa Bumi: Bethara Anataboga.<br>
         • Pohon: Wijaya Kusuma (Hidup sebagai pendeta).<br>
