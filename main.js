@@ -245,3 +245,15 @@ window.shareWhatsApp = () => {
 // Start
 generateCalendar();
 updateDetail(TODAY, getPasaran(TODAY));
+
+// Di dalam fungsi updateDetail
+const watakNeptu = (typeof DATA_WATAK_NEPTU !== 'undefined') ? DATA_WATAK_NEPTU[neptu] : null;
+
+// Lalu di bagian innerHTML (di bawah bagian Pranata Mangsa), tambahkan:
+${watakNeptu ? `
+<div style="margin-top:20px; padding:12px; border:1px solid #e1bee7; border-radius:8px; background:#f3e5f5;">
+    <h4 style="color:#7b1fa2; margin:0 0 5px 0; border-bottom:1px solid #d1c4e9;">🌟 Watak Berdasarkan Neptu ${neptu}</h4>
+    <p style="font-size:0.85rem; font-weight:bold; margin-bottom:5px;">Sebutan: ${watakNeptu.sebutan}</p>
+    <div style="font-size:0.85rem; line-height:1.5; color:#4a148c;">${watakNeptu.watak}</div>
+</div>
+` : ""}
