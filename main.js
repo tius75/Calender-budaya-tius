@@ -245,12 +245,30 @@ function updateDetail(date, pasaran) {
         </div>`;
     }
 
-    let tabelHtml = `<table style="width:100%; border-collapse: collapse; margin-top:10px; font-size:0.85rem; border:1px solid #ddd;">
-            <tr style="background:#f9f9f9;"><th style="border:1px solid #ddd; padding:8px;">Usia</th><th style="border:1px solid #ddd; padding:8px;">Nilai</th><th style="border:1px solid #ddd; padding:8px;">Nasib</th></tr>`;
-    dataSriJati.forEach(item => {
-        tabelHtml += `<tr><td style="border:1px solid #ddd; padding:8px; text-align:center;">${item.usia}</td><td style="border:1px solid #ddd; padding:8px; text-align:center; color:#D30000; font-weight:bold;">${item.nilai}</td><td style="border:1px solid #ddd; padding:8px;">${item.ket}</td></tr>`;
-    });
-    tabelHtml += `</table>`;
+    // KODE BARU (SINKRON DENGAN data-srijati.js)
+let tabelHtml = `<table style="width:100%; border-collapse: collapse; margin-top:10px; font-size:0.85rem; border:1px solid #ddd;">
+        <thead>
+            <tr style="background:#f9f9f9;">
+                <th style="border:1px solid #ddd; padding:8px;">Usia</th>
+                <th style="border:1px solid #ddd; padding:8px;">Nilai</th>
+                <th style="border:1px solid #ddd; padding:8px;">Nasib</th>
+            </tr>
+        </thead>
+        <tbody>`;
+
+dataSriJati.forEach(item => {
+    // SRI_JATI_DESC diambil dari file data-srijati.js
+    const deskripsi = (typeof SRI_JATI_DESC !== 'undefined') ? (SRI_JATI_DESC[item.nilai] || "Data tidak ada") : "Deskripsi Error";
+    
+    tabelHtml += `
+        <tr>
+            <td style="border:1px solid #ddd; padding:8px; text-align:center;">${item.usia} Thn</td>
+            <td style="border:1px solid #ddd; padding:8px; text-align:center; color:#D30000; font-weight:bold;">${item.nilai}</td>
+            <td style="border:1px solid #ddd; padding:8px;">${deskripsi}</td>
+        </tr>`;
+});
+tabelHtml += `</tbody></table>`;
+
 
     detailDiv.style.display = 'block';
     detailDiv.innerHTML = `
