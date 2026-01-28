@@ -6,17 +6,15 @@
   <title>Kalender Jawa dan Wuku Abadi</title>
   <link rel="stylesheet" href="styles.css">
   <style>
-    /* CSS Penanda Warna */
     .sunday { color: #D30000 !important; font-weight: bold; background-color: #fff0f0; }
     .holiday { color: #D30000 !important; font-weight: bold; }
     .today { background-color: #ffeb3b !important; border: 2px solid #D30000 !important; border-radius: 50%; color: #000 !important; font-weight: bold; }
     
-    /* Memastikan detail muncul dan sesuai dengan styles.css */
-    #detail.active-show { 
-        display: grid !important; 
-        opacity: 1 !important;
-        visibility: visible !important;
-    }
+    #detail.active-show { display: grid !important; opacity: 1 !important; visibility: visible !important; }
+    
+    /* Tambahan Sifat Wuku */
+    .wuku-info { margin-top: 15px; padding-top: 15px; border-top: 2px dashed #D30000; font-size: 0.85em; line-height: 1.6; color: #444; text-align: left; }
+    .wuku-title { color: #D30000; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; display: block; }
   </style>
 </head>
 <body>
@@ -41,7 +39,6 @@
     </div>
 
     <div class="calendar" id="calendar"></div>
-    
     <div id="detail"></div>
     <div id="pancatan-results"></div>
     
@@ -51,33 +48,50 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   
   <script>
-    // --- DATABASE INTERNAL (MENGGANTIKAN main.js) ---
     const PASARAN = ['Legi', 'Pahing', 'Pon', 'Wage', 'Kliwon'];
     const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const WUKU_LIST = ["Sinta", "Landep", "Wukir", "Kurantil", "Tolu", "Gumbreg", "Warigalit", "Warigagung", "Julungwangi", "Sungsang", "Galungan", "Kuningan", "Langkir", "Mandasiya", "Julungpujut", "Pahang", "Kuruwelut", "Marakeh", "Tambir", "Medangkungan", "Maktal", "Wuye", "Manahil", "Prangbakat", "Bala", "Wugu", "Wayang", "Kulawu", "Dukut", "Watugunung"];
     const NEPTU_HARI = { 'Minggu': 5, 'Senin': 4, 'Selasa': 3, 'Rabu': 7, 'Kamis': 8, 'Jumat': 6, 'Sabtu': 9 };
     const NEPTU_PASARAN = { 'Legi': 5, 'Pahing': 9, 'Pon': 7, 'Wage': 4, 'Kliwon': 8 };
 
-    const LIBUR_NASIONAL = {
-        "2024-08-17": "Hari Kemerdekaan RI",
-        "2024-12-25": "Hari Natal",
-        "2025-01-01": "Tahun Baru Masehi",
-        "2025-03-29": "Idul Fitri 1446H"
+    // Objek Sifat Wuku (Masukkan data dari teks Anda di sini)
+    const SIFAT_WUKU_DB = {
+        "Galungan": "<b>WUKU GALUNGAN - SONYA</b><br>Hari Naas Rabu, Sabtu Minggu. Dewa Bumi : Bethara Kamajaya lambang pecinta dan setia. Pohonnya Tangan berwatak tidak mau menganggur. Burungnya Bidho Hatinya keras. Aralnya suka bertengkar.",
+        "Watugunung": "<b>WUKU WATUGUNUNG - SONYA</b><br>Hari Naas Selasa, Jumat. Dewa Bumi Bethara Anataboga. Pohonnya Wijaya Kusuma. Burungnya Gogik banyak bicara nasehat. Wt.gunung gerah uripe (sakit hidupnya).",
+        // ... Tambahkan wuku lainnya sesuai list Anda
     };
 
     let current = new Date();
 
+    // Fungsi Pembantu untuk normalisasi tanggal ke jam 00:00
+    function normalizeDate(d) {
+        let date = new Date(d);
+        date.setHours(0,0,0,0);
+        return date;
+    }
+
     function getPasaran(date) {
-        const base = new Date('1900-01-01');
-        const diff = Math.floor((date - base) / (1000 * 60 * 60 * 24));
-        return PASARAN[(((diff + 1) % 5) + 5) % 5];
+        const target = normalizeDate(date);
+        const base = normalizeDate(new Date(1900, 0, 1)); // Senin Pahing
+        const diffDays = Math.round((target - base) / (1000 * 60 * 60 * 24));
+        // Pahing adalah indeks 1, jadi (selisih + 1)
+        return PASARAN[(((diffDays + 1) % 5) + 5) % 5];
+    }
+
+    function getWuku(date) {
+        const target = normalizeDate(date);
+        const baseWuku = normalizeDate(new Date(2024, 4, 19)); // Minggu Sinta
+        const diffDays = Math.round((target - baseWuku) / (1000 * 60 * 60 * 24));
+        const wukuIndex = Math.floor((((diffDays % 210) + 210) % 210) / 7);
+        return WUKU_LIST[wukuIndex];
     }
 
     function generateCalendar() {
         const grid = document.getElementById('calendar');
         const mYear = document.getElementById('monthYear');
         const mNav = document.getElementById('monthYearNav');
-        
         grid.innerHTML = '';
+        
         const y = current.getFullYear();
         const m = current.getMonth();
         const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
@@ -85,7 +99,6 @@
         mYear.innerText = `${namaBulan[m]} ${y}`;
         mNav.innerText = `${namaBulan[m]} ${y}`;
 
-        // Header Hari
         HARI.forEach((h, i) => {
             const el = document.createElement('div');
             el.innerText = h.substring(0, 3);
@@ -95,7 +108,7 @@
 
         const firstDay = new Date(y, m, 1).getDay();
         const daysInMonth = new Date(y, m + 1, 0).getDate();
-        const todayStr = new Date().toISOString().split('T')[0];
+        const todayStr = normalizeDate(new Date()).toLocaleDateString('en-CA');
 
         for (let i = 0; i < firstDay; i++) grid.appendChild(document.createElement('div'));
 
@@ -107,7 +120,6 @@
             cell.className = 'calendar-day';
             
             if (dateObj.getDay() === 0) cell.classList.add('sunday'); 
-            if (LIBUR_NASIONAL[dateStr]) cell.classList.add('holiday'); 
             if (dateStr === todayStr) cell.classList.add('today'); 
 
             cell.onclick = () => showDetail(dateObj);
@@ -116,26 +128,28 @@
     }
 
     function showDetail(date) {
-        const h = HARI[date.getDay()];
-        const p = getPasaran(date);
+        const d = normalizeDate(date);
+        const h = HARI[d.getDay()];
+        const p = getPasaran(d);
+        const w = getWuku(d);
         const nH = NEPTU_HARI[h];
         const nP = NEPTU_PASARAN[p];
-        const dateStr = date.toLocaleDateString('en-CA');
         
         const detail = document.getElementById('detail');
         detail.classList.add('active-show'); 
         
-        // MENGGUNAKAN STRUKTUR UL/LI AGAR CSS styles.css BISA MEMBACA DATA
         detail.innerHTML = `
             <h3>HASIL PERHITUNGAN WETON</h3>
             <ul>
-                <li><strong>Tanggal:</strong> ${date.toLocaleDateString('id-ID', {dateStyle:'full'})}</li>
+                <li><strong>Tanggal:</strong> ${d.toLocaleDateString('id-ID', {dateStyle:'full'})}</li>
                 <li><strong>Weton:</strong> ${h} ${p}</li>
-                <li><strong>Neptu Hari:</strong> ${nH}</li>
-                <li><strong>Neptu Pasaran:</strong> ${nP}</li>
-                <li><strong>Total Neptu:</strong> ${nH + nP}</li>
-                ${LIBUR_NASIONAL[dateStr] ? `<li style="color:red; font-weight:bold;"><strong>Keterangan:</strong> ${LIBUR_NASIONAL[dateStr]}</li>` : ''}
+                <li><strong>Wuku:</strong> ${w}</li>
+                <li><strong>Total Neptu:</strong> ${nH + nP} (${nH} + ${nP})</li>
             </ul>
+            <div class="wuku-info">
+                <span class="wuku-title">Sifat Wuku ${w}</span>
+                ${SIFAT_WUKU_DB[w] || "Detail sifat wuku " + w + " akan muncul di sini."}
+            </div>
             <div style="grid-column: 1/-1; text-align:center; margin-top:15px;">
                 <button onclick="downloadJPG()" style="background:#D30000; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer;">Simpan JPG</button>
             </div>
@@ -156,7 +170,7 @@
     async function downloadJPG() {
         const canvas = await html2canvas(document.getElementById('detail'));
         const link = document.createElement('a');
-        link.download = 'Weton_Hasil.jpg';
+        link.download = 'Weton_Tius.jpg';
         link.href = canvas.toDataURL();
         link.click();
     }
