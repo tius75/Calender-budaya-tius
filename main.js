@@ -283,27 +283,60 @@ function updateDetail(date, pasaran) {
 }
 
 // ==========================================
-// FITUR DOWNLOAD & SHARE
+// FITUR DOWNLOAD & SHARE (VERSI PERBAIKAN)
 // ==========================================
+
 function downloadPDF() {
     const element = document.getElementById('printableArea');
-    if(!element) return;
+    if (!element) {
+        alert("Data tidak ditemukan untuk diunduh!");
+        return;
+    }
+
+    // Opsi konfigurasi untuk mencegah hasil blank
     const opt = {
-        margin: 0.5,
-        filename: 'Weton-Jawa.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        margin:       [0.5, 0.5],
+        filename:     'Hasil-Weton-Jawa.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { 
+            scale: 2, 
+            useCORS: true, 
+            letterRendering: true,
+            scrollY: 0 
+        },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
-    html2pdf().set(opt).from(element).save();
+
+    // Gunakan Promise untuk memastikan elemen siap
+    html2pdf().set(opt).from(element).toPdf().get('pdf').save();
 }
 
 function shareWhatsApp() {
-    const detailArea = document.getElementById('printableArea');
-    if(!detailArea) return;
-    const text = `*HASIL CEK WETON KALENDER JAWA*\n\n${detailArea.innerText.substring(0, 500)}...\n\nCek selengkapnya di aplikasi!`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    // Ambil data langsung dari variabel agar tidak mengambil isi tabel Sri Jati yang panjang
+    const inputDate = document.getElementById('dateInput').value;
+    const dateObj = inputDate ? new Date(inputDate) : new Date();
+    
+    const h = HARI[dateObj.getDay()];
+    const p = getPasaran(dateObj);
+    const neptu = NEPTU_HARI[h] + NEPTU_PASARAN[p];
+    const wuku = getWuku(dateObj);
+    const masehi = dateObj.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
+
+    // Susun pesan WhatsApp yang rapi (Tanpa isi tabel yang panjang)
+    const pesan = 
+`*HASIL CEK WETON JAWA*
+---------------------------
+📅 *Masehi:* ${masehi}
+👹 *Weton:* ${h} ${p}
+🔢 *Neptu:* ${neptu}
+🌀 *Wuku:* ${wuku}
+---------------------------
+Cek detail lengkapnya di aplikasi Kalender Jawa!`;
+
+    const url = `https://wa.me/?text=${encodeURIComponent(pesan)}`;
+    window.open(url, '_blank');
 }
+
 
 // ==========================================
 // INITIAL START
