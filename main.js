@@ -107,3 +107,46 @@ document.getElementById('nextMonth').onclick = () => { current.setMonth(current.
 
 generateCalendar();
 updateDetail(TODAY, getPasaran(TODAY));
+
+// Tambahkan fungsi hitung Wuku sederhana (Siklus 210 hari)
+function getWuku(date) {
+    const wukuList = ["Sinta", "Landep", "Wukir", "Kurantil", "Tolu", "Gumbreg", "Warigalit", "Wariagung", "Julungwangi", "Sungsang", "Galungan", "Kuningan", "Langkir", "Mandasiya", "Julungpujut", "Pahang", "Kuruwelut", "Marakeh", "Tambir", "Medangkungan", "Maktal", "Wuye", "Manahil", "Prangbakat", "Bala", "Wugu", "Wayang", "Kulawu", "Dukut", "Watugunung"];
+    const baseDate = new Date(1900, 0, 7); // Patokan Wuku Sinta
+    const diff = Math.floor((date.getTime() - baseDate.getTime()) / (1000 * 60 * 60 * 24));
+    const wukuIndex = Math.floor((diff % 210) / 7);
+    return wukuList[wukuIndex >= 0 ? wukuIndex : wukuIndex + 30];
+}
+
+function updateDetail(date, pasaran) {
+    const detailDiv = document.getElementById('detail');
+    const h = HARI[date.getDay()];
+    const wetonKey = `${h} ${pasaran}`;
+    const wukuName = getWuku(date);
+    const neptu = NEPTU_HARI[h] + NEPTU_PASARAN[pasaran];
+
+    // Ambil teks dari file eksternal
+    const teksWuku = (typeof DATA_WUKU !== 'undefined') ? (DATA_WUKU[wukuName] || "Detail Wuku belum tersedia.") : "";
+    const teksHari = (typeof DATA_HARI !== 'undefined') ? (DATA_HARI[wetonKey] || "Detail watak hari belum tersedia.") : "";
+    const dataRejeki = (typeof TABEL_SRIJATI !== 'undefined') ? (TABEL_SRIJATI[neptu] || []) : [];
+
+    // Tampilkan di HTML
+    detailDiv.style.display = 'block';
+    detailDiv.innerHTML = `
+        <div class="card-result">
+            <h3 style="color:#D30000;">${wetonKey} (Neptu ${neptu})</h3>
+            <p><strong>Wuku:</strong> ${wukuName}</p>
+            <hr>
+            <div class="info-section">
+                <h4>🌸 Watak Kelahiran</h4>
+                <p style="font-size:0.85rem;">${teksHari}</p>
+            </div>
+            <div class="info-section">
+                <h4>🛡️ Analisis Wuku</h4>
+                <p style="font-size:0.85rem;">${teksWuku}</p>
+            </div>
+            <div class="info-section">
+                <h4>📈 Siklus Sri Jati (Rejeki)</h4>
+                </div>
+        </div>
+    `;
+}
