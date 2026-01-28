@@ -1,32 +1,177 @@
-/* Pengaturan Grid agar Muncul Lagi */
-.calendar-grid {
-    display: grid !important;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
-    padding: 10px;
+:root {
+  --primary: #D30000;
+  --primary-soft: #fff5f5;
+  --dark: #2d3436;
+  --grey: #636e72;
+  --white: #ffffff;
+  --shadow: 0 10px 25px rgba(0,0,0,0.08);
+  --radius: 12px;
 }
 
-/* Styling Tanggal & Pasaran */
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background-color: #f0f2f5;
+  margin: 0;
+  padding: 10px;
+  color: var(--dark);
+}
+
+#mainApp {
+  max-width: 500px;
+  margin: 0 auto;
+  background: var(--white);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+/* Header & Search Area */
+.filter-container {
+  background: linear-gradient(135deg, #d30000, #a00000);
+  color: white;
+  padding: 30px 20px;
+  text-align: center;
+}
+
+.filter-container h1 { margin: 0; font-size: 1.6rem; font-weight: 800; }
+.search-box { margin-top: 15px; display: flex; gap: 8px; justify-content: center; }
+
+.search-box input {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.3);
+  width: 140px;
+}
+
+.search-box button {
+  background: var(--dark);
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+/* Navigasi Bulan */
+.calendar-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: #fff;
+}
+
+.calendar-nav button {
+  background: var(--primary-soft);
+  border: none;
+  color: var(--primary);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+/* Grid Kalender - KUNCI AGAR GRID MUNCUL */
+.calendar-grid {
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  padding: 15px;
+  background: #fff;
+}
+
+/* Header Hari (Ming, Sen, Sel...) */
+.header-day {
+  text-align: center;
+  font-weight: 800;
+  font-size: 0.75rem;
+  color: var(--grey);
+  padding-bottom: 10px;
+  text-transform: uppercase;
+}
+
+/* Kotak Tanggal */
 .calendar-day {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 8px 2px !important;
-    min-height: 50px;
-    border: 1px solid #f0f0f0;
+  aspect-ratio: 1 / 1.2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #f1f1f1;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.calendar-day:hover {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+  transform: scale(1.05);
 }
 
 .date-num {
-    font-size: 1.1rem;
-    font-weight: 600;
+  font-size: 1.1rem;
+  font-weight: 700;
 }
 
+/* Teks Pasaran Kecil di Bawah Angka */
 .pasaran-text {
-    font-size: 0.65rem; /* Teks kecil di bawah angka */
-    color: #d30000;
-    text-transform: uppercase;
-    margin-top: 2px;
+  font-size: 0.6rem;
+  color: var(--primary);
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 2px;
 }
 
-.sunday .pasaran-text { color: #d30000; }
+.sunday { color: var(--primary); }
+
+/* Detail Hasil */
+.detail-container {
+  display: none; 
+  padding: 20px;
+  background: #fff;
+  border-top: 3px solid var(--primary-soft);
+}
+
+.card-result {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.card-result h3 {
+  margin: 0 0 10px 0;
+  color: var(--primary);
+  font-size: 1.4rem;
+}
+
+.info-section {
+  margin-top: 15px;
+  padding-top: 12px;
+  border-top: 1px dashed #ddd;
+}
+
+.info-section h4 {
+  color: var(--primary);
+  margin: 0 0 5px 0;
+  font-size: 0.9rem;
+}
+
+.info-section p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #444;
+  line-height: 1.5;
+}
+
+footer {
+  text-align: center;
+  padding: 25px;
+  font-size: 0.8rem;
+  color: var(--grey);
+}
