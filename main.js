@@ -301,50 +301,66 @@ async function downloadPDF() {
     const original = document.getElementById("printableArea");
     if (!original) return alert("Silakan cari weton terlebih dahulu!");
 
-    // Tampilkan loading (opsional)
+    // 1. Feedback Visual ke user
     const btn = document.querySelector('button[onclick="downloadPDF()"]');
-    const originalText = btn.innerText;
-    btn.innerText = "Memproses...";
-    btn.disabled = true;
-
-    // Kloning elemen agar tidak merusak UI di layar
-    const clone = original.cloneNode(true);
-    
-    // Pastikan klon terlihat sempurna untuk dirender
-    Object.assign(clone.style, {
-        position: 'absolute',
-        top: '-10000px',
-        left: '0',
-        width: '750px', // Lebar standar PDF agar tidak terpotong
-        display: 'block',
-        visibility: 'visible'
-    });
-    
-    document.body.appendChild(clone);
-
-    const opt = {
-        margin: [10, 10, 10, 10],
-        filename: `Weton_${original.querySelector('h2').innerText.replace(/\s/g, '_')}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-            scale: 2, 
-            useCORS: true, 
-            logging: false,
-            letterRendering: true,
-            backgroundColor: "#ffffff"
-        },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
+    const originalText = btn ? btn.innerText : "Download PDF";
+    if(btn) { btn.innerText = "⏳ Sedang Menyiapkan..."; btn.disabled = true; }
 
     try {
-        await html2pdf().set(opt).from(clone).save();
+        // 2. Buat Kontainer Wrapper (Sangat Penting untuk mencegah blank)
+        const element = original.cloneNode(true);
+        const container = document.createElement('div');
+        
+        // Atur gaya kontainer agar rapi di PDF
+        Object.assign(container.style, {
+            position: 'absolute',
+            left: '-9999px',
+            top: '0',
+            width: '700px', // Mengunci lebar agar konsisten dengan ukuran kertas
+            padding: '20px',
+            backgroundColor: '#ffffff'
+        });
+
+        // 3. Bersihkan CSS yang bisa merusak render PDF (seperti box-shadow atau fixed)
+        element.style.boxShadow = 'none';
+        element.style.border = '1px solid #ddd';
+        element.style.margin = '0';
+        
+        container.appendChild(element);
+        document.body.appendChild(container);
+
+        // 4. Konfigurasi PDF yang Dioptimasi
+        const opt = {
+            margin: [10, 10, 10, 10], // Atas, Kiri, Bawah, Kanan
+            filename: `Hasil_Weton_${new Date().getTime()}.pdf`,
+            image: { type: 'jpeg', quality: 1.0 }, // Kualitas maksimal
+            html2canvas: { 
+                scale: 2, // Ketajaman teks (retina display quality)
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff',
+                scrollY: 0,
+                scrollX: 0
+            },
+            jsPDF: { 
+                unit: 'mm', 
+                format: 'a4', 
+                orientation: 'portrait' 
+            }
+        };
+
+        // 5. Eksekusi dengan Delay kecil (agar DOM selesai memproses kloning)
+        await new Promise(resolve => setTimeout(resolve, 500));
+        await html2pdf().set(opt).from(container).save();
+
+        // 6. Hapus sampah DOM
+        document.body.removeChild(container);
+
     } catch (error) {
         console.error("PDF Error:", error);
-        alert("Gagal mengunduh PDF. Pastikan library html2pdf sudah terpasang.");
+        alert("Gagal mengunduh PDF. Pastikan koneksi internet stabil dan library html2pdf sudah terpasang.");
     } finally {
-        document.body.removeChild(clone);
-        btn.innerText = originalText;
-        btn.disabled = false;
+        if(btn) { btn.innerText = originalText; btn.disabled = false; }
     }
 }
 
