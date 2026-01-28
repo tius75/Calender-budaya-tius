@@ -1,37 +1,20 @@
-// Database Sederhana (Agar tidak error saat file lain belum siap)
-const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-const PASARAN = ['Legi', 'Pahing', 'Pon', 'Wage', 'Kliwon'];
+// Contoh Database Hari Libur Nasional 2026 (Bisa Anda tambah sendiri)
+const HARI_LIBUR = {
+    "2026-01-01": "Tahun Baru 2026",
+    "2026-01-20": "Tahun Baru Imlek",
+    "2026-02-15": "Isra Mi'raj",
+    "2026-03-20": "Hari Raya Nyepi"
+};
 
-let current = new Date();
-
-// Rumus Pasaran Akurat
-function getPasaran(date) {
-    const base = new Date(1900, 0, 1); // Senin Pahing
-    const diff = Math.floor((date.getTime() - base.getTime()) / (1000 * 60 * 60 * 24));
-    return PASARAN[(((diff + 1) % 5) + 5) % 5];
-}
-
-// Fungsi Render Kalender
 function generateCalendar() {
     const grid = document.getElementById('calendar');
     const monthNav = document.getElementById('monthYearNav');
-    
-    if (!grid) return; // Mencegah error jika id tidak ditemukan
-
     grid.innerHTML = '';
+    
     const y = current.getFullYear();
     const m = current.getMonth();
-    const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
     
-    monthNav.innerText = `${namaBulan[m]} ${y}`;
-
-    // Header Hari
-    HARI.forEach((h, i) => {
-        const el = document.createElement('div');
-        el.innerText = h.substring(0, 3);
-        el.className = i === 0 ? 'header-day sunday' : 'header-day';
-        grid.appendChild(el);
-    });
+    // ... (kode header hari tetap sama) ...
 
     const firstDay = new Date(y, m, 1).getDay();
     const daysInMonth = new Date(y, m + 1, 0).getDate();
@@ -40,25 +23,52 @@ function generateCalendar() {
 
     for (let d = 1; d <= daysInMonth; d++) {
         const dateObj = new Date(y, m, d);
+        const dateString = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         const p = getPasaran(dateObj);
+        const libur = HARI_LIBUR[dateString];
         
         const cell = document.createElement('div');
         cell.className = 'calendar-day';
+        
+        // Cek jika hari Minggu
         if (dateObj.getDay() === 0) cell.classList.add('sunday');
+        
+        // Cek jika hari Libur Nasional
+        if (libur) cell.classList.add('sunday'); 
 
         cell.innerHTML = `
             <div class="date-num">${d}</div>
             <div class="pasaran-text">${p}</div>
+            ${libur ? `<div class="holiday-text">Libur</div>` : ''}
         `;
 
-        cell.onclick = () => alert(`Tanggal: ${d} ${namaBulan[m]}, Pasaran: ${p}`);
+        // Kembalikan ke fungsi showDetail (bukan alert)
+        cell.onclick = () => updateDetail(dateObj, p, libur);
         grid.appendChild(cell);
     }
 }
 
-// Navigasi
-document.getElementById('prevMonth').onclick = () => { current.setMonth(current.getMonth() - 1); generateCalendar(); };
-document.getElementById('nextMonth').onclick = () => { current.setMonth(current.getMonth() + 1); generateCalendar(); };
+function updateDetail(date, pasaran, keteranganLibur) {
+    const detailDiv = document.getElementById('detail');
+    const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    
+    // Logika Kalender Chinese
+    const chineseDate = new Intl.DateTimeFormat('id-ID-u-ca-chinese', {
+        day: 'numeric', month: 'long', year: 'numeric'
+    }).format(date);
 
-// Jalankan
-generateCalendar();
+    detailDiv.style.display = 'block';
+    detailDiv.innerHTML = `
+        <div class="card-result">
+            <h3 style="color:#d30000;">${date.getDate()} ${namaBulan[date.getMonth()]} ${date.getFullYear()}</h3>
+            <p><strong>Weton:</strong> ${HARI[date.getDay()]} ${pasaran}</p>
+            <p><strong>Kalender Chinese:</strong> ${chineseDate}</p>
+            ${keteranganLibur ? `<p style="color:red;"><strong>Keterangan:</strong> ${keteranganLibur}</p>` : ''}
+            <hr>
+            <p style="font-size:0.9rem; color:#666;">Silahkan klik tanggal lain untuk melihat detail weton dan ramalan.</p>
+        </div>
+    `;
+    
+    // Otomatis scroll ke bawah agar user tahu detail sudah muncul
+    detailDiv.scrollIntoView({ behavior: 'smooth' });
+}
