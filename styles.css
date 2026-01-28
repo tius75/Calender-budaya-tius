@@ -2,24 +2,20 @@
   --primary: #D30000;
   --primary-soft: #fff5f5;
   --dark: #2d3436;
-  --grey: #636e72;
   --white: #ffffff;
-  --shadow: 0 10px 25px rgba(0,0,0,0.08);
-  --radius: 12px;
+  --shadow: 0 10px 25px rgba(0,0,0,0.1);
 }
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'Inter', -apple-system, sans-serif;
-  background-color: #f0f2f5;
-  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f7f6;
   padding: 10px;
-  color: var(--dark);
 }
 
 #mainApp {
-  max-width: 500px;
+  max-width: 450px;
   margin: 0 auto;
   background: var(--white);
   border-radius: 20px;
@@ -27,151 +23,116 @@ body {
   overflow: hidden;
 }
 
-/* Header & Search Area */
+/* Header Red Area */
 .filter-container {
-  background: linear-gradient(135deg, #d30000, #a00000);
+  background: linear-gradient(135deg, #d30000 0%, #8b0000 100%);
   color: white;
-  padding: 30px 20px;
+  padding: 25px 15px;
   text-align: center;
 }
 
-.filter-container h1 { margin: 0; font-size: 1.6rem; font-weight: 800; }
-.search-box { margin-top: 15px; display: flex; gap: 8px; justify-content: center; }
+.search-box {
+  margin-top: 15px;
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+}
 
 .search-box input {
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.3);
-  width: 140px;
+  padding: 8px;
+  border-radius: 5px;
+  border: none;
+  width: 130px;
 }
 
 .search-box button {
+  padding: 8px 12px;
+  border-radius: 5px;
+  border: none;
   background: var(--dark);
   color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 8px;
   font-weight: bold;
 }
 
-/* Navigasi Bulan */
+/* Navigation */
 .calendar-nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 20px;
-  background: #fff;
+  padding: 15px;
 }
 
 .calendar-nav button {
   background: var(--primary-soft);
-  border: none;
   color: var(--primary);
-  width: 40px;
-  height: 40px;
+  border: none;
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
-  font-size: 1.2rem;
   cursor: pointer;
 }
 
-/* Grid Kalender - KUNCI AGAR GRID MUNCUL */
+/* KUNCI: Grid Kalender */
 .calendar-grid {
   display: grid !important;
   grid-template-columns: repeat(7, 1fr);
-  gap: 5px;
-  padding: 15px;
-  background: #fff;
+  gap: 2px;
+  padding: 10px;
+  min-height: 300px; /* Mencegah tampilan putih kosong */
 }
 
-/* Header Hari (Ming, Sen, Sel...) */
 .header-day {
   text-align: center;
-  font-weight: 800;
-  font-size: 0.75rem;
-  color: var(--grey);
-  padding-bottom: 10px;
+  font-weight: bold;
+  font-size: 0.7rem;
+  color: #888;
+  padding: 10px 0;
   text-transform: uppercase;
 }
 
-/* Kotak Tanggal */
 .calendar-day {
   aspect-ratio: 1 / 1.2;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 1px solid #f1f1f1;
-  border-radius: 10px;
+  border: 1px solid #f9f9f9;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s;
-}
-
-.calendar-day:hover {
-  background: var(--primary-soft);
-  border-color: var(--primary);
-  transform: scale(1.05);
 }
 
 .date-num {
   font-size: 1.1rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 
-/* Teks Pasaran Kecil di Bawah Angka */
 .pasaran-text {
   font-size: 0.6rem;
   color: var(--primary);
-  font-weight: 600;
-  text-transform: uppercase;
+  font-weight: bold;
   margin-top: 2px;
 }
 
 .sunday { color: var(--primary); }
 
-/* Detail Hasil */
+/* Detail Results */
 .detail-container {
-  display: none; 
+  display: none;
   padding: 20px;
-  background: #fff;
-  border-top: 3px solid var(--primary-soft);
+  border-top: 5px solid var(--primary-soft);
 }
 
 .card-result {
-  background: #fff;
   border: 1px solid #eee;
-  border-radius: var(--radius);
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-
-.card-result h3 {
-  margin: 0 0 10px 0;
-  color: var(--primary);
-  font-size: 1.4rem;
+  padding: 15px;
+  border-radius: 10px;
 }
 
 .info-section {
-  margin-top: 15px;
-  padding-top: 12px;
-  border-top: 1px dashed #ddd;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #ccc;
 }
 
-.info-section h4 {
-  color: var(--primary);
-  margin: 0 0 5px 0;
-  font-size: 0.9rem;
-}
-
-.info-section p {
-  margin: 0;
-  font-size: 0.85rem;
-  color: #444;
-  line-height: 1.5;
-}
-
-footer {
-  text-align: center;
-  padding: 25px;
-  font-size: 0.8rem;
-  color: var(--grey);
-}
+.info-section h4 { color: var(--primary); font-size: 0.9rem; }
+.info-section p { font-size: 0.85rem; color: #444; }
