@@ -96,6 +96,10 @@ function updateDetail(date, pasaran) {
     const sisaBagi4 = neptu % 4;
     const nasibKematian = NASIB_AHLI_WARIS[sisaBagi4];
 
+// Munculkan tombol aksi setelah detail terisi
+document.getElementById('actionButtons').style.display = 'flex';
+
+
     // Ambil data dari file pendukung (Global Variables)
     const teksWuku = (typeof DATA_WUKU !== 'undefined') ? (DATA_WUKU[wukuName] || "Detail wuku belum tersedia.") : "Data Wuku tidak terbaca.";
     const teksHari = (typeof DATA_HARI !== 'undefined') ? (DATA_HARI[wetonKey] || "Data watak hari belum tersedia.") : "Data Hari tidak terbaca.";
