@@ -1,160 +1,119 @@
-// ==========================================
-// 1. DATA REFERENSI UTAMA
-// ==========================================
-const HARI = ['Minggu', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Senin']; // Urutan disesuaikan index Date()
+// Data Dasar
 const PASARAN = ['Legi', 'Pahing', 'Pon', 'Wage', 'Kliwon'];
+const HARI_NAMA = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 const NEPTU_HARI = { 'Minggu': 5, 'Senin': 4, 'Selasa': 3, 'Rabu': 7, 'Kamis': 8, 'Jumat': 6, 'Sabtu': 9 };
 const NEPTU_PASARAN = { 'Pahing': 9, 'Pon': 7, 'Wage': 4, 'Kliwon': 8, 'Legi': 5 };
 
 let current = new Date();
-const TODAY = new Date();
 
-// ==========================================
-// 2. MODUL LOGIKA (Modular Internal)
-// ==========================================
-const ModulFitur = {
-    hitungUsia: (tglLahir) => {
-        const hariIni = new Date();
-        let thn = hariIni.getFullYear() - tglLahir.getFullYear();
-        let bln = hariIni.getMonth() - tglLahir.getMonth();
-        let hari = hariIni.getDate() - tglLahir.getDate();
-        if (hari < 0) { bln--; hari += new Date(hariIni.getFullYear(), hariIni.getMonth(), 0).getDate(); }
-        if (bln < 0) { thn--; bln += 12; }
-        return `${thn} Thn, ${bln} Bln, ${hari} Hr`;
-    },
-    getArah: (n) => {
-        const map = {7:"Barat", 8:"Utara", 9:"Timur", 10:"Selatan", 11:"Barat", 12:"Utara", 13:"Timur", 14:"Selatan", 15:"Barat", 16:"Utara", 17:"Timur", 18:"Selatan"};
-        return map[n] || "Tengah";
-    },
-    getKamarokam: (n) => {
-        const data = {
-            1: { n: "NUJU PADU", w: "Sering bertengkar/sulaya.", m: "Dapur, Warung." },
-            2: { n: "KALA TINANTANG", w: "Sakit-sakitan & emosi tinggi.", m: "Dapur, Warung." },
-            3: { n: "SANGGAR WARINGIN", w: "Bahagia & pelindung keluarga.", m: "Hajatan, Ibadah." },
-            4: { n: "MANTRI SINAROJA", w: "Cita-cita tercapai & cukup pangan.", m: "Hajatan, Pindah." },
-            5: { n: "MACAN KETAWAN", w: "Disegani tapi sering kehilangan.", m: "Pintu/Regol." },
-            0: { n: "NUJU PATI", w: "Rejeki mampet & bencana.", m: "Paku Bumi." }
-        };
-        return data[n % 6];
-    }
-};
-
-// ==========================================
-// 3. FUNGSI RENDER (Grid & Detail)
-// ==========================================
-
+// 1. Fungsi Hitung Pasaran
 function getPasaran(date) {
     const base = new Date(1900, 0, 1);
     const diff = Math.floor((date.getTime() - base.getTime()) / (1000 * 60 * 60 * 24));
     return PASARAN[(((diff + 1) % 5) + 5) % 5];
 }
 
-function updateDetail(date) {
-    const detailDiv = document.getElementById('detail');
-    if (!detailDiv) return;
-
-    const h = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][date.getDay()];
+// 2. Fungsi Tampilkan Detail (Dipanggil saat klik)
+function showDetail(tgl, bln, thn) {
+    const date = new Date(thn, bln, tgl);
+    const h = HARI_NAMA[date.getDay()];
     const p = getPasaran(date);
     const neptu = NEPTU_HARI[h] + NEPTU_PASARAN[p];
-    const kamar = ModulFitur.getKamarokam(neptu);
+    
+    // Arah Meditasi
+    const arahMap = {7:"Barat", 8:"Utara", 9:"Timur", 10:"Selatan", 11:"Barat", 12:"Utara", 13:"Timur", 14:"Selatan", 15:"Barat", 16:"Utara", 17:"Timur", 18:"Selatan"};
+    const arah = arahMap[neptu] || "Tengah";
 
+    // Kamarokam (Pembagi 6)
+    const kamarData = [
+        { n: "NUJU PATI", w: "Rejeki mampet & bencana.", m: "Paku Bumi." }, // index 0
+        { n: "NUJU PADU", w: "Sering bertengkar.", m: "Dapur/Warung." },
+        { n: "KALA TINANTANG", w: "Sakit-sakitan & emosi.", m: "Dapur." },
+        { n: "SANGGAR WARINGIN", w: "Bahagia & pelindung.", m: "Hajatan/Ibadah." },
+        { n: "MANTRI SINAROJA", w: "Cita-cita tercapai.", m: "Pindah Rumah." },
+        { n: "MACAN KETAWAN", w: "Disegani tapi waspada kehilangan.", m: "Pintu Gerbang." }
+    ];
+    const kamar = kamarData[neptu % 6];
+
+    const detailDiv = document.getElementById('detail');
     detailDiv.innerHTML = `
-        <div id="capture-area" style="background:#fff; padding:20px; border-radius:12px; border:2px solid #D30000; color:#000; margin-top:20px;">
-            <h2 style="color:#D30000; border-bottom:2px solid #D30000; padding-bottom:5px;">${h} ${p}</h2>
-            <p>📅 <strong>${date.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'})}</strong></p>
-            <p>👶 Usia: ${ModulFitur.hitungUsia(date)}</p>
-            <p>🎯 Neptu: ${neptu} | 🧘 Meditasi: ${ModulFitur.getArah(neptu)}</p>
-            
-            <div style="background:#f9f9f9; padding:10px; border-radius:8px; margin-top:10px; border-left:5px solid #D30000;">
-                <h4 style="margin:0;">💠 KAMAROKAM: ${kamar.n}</h4>
-                <p style="font-size:0.85rem; margin:5px 0;">${kamar.w}</p>
-                <p style="font-size:0.85rem; color:#D30000;">Cocok untuk: ${kamar.m}</p>
+        <div id="capture-area" style="padding:20px; border:2px solid #D30000; background:#fff; margin-top:20px; border-radius:10px;">
+            <h2 style="color:#D30000; margin-top:0;">${h} ${p}</h2>
+            <p><strong>Masehi:</strong> ${tgl}/${bln+1}/${thn}</p>
+            <p><strong>Neptu:</strong> ${neptu} | <strong>Arah Meditasi:</strong> ${arah}</p>
+            <hr>
+            <div style="background:#f9f9f9; padding:10px; border-radius:5px;">
+                <h3 style="margin:0; font-size:1rem;">💠 Kamarokam: ${kamar.n}</h3>
+                <p style="font-size:0.9rem;">${kamar.w}</p>
+                <p style="font-size:0.9rem; color:#D30000;"><strong>Manfaat:</strong> ${kamar.m}</p>
+            </div>
+            <div style="margin-top:15px; display:flex; gap:10px;">
+                <button onclick="window.print()" style="padding:8px; flex:1; cursor:pointer;">Cetak/PDF</button>
+                <button onclick="shareWA('${h} ${p}, Neptu ${neptu}, Arah ${arah}')" style="padding:8px; flex:1; background:#25D366; color:white; border:none; cursor:pointer;">WA</button>
             </div>
         </div>
-        <div style="display:flex; gap:10px; margin-top:15px;">
-            <button onclick="window.downloadPDF()" style="flex:1; padding:10px; background:#D30000; color:#fff; border:none; border-radius:5px; cursor:pointer;">PDF</button>
-            <button onclick="window.shareWA()" style="flex:1; padding:10px; background:#25D366; color:#fff; border:none; border-radius:5px; cursor:pointer;">WhatsApp</button>
-        </div>
     `;
+    detailDiv.scrollIntoView({ behavior: 'smooth' });
 }
 
-function generateCalendar() {
-    const grid = document.getElementById('calendar');
-    if (!grid) return;
-    grid.innerHTML = '';
+window.shareWA = (txt) => {
+    window.open(`https://wa.me/?text=${encodeURIComponent("Hasil Ramalan: " + txt)}`, '_blank');
+}
 
+// 3. Render Kalender
+function drawCalendar() {
+    const grid = document.getElementById('calendar');
+    const mNav = document.getElementById('monthYearNav');
+    if (!grid) return;
+
+    grid.innerHTML = '';
     const y = current.getFullYear();
     const m = current.getMonth();
     
-    // Header
-    ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].forEach((h, i) => {
-        const el = document.createElement('div');
-        el.innerText = h;
-        el.className = 'header-day' + (i === 0 ? ' sunday' : '');
-        grid.appendChild(el);
+    if (mNav) mNav.innerText = new Intl.DateTimeFormat('id-ID', { month: 'long', year: 'numeric' }).format(current);
+
+    // Header Hari
+    ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].forEach(h => {
+        const d = document.createElement('div');
+        d.innerText = h;
+        d.className = 'header-day' + (h === 'Min' ? ' sunday' : '');
+        grid.appendChild(d);
     });
 
-    const firstDay = new Date(y, m, 1).getDay();
-    const daysInMonth = new Date(y, m + 1, 0).getDate();
+    const first = new Date(y, m, 1).getDay();
+    const last = new Date(y, m + 1, 0).getDate();
 
-    for (let i = 0; i < firstDay; i++) grid.appendChild(document.createElement('div'));
+    for (let i = 0; i < first; i++) grid.appendChild(document.createElement('div'));
 
-    for (let d = 1; d <= daysInMonth; d++) {
-        const dateObj = new Date(y, m, d);
+    for (let i = 1; i <= last; i++) {
         const cell = document.createElement('div');
         cell.className = 'calendar-day';
-        if (dateObj.getDay() === 0) cell.classList.add('sunday-block');
-        if (dateObj.toDateString() === TODAY.toDateString()) cell.classList.add('today-highlight');
+        const dObj = new Date(y, m, i);
+        if (dObj.getDay() === 0) cell.style.color = 'red';
         
-        cell.innerHTML = `<div>${d}</div><div style="font-size:0.6rem;">${getPasaran(dateObj)}</div>`;
+        cell.innerHTML = `<b>${i}</b><br><small style="font-size:0.6rem">${getPasaran(dObj)}</small>`;
         
-        // EVENT CLICK - Dipastikan terpasang
-        cell.onclick = (e) => {
-            e.preventDefault();
-            document.querySelectorAll('.calendar-day').forEach(c => c.style.border = '1px solid #eee');
-            cell.style.border = '2px solid #D30000';
-            updateDetail(dateObj);
+        // GUNAKAN DATA ATTRIBUTE AGAR AMAN
+        cell.dataset.tgl = i;
+        cell.dataset.bln = m;
+        cell.dataset.thn = y;
+        
+        // KLIK EVENT
+        cell.onclick = function() {
+            // Hapus highlight dari semua cell
+            document.querySelectorAll('.calendar-day').forEach(c => c.style.background = 'white');
+            // Beri warna cell yang diklik
+            this.style.background = '#ffebee';
+            showDetail(this.dataset.tgl, this.dataset.bln, this.dataset.thn);
         };
+        
         grid.appendChild(cell);
     }
-    
-    const mNav = document.getElementById('monthYearNav');
-    if (mNav) mNav.innerText = `${new Intl.DateTimeFormat('id-ID', {month:'long', year:'numeric'}).format(current)}`;
 }
 
-// ==========================================
-// 4. GLOBAL ACTION (PDF & WA)
-// ==========================================
-window.downloadPDF = () => {
-    const el = document.getElementById('capture-area');
-    if (el && typeof html2pdf !== 'undefined') {
-        html2pdf().from(el).set({ margin: 1, filename: 'weton.pdf' }).save();
-    } else {
-        alert("Library PDF belum dimuat atau detail kosong!");
-    }
-};
-
-window.shareWA = () => {
-    const el = document.getElementById('capture-area');
-    if (el) {
-        const text = encodeURIComponent("Hasil Ramalan Weton:\n" + el.innerText);
-        window.open(`https://wa.me/?text=${text}`, '_blank');
-    }
-};
-
-// ==========================================
-// 5. BOOTSTRAP
-// ==========================================
+// 4. Navigasi & Boot
 window.onload = () => {
-    generateCalendar();
-    
-    document.getElementById('prevMonth')?.addEventListener('click', () => {
-        current.setMonth(current.getMonth() - 1);
-        generateCalendar();
-    });
-    
-    document.getElementById('nextMonth')?.addEventListener('click', () => {
-        current.setMonth(current.getMonth() + 1);
-        generateCalendar();
-    });
+    drawCalendar();
+    document.getElementById('prevMonth').onclick = () => { current.setMonth(current.getMonth() - 1); drawCalendar(); };
+    document.getElementById('nextMonth').onclick = () => { current.setMonth(current.getMonth() + 1); drawCalendar(); };
 };
