@@ -287,51 +287,69 @@ function updateDetail(date, pasaran) {
 // ==========================================
 
 async function downloadPDF() {
-    // 1. Ambil elemen sumber
     const source = document.getElementById('printableArea');
-    if (!source) return alert("Data tidak ditemukan!");
+    if (!source) {
+        alert("Data tidak ditemukan!");
+        return;
+    }
 
-    // 2. Buat "Clone" atau salinan sementara agar tidak terganggu CSS layar
+    // Clone node
     const clone = source.cloneNode(true);
-    
-    // 3. Modifikasi clone agar pasti terlihat oleh library
+
+    // Paksa semua elemen di clone agar terlihat
+    clone.querySelectorAll('*').forEach(el => {
+        el.style.visibility = 'visible';
+        el.style.opacity = '1';
+    });
+
     Object.assign(clone.style, {
-        position: "absolute",
-        left: "-9999px",
+        position: "fixed",
+        left: "0",
         top: "0",
+        zIndex: "-9999",
         display: "block",
-        width: "800px", // Paksa lebar standar A4 agar tabel tidak berantakan
-        background: "white",
-        color: "black",
+        width: "794px", // lebar A4 px (aman)
+        backgroundColor: "#ffffff",
+        color: "#000000",
         overflow: "visible"
     });
 
     document.body.appendChild(clone);
 
-    // 4. Konfigurasi PDF
+    // ⏳ PENTING: beri waktu browser render DOM
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    await new Promise(resolve => setTimeout(resolve, 300));
+
     const opt = {
-        margin: [0.5, 0.5],
+        margin: 10, // gunakan px (lebih stabil di mobile)
         filename: 'Detail-Weton-Lengkap.pdf',
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-            scale: 2, 
-            useCORS: true, 
-            logging: false,
+        html2canvas: {
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
             backgroundColor: "#ffffff",
-            scrollY: 0,
-            windowWidth: 800 // Samakan dengan lebar clone
+            scrollX: 0,
+            scrollY: -window.scrollY,
+            windowWidth: clone.scrollWidth,
+            logging: false
         },
-        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+        jsPDF: {
+            unit: 'px',
+            format: 'a4',
+            orientation: 'portrait'
+        }
     };
 
     try {
-        // 5. Proses cetak dari clone, bukan dari elemen asli yang mungkin tersembunyi
-        await html2pdf().set(opt).from(clone).save();
+        await html2pdf()
+            .set(opt)
+            .from(clone)
+            .save();
     } catch (err) {
-        console.error("PDF Error: ", err);
+        console.error("PDF Error:", err);
         alert("Gagal mengunduh PDF.");
     } finally {
-        // 6. Hapus clone dari dokumen agar tidak memenuhi memori
         document.body.removeChild(clone);
     }
 }
