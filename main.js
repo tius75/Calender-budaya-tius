@@ -179,18 +179,31 @@ window.searchWeton = () => {
 generateCalendar();
 updateDetail(TODAY, getPasaran(TODAY));
 
-// --- Fungsi Download PDF ---
 window.downloadPDF = () => {
     const element = document.getElementById('detail');
+    
+    // Cek apakah data sudah ada
+    if (!element || element.innerHTML.trim() === "") {
+        alert("Silakan pilih tanggal terlebih dahulu!");
+        return;
+    }
+
     const opt = {
-        margin:       1,
-        filename:     'Ramalan_Srijati.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        margin:       0.5,
+        filename:     'Ramalan_Weton_SriJati.pdf',
+        image:        { type: 'jpeg', quality: 1 },
+        html2canvas:  { 
+            scale: 2, 
+            backgroundColor: '#ffffff', // KUNCI UTAMA: Memaksa latar putih
+            useCORS: true 
+        },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
     };
-    html2pdf().set(opt).from(element).save();
+
+    // Eksekusi dengan proteksi promise
+    html2pdf().set(opt).from(element).save().catch(err => console.log(err));
 };
+
 
 // --- Fungsi Share WhatsApp ---
 window.shareWhatsApp = () => {
