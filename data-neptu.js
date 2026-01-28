@@ -26,3 +26,13 @@ const DATA_WATAK_NEPTU = {
     },
     // Anda bisa menambahkan neptu 13-18 di sini nanti
 };
+
+// Tambahkan ini di dalam file data-neptu.js atau buat variabel baru
+const DATA_PEMBAGI_5 = {
+    1: { nama: "Sri", arti: "Murah rejeki (Rejeki datang dari mana saja)." },
+    2: { nama: "Lungguh", arti: "Kecukupan dalam perjalanan hidup." },
+    3: { nama: "Gendhong", arti: "Mapan dalam segala hal yang berkaitan dengan lahiriah." },
+    4: { nama: "Loro", arti: "Sakit-sakitan (baik fisik maupun batin, atau sering gagal dalam usaha)." },
+    0: { nama: "Pati", arti: "Apapun yang dilakukan selalu gagal dan mendapatkan jalan buntu." }
+};
+
