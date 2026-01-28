@@ -1,5 +1,4 @@
-// main.js
-import { TABEL_SRIJATI } from './data-srijati.js';
+// JANGAN ada baris 'import' di sini!
 
 const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 const PASARAN = ['Legi', 'Pahing', 'Pon', 'Wage', 'Kliwon'];
@@ -60,7 +59,7 @@ function updateDetail(date, pasaran) {
     const h = HARI[date.getDay()];
     const neptu = NEPTU_HARI[h] + NEPTU_PASARAN[pasaran];
     
-    // Proteksi: Cek apakah TABEL_SRIJATI sudah terisi dari import
+    // TABEL_SRIJATI diambil dari file data-srijati.js yang dimuat sebelumnya
     const dataRejeki = (typeof TABEL_SRIJATI !== 'undefined') ? (TABEL_SRIJATI[neptu] || []) : [];
     
     let tabelHtml = `<table style="width:100%; border-collapse: collapse; margin-top:10px; font-size:0.8rem; border:1px solid #ddd;">
@@ -81,7 +80,7 @@ function updateDetail(date, pasaran) {
             <h3 style="color:#D30000;">Neptu: ${neptu}</h3>
             <p><strong>Weton:</strong> ${h} ${pasaran}</p>
             <div style="margin-top:10px;">
-                <h4 style="color:#D30000; border-bottom:1px solid #eee;">📈 Siklus Sri Jati (Rejeki)</h4>
+                <h4 style="color:#D30000; border-bottom:1px solid #eee;">📈 Siklus Rejeki (Sri Jati)</h4>
                 ${dataRejeki.length > 0 ? tabelHtml : "<p>Data neptu ini belum tersedia.</p>"}
             </div>
         </div>
@@ -89,19 +88,20 @@ function updateDetail(date, pasaran) {
     detailDiv.scrollIntoView({ behavior: 'smooth' });
 }
 
-// Fungsi Cari Weton (Pindah View)
-window.searchWeton = () => {
-    const val = document.getElementById('dateInput').value;
-    if (val) {
-        const targetDate = new Date(val);
-        // INI KUNCI AGAR VIEW BERPINDAH TAHUN/BULAN
-        current = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
-        generateCalendar();
-        updateDetail(targetDate, getPasaran(targetDate));
-    }
-};
+// FUNGSI CARI: Pindah View Tahun & Bulan
+const btnSearch = document.getElementById('btnSearch');
+if (btnSearch) {
+    btnSearch.onclick = () => {
+        const val = document.getElementById('dateInput').value;
+        if (val) {
+            const targetDate = new Date(val);
+            current = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
+            generateCalendar();
+            updateDetail(targetDate, getPasaran(targetDate));
+        }
+    };
+}
 
-// Navigasi
 document.getElementById('prevMonth').onclick = () => { current.setMonth(current.getMonth() - 1); generateCalendar(); };
 document.getElementById('nextMonth').onclick = () => { current.setMonth(current.getMonth() + 1); generateCalendar(); };
 
