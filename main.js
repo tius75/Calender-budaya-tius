@@ -182,27 +182,34 @@ updateDetail(TODAY, getPasaran(TODAY));
 window.downloadPDF = () => {
     const element = document.getElementById('detail');
     
-    // Cek apakah data sudah ada
-    if (!element || element.innerHTML.trim() === "") {
-        alert("Silakan pilih tanggal terlebih dahulu!");
+    if (!element || element.innerText.trim() === "") {
+        alert("Pilih tanggal terlebih dahulu agar data muncul!");
         return;
     }
 
+    // Opsi khusus untuk menangani teks yang "hilang"
     const opt = {
         margin:       0.5,
-        filename:     'Ramalan_Weton_SriJati.pdf',
+        filename:     'Ramalan_Weton.pdf',
         image:        { type: 'jpeg', quality: 1 },
         html2canvas:  { 
             scale: 2, 
-            backgroundColor: '#ffffff', // KUNCI UTAMA: Memaksa latar putih
-            useCORS: true 
+            backgroundColor: "#ffffff", // Paksa latar belakang putih
+            useCORS: true,
+            onclone: (clonedDoc) => {
+                // Trik Jitu: Paksa semua teks di dokumen kloning menjadi hitam agar tidak putih/kosong
+                const detailClone = clonedDoc.getElementById('detail');
+                detailClone.style.color = "black";
+                const allTexts = detailClone.querySelectorAll('*');
+                allTexts.forEach(el => el.style.color = "black");
+            }
         },
         jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
     };
 
-    // Eksekusi dengan proteksi promise
-    html2pdf().set(opt).from(element).save().catch(err => console.log(err));
+    html2pdf().set(opt).from(element).save();
 };
+
 
 
 // --- Fungsi Share WhatsApp ---
