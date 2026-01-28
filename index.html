@@ -5,9 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Kalender Jawa & Wuku Abadi</title>
   <link rel="stylesheet" href="styles.css">
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
   <div id="mainApp">
@@ -31,27 +30,22 @@
 
     <div id="calendar" class="calendar-grid"></div>
 
-    <div id="detail" class="detail-container"></div>
+    <div id="detail" class="detail-container" style="background: white; padding: 10px; border-radius: 8px;"></div>
 
-<div id="detail"></div>
-<div id="actionButtons" style="display:none; text-align:center; margin-top:20px; gap:10px; justify-content:center;">
-    <button onclick="downloadPDF()" style="background:#D30000; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer;">📥 Download PDF</button>
-    <button onclick="shareWhatsApp()" style="background:#25D366; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer;">📱 Kirim ke WhatsApp</button>
-</div>
-
+    <div id="actionButtons" style="display:none; text-align:center; margin-top:20px; gap:10px; justify-content:center; padding-bottom: 40px;">
+        <button onclick="downloadPDF()" style="background:#D30000; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-weight:bold;">📥 Download PDF</button>
+        <button onclick="shareWhatsApp()" style="background:#25D366; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-weight:bold;">📱 Kirim ke WhatsApp</button>
+    </div>
 
     <footer>
       <p>&copy; 2026 Kalender Jawa Modern • By Tius</p>
     </footer>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
- <script src="data-srijati.js"></script>
-<script src="data-wuku.js"></script>
-<script src="data-hari.js"></script>
-<script src="main.js"></script>
-
+  <script src="data-srijati.js"></script>
+  <script src="data-wuku.js"></script>
+  <script src="data-hari.js"></script>
+  <script src="main.js"></script>
 
 </body>
 </html>
