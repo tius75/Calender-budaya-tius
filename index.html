@@ -2,8 +2,86 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalender Jawa Abadi</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kalender Jawa Modern</title>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <style>
+        :root { --primary: #D30000; --bg: #f4f4f4; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
+        #mainApp { max-width: 500px; margin: auto; background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        
+        .header-section { text-align: center; margin-bottom: 20px; }
+        .search-box { display: flex; gap: 5px; margin-bottom: 20px; }
+        .search-box input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
+        .search-box button { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+        .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .calendar-nav button { background: none; border: 1px solid #ddd; padding: 5px 15px; border-radius: 5px; cursor: pointer; }
+
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
+        .header-day { font-weight: bold; font-size: 12px; padding: 5px 0; color: #666; }
+        .sunday-red { color: red !important; }
+        
+        .calendar-day { border: 1px solid #eee; padding: 8px 0; border-radius: 8px; cursor: pointer; font-size: 14px; min-height: 45px; transition: 0.2s; }
+        .calendar-day:hover { background: #fff5f5; border-color: var(--primary); }
+        .today-highlight { background: #fff0f0; border: 1px solid var(--primary); }
+        .selected-day { background: var(--primary) !important; color: white !important; }
+
+        #detail { margin-top: 20px; display: none; border-top: 2px solid #eee; padding-top: 15px; }
+        .action-buttons { display: none; gap: 10px; margin-top: 15px; justify-content: center; padding-bottom: 20px; }
+        .btn-pdf { background: #333; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
+        .btn-wa { background: #25D366; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
+
+        @media print {
+            body * { visibility: hidden; }
+            #printArea, #printArea * { visibility: visible; }
+            #printArea { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+    </style>
 </head>
+<body>
+
+<div id="mainApp">
+    <div class="header-section">
+        <h1 style="margin:0; font-size: 20px; color: var(--primary);">Kalender Jawa Abadi</h1>
+        <p style="margin:5px 0; font-size: 12px; color: #888;">Cek Weton, Neptu, & Rejeki Sri Jati</p>
+    </div>
+
+    <div class="search-box">
+        <input type="date" id="dateInput">
+        <button id="btnSearch" onclick="searchWeton()">Cari Weton</button>
+    </div>
+
+    <div class="calendar-nav">
+        <button id="prevMonth">◀</button>
+        <h3 id="monthYearNav" style="margin:0;">Januari 2026</h3>
+        <button id="nextMonth">▶</button>
+    </div>
+
+    <div id="calendar" class="calendar-grid"></div>
+
+    <div id="detail"></div>
+
+    <div id="actionButtons" class="action-buttons">
+        <button class="btn-pdf" onclick="downloadPDF()">📥 Simpan PDF</button>
+        <button class="btn-wa" onclick="shareWhatsApp()">📱 Share WA</button>
+    </div>
+
+    <footer style="text-align:center; font-size:11px; color:#aaa; margin-top:20px; border-top:1px solid #eee; padding-top:10px;">
+        &copy; 2026 Kalender Jawa Modern • By Tius
+    </footer>
+</div>
+
+<script src="data-srijati.js"></script>
+<script src="data-wuku.js"></script>
+<script src="data-mangsa.js"></script>
+<script src="data-hari.js"></script>
+<script src="data-neptu.js"></script>
+<script src="data-astrologi.js"></script>
+
+<script src="main.js"></script>
+
+</body>
+</html>
