@@ -1,183 +1,157 @@
 :root {
-  --primary-color: #D30000;
-  --primary-dark: #a00000;
-  --bg-color: #f8f9fa;
-  --text-dark: #2d3436;
-  --text-light: #636e72;
+  --primary: #D30000;
+  --primary-soft: #fff5f5;
+  --dark: #2d3436;
+  --grey: #636e72;
   --white: #ffffff;
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-  --radius: 16px;
+  --shadow: 0 10px 25px rgba(0,0,0,0.08);
+  --radius: 12px;
 }
 
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
 body {
-  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  background-color: var(--bg-color);
+  font-family: 'Inter', -apple-system, sans-serif;
+  background-color: #f0f2f5;
   margin: 0;
-  padding: 20px;
-  color: var(--text-dark);
+  padding: 15px;
+  color: var(--dark);
+  line-height: 1.6;
 }
 
 #mainApp {
   max-width: 500px;
-  margin: 20px auto;
+  margin: 0 auto;
   background: var(--white);
-  border-radius: var(--radius);
+  border-radius: 20px;
   box-shadow: var(--shadow);
   overflow: hidden;
-  border: 1px solid rgba(0,0,0,0.05);
 }
 
-/* Header & Filter */
+/* Header & Search */
 .filter-container {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-  color: var(--white);
-  padding: 30px 20px;
+  background: linear-gradient(135deg, #d30000, #800000);
+  color: white;
+  padding: 25px 20px;
   text-align: center;
 }
 
-.mobile-header h2 {
-  margin: 0;
-  font-size: 1.4em;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
+.filter-container h1 { margin: 0; font-size: 1.5rem; }
+.search-box { margin-top: 15px; display: flex; gap: 8px; justify-content: center; }
 
-#monthYear {
-  font-size: 1.1em;
-  opacity: 0.9;
-  margin-top: 5px;
-  font-weight: 400;
-}
-
-/* Input Area */
-.search-date-container {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-.input-date input {
-  padding: 10px 15px;
-  border-radius: 10px;
+.search-box input {
+  padding: 10px;
+  border-radius: 8px;
   border: none;
-  outline: none;
-  font-size: 0.9em;
+  font-size: 14px;
 }
 
-.input-date button {
-  padding: 10px 20px;
-  border-radius: 10px;
-  border: none;
-  background: var(--text-dark);
+.search-box button {
+  background: var(--dark);
   color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-weight: bold;
   cursor: pointer;
-  font-weight: 600;
-  transition: transform 0.2s;
 }
 
-.input-date button:hover {
-  transform: translateY(-2px);
-}
-
-/* Navigation */
-.nav {
+/* Calendar Nav */
+.calendar-nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
-  background: #fff;
+  padding: 15px 20px;
 }
 
-.nav button {
-  background: #f1f2f6;
+.calendar-nav button {
+  background: var(--primary-soft);
   border: none;
-  width: 40px;
-  height: 40px;
+  color: var(--primary);
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
-  color: var(--primary-color);
-  font-size: 1.2em;
   cursor: pointer;
-  transition: all 0.2s;
+  font-size: 16px;
 }
 
-.nav button:hover {
-  background: var(--primary-color);
-  color: white;
-}
-
-#monthYearNav {
-  font-weight: 700;
-  font-size: 1.1em;
-  color: var(--text-dark);
-}
-
-/* Calendar Grid */
-.calendar {
+/* Grid Kalender */
+.calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
-  padding: 15px;
-  background: #fff;
+  padding: 10px;
+  gap: 5px;
 }
 
-.calendar div {
+.calendar-grid div {
   text-align: center;
-  padding: 12px 0;
-  font-size: 0.9em;
-  font-weight: 600;
-  border-radius: 12px;
-  transition: all 0.2s;
+  padding: 12px 5px;
+  font-size: 14px;
+  border-radius: 8px;
   cursor: pointer;
+  transition: 0.2s;
 }
 
-/* Nama Hari */
-.calendar div:nth-child(-n+7) {
-  color: var(--text-light);
-  font-weight: 700;
-  text-transform: uppercase;
-  font-size: 0.75em;
-  cursor: default;
-}
+/* State Hari */
+.calendar-day:hover { background: var(--primary-soft); color: var(--primary); }
+.sunday { color: var(--primary); font-weight: bold; }
+.today { background: var(--primary) !important; color: white !important; font-weight: bold; }
 
-.calendar-day:hover {
-  background-color: #f1f2f6;
-  color: var(--primary-color);
-}
-
-/* Detail Section */
-#detail {
-  margin: 20px;
+/* Hasil Detail (Modular Design) */
+.detail-container {
+  display: none; /* Muncul via JS */
   padding: 20px;
+  background: white;
+  border-top: 2px solid var(--primary-soft);
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.card-result {
   background: #fff;
+  border: 1px solid #eee;
   border-radius: var(--radius);
-  border-left: 5px solid var(--primary-color);
-  display: none;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  padding: 15px;
 }
 
-#detail h3 {
-  margin-top: 0;
-  font-size: 1.1em;
-  color: var(--primary-color);
+.info-section {
+  margin-top: 15px;
+  padding-top: 12px;
+  border-top: 1px dashed #ddd;
 }
 
-#detail ul {
-  list-style: none;
-  padding: 0;
+.info-section h4 {
+  color: var(--primary);
+  margin: 0 0 5px 0;
+  font-size: 14px;
+  text-transform: uppercase;
 }
 
-#detail li {
-  padding: 8px 0;
-  border-bottom: 1px solid #eee;
-  font-size: 0.95em;
+.info-section p {
+  margin: 0;
+  font-size: 13px;
+  color: #444;
 }
 
-#detail li:last-child { border: none; }
+footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 12px;
+  color: var(--grey);
+}
 
-/* Responsive */
-@media (max-width: 480px) {
-  body { padding: 10px; }
-  .calendar { gap: 4px; padding: 10px; }
-  .calendar div { padding: 10px 0; font-size: 0.85em; }
+.btn-download {
+  width: 100%;
+  background: #27ae60;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 20px;
+  font-weight: bold;
+  cursor: pointer;
 }
