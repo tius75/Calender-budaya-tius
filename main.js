@@ -293,64 +293,70 @@ async function downloadPDF() {
         return;
     }
 
-    // Clone node
-    const clone = source.cloneNode(true);
+    // Simpan posisi asli
+    const originalStyle = source.getAttribute("style");
+    const originalParent = source.parentNode;
+    const placeholder = document.createElement("div");
 
-    // Paksa semua elemen di clone agar terlihat
-    clone.querySelectorAll('*').forEach(el => {
-        el.style.visibility = 'visible';
-        el.style.opacity = '1';
-    });
+    originalParent.insertBefore(placeholder, source);
 
-    Object.assign(clone.style, {
-        position: "fixed",
-        left: "0",
-        top: "0",
-        zIndex: "-9999",
+    // Paksa elemen tampil NORMAL di body
+    document.body.appendChild(source);
+
+    Object.assign(source.style, {
         display: "block",
-        width: "794px", // lebar A4 px (aman)
+        position: "relative",
+        visibility: "visible",
+        opacity: "1",
+        transform: "none",
+        width: "794px",
         backgroundColor: "#ffffff",
-        color: "#000000",
-        overflow: "visible"
+        color: "#000000"
     });
 
-    document.body.appendChild(clone);
+    // Paksa semua child terlihat
+    source.querySelectorAll('*').forEach(el => {
+        el.style.visibility = "visible";
+        el.style.opacity = "1";
+    });
 
-    // ⏳ PENTING: beri waktu browser render DOM
-    await new Promise(resolve => requestAnimationFrame(resolve));
-    await new Promise(resolve => setTimeout(resolve, 300));
+    // ⏳ tunggu render BENAR
+    await new Promise(r => setTimeout(r, 500));
 
     const opt = {
-        margin: 10, // gunakan px (lebih stabil di mobile)
-        filename: 'Detail-Weton-Lengkap.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
+        margin: 10,
+        filename: "Detail-Weton-Lengkap.pdf",
+        image: { type: "jpeg", quality: 1 },
         html2canvas: {
             scale: 2,
             useCORS: true,
             allowTaint: true,
             backgroundColor: "#ffffff",
+            windowWidth: source.scrollWidth,
+            windowHeight: source.scrollHeight,
             scrollX: 0,
-            scrollY: -window.scrollY,
-            windowWidth: clone.scrollWidth,
-            logging: false
+            scrollY: 0
         },
         jsPDF: {
-            unit: 'px',
-            format: 'a4',
-            orientation: 'portrait'
+            unit: "px",
+            format: "a4",
+            orientation: "portrait"
         }
     };
 
     try {
-        await html2pdf()
-            .set(opt)
-            .from(clone)
-            .save();
-    } catch (err) {
-        console.error("PDF Error:", err);
-        alert("Gagal mengunduh PDF.");
-    } finally {
-        document.body.removeChild(clone);
+        await html2pdf().set(opt).from(source).save();
+    } catch (e) {
+        console.error(e);
+        alert("Gagal membuat PDF");
+    }
+
+    // 🔙 kembalikan ke posisi semula
+    placeholder.replaceWith(source);
+    if (originalStyle !== null) {
+        source.setAttribute("style", originalStyle);
+    } else {
+        source.removeAttribute("style");
     }
 }
 
