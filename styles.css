@@ -136,3 +136,28 @@ body {
 
 .info-section h4 { color: var(--primary); font-size: 0.9rem; }
 .info-section p { font-size: 0.85rem; color: #444; }
+
+/* Memberi blok merah muda pada hari Minggu di grid */
+.calendar-day.sunday {
+    background-color: #fff0f0; /* Merah muda halus */
+    color: #d30000;
+}
+
+/* Memastikan detail muncul di bawah kalender */
+.detail-container {
+    display: none; /* Akan diubah jadi 'block' via JS */
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #eee;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* Warna khusus untuk teks hari libur */
+.holiday-text {
+    font-size: 0.6rem;
+    color: #ff4757;
+    font-weight: bold;
+    margin-top: 2px;
+}
