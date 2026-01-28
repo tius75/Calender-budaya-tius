@@ -1,20 +1,35 @@
-// Contoh Database Hari Libur Nasional 2026 (Bisa Anda tambah sendiri)
-const HARI_LIBUR = {
-    "2026-01-01": "Tahun Baru 2026",
-    "2026-01-20": "Tahun Baru Imlek",
-    "2026-02-15": "Isra Mi'raj",
-    "2026-03-20": "Hari Raya Nyepi"
-};
+const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+const PASARAN = ['Legi', 'Pahing', 'Pon', 'Wage', 'Kliwon'];
+
+let current = new Date();
+const today = new Date(); // Untuk penanda hari ini
+
+function getPasaran(date) {
+    const base = new Date(1900, 0, 1);
+    const diff = Math.floor((date.getTime() - base.getTime()) / (1000 * 60 * 60 * 24));
+    return PASARAN[(((diff + 1) % 5) + 5) % 5];
+}
 
 function generateCalendar() {
     const grid = document.getElementById('calendar');
-    const monthNav = document.getElementById('monthYearNav');
-    grid.innerHTML = '';
+    const mNav = document.getElementById('monthYearNav');
+    const mTxt = document.getElementById('monthYearText');
     
+    grid.innerHTML = '';
     const y = current.getFullYear();
     const m = current.getMonth();
+    const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
     
-    // ... (kode header hari tetap sama) ...
+    mNav.innerText = `${namaBulan[m]} ${y}`;
+    if(mTxt) mTxt.innerText = `${namaBulan[m]} ${y}`;
+
+    // Header Hari
+    HARI.forEach((h, i) => {
+        const el = document.createElement('div');
+        el.innerText = h.substring(0, 3);
+        el.className = i === 0 ? 'header-day sunday' : 'header-day';
+        grid.appendChild(el);
+    });
 
     const firstDay = new Date(y, m, 1).getDay();
     const daysInMonth = new Date(y, m + 1, 0).getDate();
@@ -23,52 +38,56 @@ function generateCalendar() {
 
     for (let d = 1; d <= daysInMonth; d++) {
         const dateObj = new Date(y, m, d);
-        const dateString = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         const p = getPasaran(dateObj);
-        const libur = HARI_LIBUR[dateString];
         
         const cell = document.createElement('div');
         cell.className = 'calendar-day';
-        
-        // Cek jika hari Minggu
-        if (dateObj.getDay() === 0) cell.classList.add('sunday');
-        
-        // Cek jika hari Libur Nasional
-        if (libur) cell.classList.add('sunday'); 
+
+        // Penanda Hari Minggu
+        if (dateObj.getDay() === 0) cell.classList.add('sunday-block');
+
+        // Penanda Hari Ini (Today)
+        if (dateObj.toDateString() === today.toDateString()) {
+            cell.classList.add('today-highlight');
+        }
 
         cell.innerHTML = `
             <div class="date-num">${d}</div>
             <div class="pasaran-text">${p}</div>
-            ${libur ? `<div class="holiday-text">Libur</div>` : ''}
         `;
 
-        // Kembalikan ke fungsi showDetail (bukan alert)
-        cell.onclick = () => updateDetail(dateObj, p, libur);
+        // Pastikan TIDAK menggunakan alert()
+        cell.onclick = () => updateDetail(dateObj, p);
         grid.appendChild(cell);
     }
 }
 
-function updateDetail(date, pasaran, keteranganLibur) {
+function updateDetail(date, pasaran) {
     const detailDiv = document.getElementById('detail');
     const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
     
-    // Logika Kalender Chinese
-    const chineseDate = new Intl.DateTimeFormat('id-ID-u-ca-chinese', {
-        day: 'numeric', month: 'long', year: 'numeric'
-    }).format(date);
-
     detailDiv.style.display = 'block';
     detailDiv.innerHTML = `
         <div class="card-result">
-            <h3 style="color:#d30000;">${date.getDate()} ${namaBulan[date.getMonth()]} ${date.getFullYear()}</h3>
+            <h3 style="color:#d30000; margin-bottom:10px; border-bottom:2px solid #eee;">Detail Weton</h3>
+            <p><strong>Tanggal:</strong> ${date.getDate()} ${namaBulan[date.getMonth()]} ${date.getFullYear()}</p>
             <p><strong>Weton:</strong> ${HARI[date.getDay()]} ${pasaran}</p>
-            <p><strong>Kalender Chinese:</strong> ${chineseDate}</p>
-            ${keteranganLibur ? `<p style="color:red;"><strong>Keterangan:</strong> ${keteranganLibur}</p>` : ''}
-            <hr>
-            <p style="font-size:0.9rem; color:#666;">Silahkan klik tanggal lain untuk melihat detail weton dan ramalan.</p>
+            <hr style="margin:10px 0; border:0; border-top:1px dashed #ccc;">
+            <p style="font-size:0.85rem; color:#666;">Data ramalan lainnya akan dimuat dari file data terpisah.</p>
         </div>
     `;
-    
-    // Otomatis scroll ke bawah agar user tahu detail sudah muncul
     detailDiv.scrollIntoView({ behavior: 'smooth' });
 }
+
+window.searchWeton = () => {
+    const val = document.getElementById('dateInput').value;
+    if(val) {
+        const d = new Date(val);
+        updateDetail(d, getPasaran(d));
+    }
+};
+
+document.getElementById('prevMonth').onclick = () => { current.setMonth(current.getMonth() - 1); generateCalendar(); };
+document.getElementById('nextMonth').onclick = () => { current.setMonth(current.getMonth() + 1); generateCalendar(); };
+
+generateCalendar();
