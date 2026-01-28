@@ -104,3 +104,62 @@ document.getElementById('nextMonth').onclick = () => { current.setMonth(current.
 generateCalendar();
 // Otomatis tampilkan detail hari ini
 updateDetail(TODAY, getPasaran(TODAY));
+
+import { TABEL_SRIJATI } from './data-srijati.js';
+
+// Fungsi untuk mencari Weton & Pindah Bulan
+window.searchWeton = () => {
+    const inputDate = document.getElementById('dateInput').value;
+    if (!inputDate) return;
+
+    const targetDate = new Date(inputDate);
+    
+    // KUNCI: Pindahkan kalender ke bulan & tahun yang dicari
+    current = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
+    generateCalendar(); 
+
+    // Tampilkan Detail
+    const p = getPasaran(targetDate);
+    updateDetail(targetDate, p);
+};
+
+function updateDetail(date, pasaran) {
+    const h = HARI[date.getDay()];
+    const neptu = NEPTU_HARI[h] + NEPTU_PASARAN[pasaran];
+    const detailDiv = document.getElementById('detail');
+
+    // Ambil data Sri Jati berdasarkan Neptu
+    const dataRejeki = TABEL_SRIJATI[neptu] || [];
+    
+    let tabelHtml = `
+        <table style="width:100%; border-collapse: collapse; margin-top:10px; font-size:0.85rem;">
+            <tr style="background:#eee;">
+                <th style="border:1px solid #ddd; padding:5px;">Usia</th>
+                <th style="border:1px solid #ddd; padding:5px;">Nilai</th>
+                <th style="border:1px solid #ddd; padding:5px;">Nasib</th>
+            </tr>`;
+
+    dataRejeki.forEach(item => {
+        tabelHtml += `
+            <tr>
+                <td style="border:1px solid #ddd; padding:5px; text-align:center;">${item.usia}</td>
+                <td style="border:1px solid #ddd; padding:5px; text-align:center; font-weight:bold; color:red;">${item.nilai}</td>
+                <td style="border:1px solid #ddd; padding:5px;">${item.ket}</td>
+            </tr>`;
+    });
+    tabelHtml += `</table>`;
+
+    detailDiv.style.display = 'block';
+    detailDiv.innerHTML = `
+        <div class="card-result">
+            <h3 style="color:var(--primary);">Analisis Neptu ${neptu}</h3>
+            <p><strong>Weton:</strong> ${h} ${pasaran}</p>
+            <div class="info-section">
+                <h4>📈 Siklus Rejeki (Sri Jati)</h4>
+                ${dataRejeki.length > 0 ? tabelHtml : "<p>Data neptu ini belum lengkap.</p>"}
+            </div>
+        </div>
+    `;
+    detailDiv.scrollIntoView({ behavior: 'smooth' });
+}
+
