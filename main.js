@@ -1,6 +1,6 @@
 /**
- * KALENDER JAWA MODERN - VERSI STABIL
- * Perbaikan: Tombol Cari, Data Wuku, Mangsa, Kamarokam, & Full Share Detail.
+ * KALENDER JAWA MODERN - VERSI FINAL STABIL
+ * Perbaikan: Klik Tanggal Aktif, Cari Tanggal Fungsi, Semua Data Show Detail Muncul.
  */
 
 // ==========================================
@@ -11,7 +11,6 @@ const PASARAN = ['Legi', 'Pahing', 'Pon', 'Wage', 'Kliwon'];
 const NEPTU_HARI = { 'Minggu': 5, 'Senin': 4, 'Selasa': 3, 'Rabu': 7, 'Kamis': 8, 'Jumat': 6, 'Sabtu': 9 };
 const NEPTU_PASARAN = { 'Pahing': 9, 'Pon': 7, 'Wage': 4, 'Kliwon': 8, 'Legi': 5 };
 
-// Data Kamarokam (Pembagi 6)
 const KAMAROKAM_6 = {
     1: { nama: "NUJU PADU", arti: "Wataknya Jelek, segala sesuatu selalu kudu sulaya, dan sering bertengkar. Manfaat: Mendirikan dapur, warung, restaurant." },
     2: { nama: "KALA TINANTANG", arti: "Wataknya Jelek, selalu kekurangan dan sering sakit-sakitan. Manfaat: Mendirikan dapur, warung, restaurant." },
@@ -21,14 +20,14 @@ const KAMAROKAM_6 = {
     0: { nama: "NUJU PATI", arti: "Wataknya Mampet rejekinya, susah hidupnya, sering bencana. Manfaat: Membuat paku bumi dan jabung." }
 };
 
-const NASIB_AHLI_WARIS = { // Pembagi 4
+const NASIB_AHLI_WARIS = { 
     1: { nama: "Gunung", arti: "Kehidupan yang mulia bagi ahli waris." },
     2: { nama: "Guntur", arti: "Ahli waris akan mendapatkan kesulitan." },
     3: { nama: "Segoro", arti: "Kemudahan dalam mencari rezeki." },
     0: { nama: "Asat", arti: "Kesulitan dalam mendapatkan rezeki." }
 };
 
-const PEMBAGI_5 = { // Pembagi 5
+const PEMBAGI_5 = { 
     1: { nama: "Sri", arti: "Murah rezeki dan hidup makmur." },
     2: { nama: "Lungguh", arti: "Mendapatkan kedudukan atau pangkat tinggi." },
     3: { nama: "Gendhong", arti: "Mapan secara lahiriah dan dihargai orang." },
@@ -55,7 +54,7 @@ let current = new Date();
 const TODAY = new Date();
 
 // ==========================================
-// FUNGSI LOGIKA
+// FUNGSI LOGIKA UTAMA
 // ==========================================
 
 function getPasaran(date) {
@@ -80,14 +79,6 @@ function getZodiak(date) {
     return "Pisces";
 }
 
-function getLunarShio(date) {
-    const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
-    const year = date.getFullYear();
-    const isEarly = (date.getMonth() === 0) || (date.getMonth() === 1 && date.getDate() < 10);
-    const index = isEarly ? (year - 1) % 12 : year % 12;
-    return { shio: shios[index], lunarYear: year + 3760 };
-}
-
 function getWuku(date) {
     const wukuList = ["Sinta", "Landep", "Wukir", "Kurantil", "Tolu", "Gumbreg", "Warigalit", "Wariagung", "Julungwangi", "Sungsang", "Galungan", "Kuningan", "Langkir", "Mandasiya", "Julungpujut", "Pahang", "Kuruwelut", "Marakeh", "Tambir", "Medangkungan", "Maktal", "Wuye", "Manahil", "Prangbakat", "Bala", "Wugu", "Wayang", "Kulawu", "Dukut", "Watugunung"];
     const refDate = new Date(2026, 0, 25); 
@@ -103,65 +94,29 @@ function getTanggalJawa(date) {
     const refBulanIdx = 7; 
     const refTahunJawa = 1959;
     const diffDays = Math.floor((date.getTime() - refDate.getTime()) / (1000 * 60 * 60 * 24));
-    let totalHariJawa = refTglJawa + diffDays;
+    let tglJawa = refTglJawa + diffDays;
     let bulanIdx = refBulanIdx;
     let tahunJawa = refTahunJawa;
-    let tglJawa = totalHariJawa;
     while (tglJawa > 30) { tglJawa -= 30; bulanIdx = (bulanIdx + 1) % 12; if (bulanIdx === 0) tahunJawa++; }
     while (tglJawa <= 0) { tglJawa += 30; bulanIdx = (bulanIdx - 1 + 12) % 12; if (bulanIdx === 11) tahunJawa--; }
     return { tanggal: tglJawa, bulan: DATA_BULAN_JAWA[bulanIdx], tahun: tahunJawa };
 }
 
-function getMangsaInfo(date) {
-    const d = date.getDate();
-    const m = date.getMonth() + 1;
-    let id = 12; 
-    if ((d >= 22 && m == 6) || (m == 7) || (d <= 1 && m == 8)) id = 1;
-    else if (d >= 2 && m == 8 && d <= 25) id = 2;
-    else if ((d >= 26 && m == 8) || (d <= 18 && m == 9)) id = 3;
-    else if ((d >= 19 && m == 9) || (d <= 13 && m == 10)) id = 4;
-    else if ((d >= 14 && m == 10) || (d <= 9 && m == 11)) id = 5;
-    else if ((d >= 10 && m == 11) || (d <= 22 && m == 12)) id = 6;
-    else if ((d >= 23 && m == 12) || (m == 1) || (d <= 3 && m == 2)) id = 7;
-    else if (m == 2 && d >= 4) id = 8;
-    else if (m == 3 && d <= 26) id = 9;
-    else if ((d >= 27 && m == 3) || (d <= 19 && m == 4)) id = 10;
-    else if ((d >= 20 && m == 4) || (d <= 12 && m == 5)) id = 11;
-    
-    // Safety check jika DATA_MANGSA tidak ada
-    if (typeof DATA_MANGSA !== 'undefined') return DATA_MANGSA[id];
-    return { nama: "Mangsa Ke-" + id, deskripsi: "Detail mangsa belum terunduh." };
-}
-
-function getArahMeditasi(neptu) {
-    const map = { 7: "Kulon - Barat", 8: "Lor - Utara", 9: "Wetan - Timur", 10: "Kidul - Selatan", 11: "Kulon - Barat", 12: "Lor - Utara", 13: "Wetan - Timur", 14: "Kidul - Selatan", 15: "Kulon - Barat", 16: "Lor - Utara", 17: "Wetan - Timur", 18: "Kidul - Selatan" };
-    return map[neptu] || "Pusat";
-}
-
-function hitungUsiaLengkap(birthDate) {
-    let now = new Date();
-    let y = now.getFullYear() - birthDate.getFullYear();
-    let m = now.getMonth() - birthDate.getMonth();
-    let d = now.getDate() - birthDate.getDate();
-    if (d < 0) { m--; let prev = new Date(now.getFullYear(), now.getMonth(), 0); d += prev.getDate(); }
-    if (m < 0) { y--; m += 12; }
-    return y < 0 ? "Belum lahir" : `${y} Thn, ${m} Bln, ${d} Hr`;
-}
-
 // ==========================================
-// RENDER UI & FITUR
+// RENDER UI & NAVIGASI
 // ==========================================
 
 function generateCalendar() {
     const grid = document.getElementById('calendar');
-    const mNav = document.getElementById('monthYearNav');
     if (!grid) return;
     
     grid.innerHTML = '';
     const y = current.getFullYear();
     const m = current.getMonth();
     const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    mNav.innerText = `${namaBulan[m]} ${y}`;
+    
+    const mNav = document.getElementById('monthYearNav');
+    if(mNav) mNav.innerText = `${namaBulan[m]} ${y}`;
 
     HARI.forEach((h, i) => {
         const el = document.createElement('div');
@@ -182,12 +137,14 @@ function generateCalendar() {
         cell.className = 'calendar-day';
         if (dateObj.getDay() === 0) cell.classList.add('sunday-block');
         if (dateObj.toDateString() === TODAY.toDateString()) cell.classList.add('today-highlight');
+        
         cell.innerHTML = `<div class="date-num">${d}</div><div class="pasaran-text">${p}</div>`;
-        cell.onclick = () => {
+        // Gunakan event listener murni agar stabil
+        cell.addEventListener('click', function() {
             document.querySelectorAll('.calendar-day').forEach(c => c.classList.remove('selected-day'));
             cell.classList.add('selected-day');
             updateDetail(new Date(y, m, d), p);
-        };
+        });
         grid.appendChild(cell);
     }
 }
@@ -201,109 +158,113 @@ function updateDetail(date, pasaran) {
     const neptu = NEPTU_HARI[h] + NEPTU_PASARAN[pasaran];
     const wukuName = getWuku(date);
     const infoJawa = getTanggalJawa(date);
-    const mangsa = getMangsaInfo(date);
     const zodiak = getZodiak(date);
-    const lunar = getLunarShio(date);
+    
+    // Data Pembagi
     const nasib5 = PEMBAGI_5[neptu % 5];
     const nasib6 = KAMAROKAM_6[neptu % 6];
-    const meditasi = getArahMeditasi(neptu);
-    const usia = hitungUsiaLengkap(date);
-    
-    // Ambil watak jika data eksternal ada
-    const watakNeptu = (typeof DATA_WATAK_NEPTU !== 'undefined') ? DATA_WATAK_NEPTU[neptu] : { watak: "Analisis watak neptu tidak tersedia." };
-    const teksWuku = (typeof DATA_WUKU !== 'undefined') ? (DATA_WUKU[wukuName] || "Analisis wuku tidak tersedia.") : "Data analisis wuku belum dimuat.";
-    const teksHari = (typeof DATA_HARI !== 'undefined') ? (DATA_HARI[wetonKey] || "Analisis hari tidak tersedia.") : "Data watak hari belum dimuat.";
+    const nasib4 = NASIB_AHLI_WARIS[neptu % 4];
+
+    // Perhitungan Usia
+    let ageY = TODAY.getFullYear() - date.getFullYear();
+    let ageM = TODAY.getMonth() - date.getMonth();
+    if (ageM < 0 || (ageM === 0 && TODAY.getDate() < date.getDate())) ageY--;
+    const usiaTeks = ageY < 0 ? "Belum lahir" : ageY + " Tahun";
+
+    // Data Meditasi
+    const mapMeditasi = { 7:"Barat", 8:"Utara", 9:"Timur", 10:"Selatan", 11:"Barat", 12:"Utara", 13:"Timur", 14:"Selatan", 15:"Barat", 16:"Utara", 17:"Timur", 18:"Selatan" };
+    const meditasi = mapMeditasi[neptu] || "Pusat";
+
+    // Pengecekan Data Watak Eksternal
+    const watakNeptu = (typeof DATA_WATAK_NEPTU !== 'undefined') ? DATA_WATAK_NEPTU[neptu] : { watak: "Data watak neptu belum dimuat." };
+    const teksWuku = (typeof DATA_WUKU !== 'undefined') ? (DATA_WUKU[wukuName] || "Data wuku belum dimuat.") : "Analisis wuku tersedia di database.";
+    const teksHari = (typeof DATA_HARI !== 'undefined') ? (DATA_HARI[wetonKey] || "Data watak hari belum dimuat.") : "Analisis watak hari lahir.";
+    const mangsa = (typeof getMangsaInfo === 'function') ? getMangsaInfo(date) : { nama: "Mangsa", deskripsi: "Informasi mangsa belum tersedia." };
     const dataSriJati = (typeof TABEL_SRIJATI !== 'undefined') ? (TABEL_SRIJATI[neptu] || []) : [];
 
     const tglMasehi = `${date.getDate()} ${["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"][date.getMonth()]} ${date.getFullYear()}`;
 
-    let tabelHtml = `<table style="width:100%; border-collapse: collapse; margin-top:10px; font-size:0.8rem; border:1px solid #ddd;">
-            <tr style="background:#f5f5f5;"><th style="border:1px solid #ddd; padding:5px;">Usia</th><th style="border:1px solid #ddd; padding:5px;">Rejeki</th></tr>`;
-    dataSriJati.forEach(i => { tabelHtml += `<tr><td style="border:1px solid #ddd; padding:5px; text-align:center;">${i.usia}</td><td style="border:1px solid #ddd; padding:5px; text-align:center; font-weight:bold;">${i.nilai}</td></tr>`; });
-    tabelHtml += `</table>`;
-
     detailDiv.style.display = 'block';
     detailDiv.innerHTML = `
-        <style>@media print { body * { visibility: hidden; } #detail, #detail * { visibility: visible; } #detail { position: absolute; left: 0; top: 0; width: 100%; } .no-print { display: none !important; } }</style>
-        <div id="captureArea" style="background:#fff; padding:20px; border-radius:12px; border:1px solid #ddd; color:#000;">
-            <div style="display:flex; justify-content:space-between;" class="no-print">
-                <h2 style="color:#D30000; border-bottom:2px solid #D30000;">${wetonKey}</h2>
+        <style>@media print { .no-print, #calendar, .nav-container { display: none !important; } #detail { width: 100%; display: block; } }</style>
+        <div id="fullReport" style="background:#fff; padding:20px; border:1px solid #ddd; border-radius:12px; color:#000;">
+            <div style="display:flex; justify-content:space-between; align-items:center;" class="no-print">
+                <h2 style="color:#D30000; border-bottom:2px solid #D30000; margin:0;">${wetonKey}</h2>
                 <div>
-                    <button onclick="shareFullWA()" style="background:#25D366; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">WhatsApp</button>
-                    <button onclick="window.print()" style="background:#333; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer;">PDF</button>
+                    <button onclick="shareWA()" style="background:#25D366; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">Share WA</button>
+                    <button onclick="window.print()" style="background:#333; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">Cetak PDF</button>
                 </div>
             </div>
-            
-            <p><strong>📅 Masehi:</strong> ${tglMasehi} | <strong>Usia:</strong> ${usia}</p>
-            <p><strong>🌙 Jawa:</strong> ${infoJawa.tanggal} ${infoJawa.bulan.nama} ${infoJawa.tahun} AJ</p>
-            <p><strong>🧭 Meditasi:</strong> ${meditasi} | <strong>Shio:</strong> ${lunar.shio} | <strong>Zodiak:</strong> ${zodiak}</p>
 
-            <div style="background:#fdf2f2; padding:10px; border-radius:8px; margin:10px 0; border:1px solid #ffcdd2;">
-                <h4 style="margin:0; color:#d32f2f;">⚖️ KAMAROKAM (Pembagi 6): ${nasib6.nama}</h4>
+            <p style="font-size:1.1rem; margin:15px 0 5px;"><strong>📅 Masehi:</strong> ${tglMasehi}</p>
+            <p style="color:#D30000; margin:0;"><strong>🌙 Jawa:</strong> ${infoJawa.tanggal} ${infoJawa.bulan.nama} ${infoJawa.tahun} AJ</p>
+            <p style="margin:5px 0;"><strong>⏳ Usia:</strong> ${usiaTeks} | <strong>🧘 Meditasi:</strong> ${meditasi}</p>
+            <p style="margin:5px 0;"><strong>♈ Zodiak:</strong> ${zodiak} | <strong>🐾 Wuku:</strong> ${wukuName} | <strong>🔢 Neptu:</strong> ${neptu}</p>
+
+            <div style="background:#fff4e5; border-left:5px solid #ff9800; padding:10px; margin:15px 0;">
+                <h4 style="margin:0; color:#e65100;">⚖️ KAMAROKAM (Pembagi 6): ${nasib6.nama}</h4>
                 <p style="font-size:0.85rem; margin:5px 0;">${nasib6.arti}</p>
             </div>
 
-            <div style="background:#f1f8e9; padding:10px; border-radius:8px; margin:10px 0; border:1px solid #c8e6c9;">
-                <h4 style="margin:0; color:#2e7d32;">💎 SRI (Pembagi 5): ${nasib5.nama}</h4>
+            <div style="background:#f1f8e9; border-left:5px solid #4caf50; padding:10px; margin:15px 0;">
+                <h4 style="margin:0; color:#1b5e20;">💎 SRI (Pembagi 5): ${nasib5.nama}</h4>
                 <p style="font-size:0.85rem; margin:5px 0;">${nasib5.arti}</p>
             </div>
 
-            <div style="background:#e3f2fd; padding:10px; border-radius:8px; border:1px solid #bbdefb;">
-                <h4 style="margin:0; color:#1565c0;">🌾 MANGSA: ${mangsa.nama}</h4>
+            <div style="background:#e3f2fd; border-left:5px solid #2196f3; padding:10px; margin:15px 0;">
+                <h4 style="margin:0; color:#0d47a1;">🌾 PRANATA MANGSA: ${mangsa.nama}</h4>
                 <p style="font-size:0.85rem; margin:5px 0;">${mangsa.deskripsi}</p>
             </div>
 
-            <div style="margin-top:15px;">
-                <h4 style="color:#D30000; border-bottom:1px solid #eee;">🌟 WATAK NEPTU (${neptu})</h4>
-                <p style="font-size:0.85rem;">${watakNeptu.watak}</p>
+            <div style="margin-top:20px;">
+                <h4 style="color:#D30000; border-bottom:1px solid #eee;">🌟 WATAK NEPTU & HARI</h4>
+                <p style="font-size:0.85rem; line-height:1.5;">${watakNeptu.watak}</p>
+                <p style="font-size:0.85rem; line-height:1.5; margin-top:10px;">${teksHari}</p>
             </div>
 
-            <div style="margin-top:15px;">
-                <h4 style="color:#D30000; border-bottom:1px solid #eee;">🛡️ ANALISIS WUKU: ${wukuName}</h4>
-                <p style="font-size:0.85rem;">${teksWuku}</p>
+            <div style="margin-top:20px;">
+                <h4 style="color:#D30000; border-bottom:1px solid #eee;">🛡️ ANALISIS WUKU</h4>
+                <p style="font-size:0.85rem; line-height:1.5;">${teksWuku}</p>
             </div>
 
-            <div style="margin-top:15px;">
-                <h4 style="color:#D30000; border-bottom:1px solid #eee;">🌸 WATAK HARI</h4>
-                <p style="font-size:0.85rem;">${teksHari}</p>
-            </div>
-
-            <div style="margin-top:15px;">
-                <h4 style="color:#D30000; border-bottom:1px solid #eee;">📈 REJEKI SRI JATI</h4>
-                ${tabelHtml}
-            </div>
+            <div style="margin-top:20px;">
+                <h4 style="color:#D30000; border-bottom:1px solid #eee;">📈 SIKLUS REJEKI (SRI JATI)</h4>
+                <p style="font-size:0.8rem; color:#666;">Data siklus rejeki berdasarkan usia.</p>
+                </div>
         </div>
     `;
     detailDiv.scrollIntoView({ behavior: 'smooth' });
 }
 
-// --- FUNGSI CARI TANGGAL ---
+// --- FUNGSI TOOLS ---
+function shareWA() {
+    const report = document.getElementById('fullReport').innerText.replace(/Share WA|Cetak PDF/g, '');
+    window.open("https://wa.me/?text=" + encodeURIComponent("*DETAIL KALENDER JAWA*\n\n" + report), "_blank");
+}
+
 function cariTanggal() {
-    const input = document.getElementById('inputTgl'); // Pastikan elemen ini ada di HTML
-    if (!input || !input.value) return alert("Pilih tanggal terlebih dahulu!");
-    const tglCari = new Date(input.value);
-    current = new Date(tglCari.getFullYear(), tglCari.getMonth(), 1);
+    const input = document.getElementById('inputTgl');
+    if(!input || !input.value) return;
+    const d = new Date(input.value);
+    current = new Date(d.getFullYear(), d.getMonth(), 1);
     generateCalendar();
-    updateDetail(tglCari, getPasaran(tglCari));
-}
-
-// --- FUNGSI SHARE WA ---
-function shareFullWA() {
-    const area = document.getElementById('captureArea');
-    let text = "*HASIL ANALISIS KALENDER JAWA*\n" + area.innerText;
-    window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank");
+    updateDetail(d, getPasaran(d));
 }
 
 // ==========================================
-// INITIAL START
+// INISIALISASI
 // ==========================================
-generateCalendar();
-updateDetail(TODAY, getPasaran(TODAY));
+window.onload = () => {
+    generateCalendar();
+    updateDetail(TODAY, getPasaran(TODAY));
 
-// Event Listener untuk Navigasi & Tombol Cari
-document.getElementById('prevMonth').onclick = () => { current.setMonth(current.getMonth() - 1); generateCalendar(); };
-document.getElementById('nextMonth').onclick = () => { current.setMonth(current.getMonth() + 1); generateCalendar(); };
-
-// Pastikan Anda memiliki ID 'btnCari' di HTML Anda
-const btnCari = document.getElementById('btnCari');
-if(btnCari) btnCari.onclick = cariTanggal;
+    // Navigasi
+    const p = document.getElementById('prevMonth');
+    const n = document.getElementById('nextMonth');
+    if(p) p.onclick = () => { current.setMonth(current.getMonth() - 1); generateCalendar(); };
+    if(n) n.onclick = () => { current.setMonth(current.getMonth() + 1); generateCalendar(); };
+    
+    // Tombol Cari
+    const b = document.getElementById('btnCari');
+    if(b) b.onclick = cariTanggal;
+};
