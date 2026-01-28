@@ -1,10 +1,5 @@
-/**
- * APLIKASI KALENDER WETON & ASTROLOGI LENGKAP
- * Versi: 3.0 (Final Stable)
- */
-
 // ==========================================
-// 1. KONSTANTA DASAR & DATA INTERNAL
+// 1. DATA REFERENSI (Internalized)
 // ==========================================
 const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 const PASARAN = ['Legi', 'Pahing', 'Pon', 'Wage', 'Kliwon'];
@@ -13,24 +8,21 @@ const NEPTU_PASARAN = { 'Pahing': 9, 'Pon': 7, 'Wage': 4, 'Kliwon': 8, 'Legi': 5
 
 const PEMBAGI_5 = {
     1: { n: "Sri", a: "Rezeki melimpah dan hidup makmur." },
-    2: { n: "Lungguh", a: "Mendapatkan kedudukan, pangkat, atau derajat tinggi." },
-    3: { n: "Gendhong", a: "Mapan secara lahiriah dan dihargai banyak orang." },
-    4: { n: "Loro", a: "Sering menghadapi hambatan kesehatan atau perjalanan hidup yang sulit." },
-    0: { n: "Pati", a: "Banyak rintangan besar, perlu kehati-hatian dalam melangkah." }
+    2: { n: "Lungguh", a: "Mendapatkan kedudukan atau derajat tinggi." },
+    3: { n: "Gendhong", a: "Mapan dan dihargai banyak orang." },
+    4: { n: "Loro", a: "Sering menghadapi hambatan kesehatan." },
+    0: { n: "Pati", a: "Banyak rintangan, perlu kehati-hatian." }
 };
 
 const PEMBAGI_4 = {
     1: { n: "Gunung", a: "Kehidupan yang mulia bagi ahli waris." },
-    2: { n: "Guntur", a: "Ahli waris kemungkinan akan menemui banyak cobaan." },
-    3: { n: "Segoro", a: "Kemudahan dalam mencari rezeki dan berwawasan luas." },
-    0: { n: "Asat", a: "Rezeki sering terasa cepat habis atau sulit terkumpul." }
+    2: { n: "Guntur", a: "Ahli waris akan mendapatkan kesulitan." },
+    3: { n: "Segoro", a: "Kemudahan rezeki dan wawasan luas." },
+    0: { n: "Asat", a: "Rezeki sering cepat habis atau sulit terkumpul." }
 };
 
-let current = new Date();
-const TODAY = new Date();
-
 // ==========================================
-// 2. LOGIKA PERHITUNGAN (Core Logic)
+// 2. LOGIKA PERHITUNGAN
 // ==========================================
 
 function getPasaran(date) {
@@ -39,164 +31,101 @@ function getPasaran(date) {
     return PASARAN[(((diff + 1) % 5) + 5) % 5];
 }
 
-function getWuku(date) {
-    const wukuList = ["Sinta", "Landep", "Wukir", "Kurantil", "Tolu", "Gumbreg", "Warigalit", "Wariagung", "Julungwangi", "Sungsang", "Galungan", "Kuningan", "Langkir", "Mandasiya", "Julungpujut", "Pahang", "Kuruwelut", "Marakeh", "Tambir", "Medangkungan", "Maktal", "Wuye", "Manahil", "Prangbakat", "Bala", "Wugu", "Wayang", "Kulawu", "Dukut", "Watugunung"];
-    const refDate = new Date(2026, 0, 25); 
-    const diffDays = Math.floor((date.getTime() - refDate.getTime()) / (1000 * 60 * 60 * 24));
-    let idx = (20 + Math.floor(diffDays / 7)) % 30;
-    return wukuList[idx < 0 ? idx + 30 : idx];
-}
-
-function getLunarShio(date) {
-    const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
-    const year = date.getFullYear();
-    return {
-        shio: shios[year % 12],
-        lunarYear: year + 3760 // Estimasi tahun Kongzili
-    };
-}
-
 function getZodiak(date) {
     const d = date.getDate();
     const m = date.getMonth() + 1;
-    if ((m == 3 && d >= 21) || (m == 4 && d <= 19)) return "Aries";
-    if ((m == 4 && d >= 20) || (m == 5 && d <= 20)) return "Taurus";
-    if ((m == 5 && d >= 21) || (m == 6 && d <= 20)) return "Gemini";
-    if ((m == 6 && d >= 21) || (m == 7 && d <= 22)) return "Cancer";
-    if ((m == 7 && d >= 23) || (m == 8 && d <= 22)) return "Leo";
-    if ((m == 8 && d >= 23) || (m == 9 && d <= 22)) return "Virgo";
-    if ((m == 9 && d >= 23) || (m == 10 && d <= 22)) return "Libra";
-    if ((m == 10 && d >= 23) || (m == 11 && d <= 21)) return "Scorpio";
-    if ((m == 11 && d >= 22) || (m == 12 && d <= 21)) return "Sagittarius";
-    if ((m == 12 && d >= 22) || (m == 1 && d <= 19)) return "Capricorn";
-    if ((m == 1 && d >= 20) || (m == 2 && d <= 18)) return "Aquarius";
-    return "Pisces";
-}
-
-// ==========================================
-// 3. RENDER UI & DOWNLOAD PDF
-// ==========================================
-
-function generateCalendar() {
-    const grid = document.getElementById('calendar');
-    const mNav = document.getElementById('monthYearNav');
-    if (!grid) return;
-    
-    grid.innerHTML = '';
-    const y = current.getFullYear();
-    const m = current.getMonth();
-    const namaBulanMasehi = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    mNav.innerText = `${namaBulanMasehi[m]} ${y}`;
-
-    HARI.forEach((h, i) => {
-        const el = document.createElement('div');
-        el.innerText = h.substring(0, 3);
-        el.className = 'header-day' + (i === 0 ? ' sunday' : '');
-        grid.appendChild(el);
-    });
-
-    const firstDay = new Date(y, m, 1).getDay();
-    const daysInMonth = new Date(y, m + 1, 0).getDate();
-
-    for (let i = 0; i < firstDay; i++) grid.appendChild(document.createElement('div'));
-
-    for (let d = 1; d <= daysInMonth; d++) {
-        const dateObj = new Date(y, m, d);
-        const p = getPasaran(dateObj);
-        const cell = document.createElement('div');
-        cell.className = 'calendar-day';
-        if (dateObj.getDay() === 0) cell.classList.add('sunday-block');
-        if (dateObj.toDateString() === TODAY.toDateString()) cell.classList.add('today-highlight');
-        cell.innerHTML = `<div class="date-num">${d}</div><div class="pasaran-text">${p}</div>`;
-        cell.onclick = () => updateDetail(dateObj, p);
-        grid.appendChild(cell);
+    const z = [
+        {n:"Capricorn", r:[22,12,19,1]}, {n:"Aquarius", r:[20,1,18,2]},
+        {n:"Pisces", r:[19,2,20,3]}, {n:"Aries", r:[21,3,19,4]},
+        {n:"Taurus", r:[20,4,20,5]}, {n:"Gemini", r:[21,5,20,6]},
+        {n:"Cancer", r:[21,6,22,7]}, {n:"Leo", r:[23,7,22,8]},
+        {n:"Virgo", r:[23,8,22,9]}, {n:"Libra", r:[23,9,22,10]},
+        {n:"Scorpio", r:[23,10,21,11]}, {n:"Sagittarius", r:[22,11,21,12]}
+    ];
+    for(let i of z) {
+        if((m==i.r[1] && d>=i.r[0]) || (m==i.r[3] && d<=i.r[2])) return i.n;
     }
+    return "Capricorn";
 }
+
+function getLunarInfo(date) {
+    const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
+    const y = date.getFullYear();
+    return { shio: shios[y % 12], thn: y + 3760 };
+}
+
+// ==========================================
+// 3. FUNGSI RENDER (Solusi Data Hilang)
+// ==========================================
 
 function updateDetail(date, pasaran) {
     const detailDiv = document.getElementById('detail');
     if (!detailDiv) return;
 
     const h = HARI[date.getDay()];
-    const wetonKey = `${h} ${pasaran}`;
     const neptu = NEPTU_HARI[h] + NEPTU_PASARAN[pasaran];
-    const infoJawa = (typeof getTanggalJawa === 'function') ? getTanggalJawa(date) : {tanggal: "-", bulan:{nama:"-"}, tahun:"-"};
-    const mangsa = (typeof getMangsaInfo === 'function') ? getMangsaInfo(date) : null;
-    const wuku = getWuku(date);
-    const star = getZodiak(date);
-    const lunar = getLunarShio(date);
+    const wukuName = (typeof getWuku === 'function') ? getWuku(date) : "Sinta";
+    const mangsa = (typeof getMangsaInfo === 'function') ? getMangsaInfo(date) : {nama: "Tidak Terdeteksi", deskripsi: ""};
+    const zodiak = getZodiak(date);
+    const lunar = getLunarInfo(date);
+    const infoJawa = (typeof getTanggalJawa === 'function') ? getTanggalJawa(date) : {tanggal: date.getDate(), bulan:{nama:"-"}, tahun:"-"};
 
-    // Proteksi Data Luar (File Terpisah)
-    const teksWuku = (typeof DATA_WUKU !== 'undefined') ? (DATA_WUKU[wuku] || "Detail tidak tersedia.") : "Data wuku belum dimuat.";
-    const teksHari = (typeof DATA_HARI !== 'undefined') ? (DATA_HARI[wetonKey] || "") : "";
-    const teksBintang = (typeof DATA_ZODIAK !== 'undefined') ? (DATA_ZODIAK[star] || "Karakter bintang belum tersedia.") : "Zodiak " + star;
+    // Pal Jati / Sri Jati Table Logic
+    let tabelSriJati = "";
+    if (typeof TABEL_SRIJATI !== 'undefined' && TABEL_SRIJATI[neptu]) {
+        tabelSriJati = `<div style="margin-top:20px;"><h4 style="color:#D30000; border-bottom:1px solid #eee;">📈 Pal Jati (Siklus Rezeki)</h4>
+        <table style="width:100%; border-collapse:collapse; font-size:0.8rem; margin-top:5px;">
+            <tr style="background:#eee;"><th>Usia</th><th>Nilai</th><th>Keterangan</th></tr>
+            ${TABEL_SRIJATI[neptu].map(i => `<tr><td style="border:1px solid #ddd; padding:4px; text-align:center;">${i.usia}</td><td style="border:1px solid #ddd; padding:4px; text-align:center; color:red;">${i.nilai}</td><td style="border:1px solid #ddd; padding:4px;">${i.ket}</td></tr>`).join('')}
+        </table></div>`;
+    }
 
+    // Render HTML
     detailDiv.style.display = 'block';
     detailDiv.innerHTML = `
-        <div id="capture-area" style="background:#fff; padding:25px; border-radius:15px; border:2px solid #D30000; color:#000;">
-            <h1 style="color:#D30000; border-bottom:2px solid #D30000; padding-bottom:10px; margin-top:0;">${wetonKey}</h1>
-            
-            <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:0.9rem;">
-                <span>📅 <strong>${date.getDate()} ${["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"][date.getMonth()]} ${date.getFullYear()}</strong></span>
-                <span>🏮 <strong>${lunar.lunarYear} (${lunar.shio})</strong></span>
+        <div id="pdf-area" style="background:#fff; padding:20px; border-radius:15px; border:1px solid #ddd; color:#000;">
+            <h2 style="color:#D30000; margin:0;">${h} ${pasaran}</h2>
+            <p style="font-size:0.85rem; margin:5px 0;">Masehi: ${date.toLocaleDateString('id-ID')}</p>
+            <p style="font-size:0.85rem; margin:5px 0;">Jawa: ${infoJawa.tanggal} ${infoJawa.bulan.nama} ${infoJawa.tahun} AJ</p>
+            <p style="font-size:0.85rem; margin:5px 0;">Lunar: ${lunar.thn} (Shio ${lunar.shio}) | Zodiak: ${zodiak}</p>
+
+            <div style="background:#e8f5e9; padding:10px; border-radius:8px; margin:15px 0; border-left:5px solid #2e7d32;">
+                <h4 style="margin:0; color:#1b5e20;">💎 Nasib Pembagi 5: ${PEMBAGI_5[neptu % 5].n}</h4>
+                <p style="margin:5px 0 0; font-size:0.85rem;">${PEMBAGI_5[neptu % 5].a}</p>
             </div>
 
-            <div style="background:#fef9e7; padding:15px; border-radius:10px; margin-bottom:15px; border-left:5px solid #f1c40f;">
-                <h3 style="margin:0 0 10px 0; color:#856404;">💠 Analisis Nasib (Neptu: ${neptu})</h3>
-                <p><strong>Pembagi 5 (${PEMBAGI_5[neptu % 5].n}):</strong> ${PEMBAGI_5[neptu % 5].a}</p>
-                <p><strong>Pembagi 4 (${PEMBAGI_4[neptu % 4].n}):</strong> ${PEMBAGI_4[neptu % 4].a}</p>
+            <div style="background:#fff3e0; padding:10px; border-radius:8px; margin:15px 0; border-left:5px solid #ef6c00;">
+                <h4 style="margin:0; color:#e65100;">🪦 Nasib Kematian: ${PEMBAGI_4[neptu % 4].n}</h4>
+                <p style="margin:5px 0 0; font-size:0.85rem;">${PEMBAGI_4[neptu % 4].a}</p>
             </div>
 
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
-                <div style="background:#e8f5e9; padding:10px; border-radius:8px;">
-                    <h4 style="margin:0; color:#2e7d32;">🌾 Pranata Mangsa</h4>
-                    <p style="font-size:0.8rem; margin:5px 0 0;">${mangsa ? mangsa.nama : 'Data Mangsa Kosong'}</p>
-                </div>
-                <div style="background:#e3f2fd; padding:10px; border-radius:8px;">
-                    <h4 style="margin:0; color:#0d47a1;">✨ Zodiak</h4>
-                    <p style="font-size:0.8rem; margin:5px 0 0;">${star}</p>
-                </div>
+            <div style="background:#e3f2fd; padding:10px; border-radius:8px; margin:15px 0;">
+                <h4 style="margin:0; color:#0d47a1;">🌾 Pranata Mangsa: ${mangsa.nama}</h4>
+                <p style="margin:5px 0 0; font-size:0.85rem; line-height:1.4;">${mangsa.deskripsi}</p>
             </div>
 
-            <div style="margin-bottom:15px;">
-                <h4 style="color:#D30000; margin-bottom:5px;">🛡️ Info Wuku: ${wuku}</h4>
-                <p style="font-size:0.85rem; line-height:1.4;">${teksWuku}</p>
-            </div>
+            <h4 style="color:#D30000; border-bottom:1px solid #eee; margin-top:15px;">🛡️ Analisis Wuku: ${wukuName}</h4>
+            <div style="font-size:0.85rem; line-height:1.4;">${(typeof DATA_WUKU !== 'undefined') ? (DATA_WUKU[wukuName] || "") : ""}</div>
 
-            <div style="margin-bottom:15px;">
-                <h4 style="color:#D30000; margin-bottom:5px;">🌟 Astrologi & Karakter</h4>
-                <p style="font-size:0.85rem; line-height:1.4;"><strong>Sifat ${star}:</strong> ${teksBintang}</p>
-                <p style="font-size:0.85rem; line-height:1.4;"><strong>Sifat Hari:</strong> ${teksHari}</p>
-            </div>
+            ${tabelSriJati}
         </div>
     `;
-    
-    const actionBtn = document.getElementById('actionButtons');
-    if(actionBtn) actionBtn.style.display = 'flex';
-    detailDiv.scrollIntoView({ behavior: 'smooth' });
 }
 
+// Fungsi Download PDF (Fixed)
 window.downloadPDF = () => {
-    const element = document.getElementById('capture-area');
-    if (!element) return alert("Pilih tanggal di kalender terlebih dahulu!");
-    
+    const element = document.getElementById('pdf-area');
+    if (!element) return alert("Pilih tanggal dulu!");
     const opt = {
-        margin: 0.3,
+        margin: 0.5,
         filename: 'Ramalan_Lengkap.pdf',
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 3, useCORS: true },
+        html2canvas: { scale: 2 },
         jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
     };
     html2pdf().set(opt).from(element).save();
 };
 
-// ==========================================
-// 4. NAVIGASI
-// ==========================================
-
-document.getElementById('prevMonth').onclick = () => { current.setMonth(current.getMonth() - 1); generateCalendar(); };
-document.getElementById('nextMonth').onclick = () => { current.setMonth(current.getMonth() + 1); generateCalendar(); };
-
-// Jalankan aplikasi saat load pertama
-generateCalendar();
+// Start Apps
+generateCalendar(); 
 updateDetail(TODAY, getPasaran(TODAY));
