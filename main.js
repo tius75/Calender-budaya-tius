@@ -6,6 +6,15 @@ const PASARAN = ['Legi', 'Pahing', 'Pon', 'Wage', 'Kliwon'];
 const NEPTU_HARI = { 'Minggu': 5, 'Senin': 4, 'Selasa': 3, 'Rabu': 7, 'Kamis': 8, 'Jumat': 6, 'Sabtu': 9 };
 const NEPTU_PASARAN = { 'Pahing': 9, 'Pon': 7, 'Wage': 4, 'Kliwon': 8, 'Legi': 5 };
 
+// Data Nasib Pembagi 5
+const DATA_PEMBAGI_5 = {
+    1: { nama: "Sri", arti: "Murah rejeki. Rejeki datang dari mana saja." },
+    2: { nama: "Lungguh", arti: "Kecukupan dalam perjalanan hidup." },
+    3: { nama: "Gendhong", arti: "Mapan dalam segala hal yang berkaitan dengan lahiriah." },
+    4: { nama: "Loro", arti: "Sakit-sakitan (baik fisik, batin, maupun perjalanan hidup yang sering gagal)." },
+    0: { nama: "Pati", arti: "Apapun yang dilakukan selalu gagal dan selalu mendapatkan jalan buntu." }
+};
+
 const NASIB_AHLI_WARIS = {
     1: { nama: "Gunung", arti: "Kehidupan yang mulia bagi ahli waris." },
     2: { nama: "Guntur", arti: "Ahli waris akan mendapatkan kesulitan." },
@@ -135,6 +144,10 @@ function updateDetail(date, pasaran) {
     const infoJawa = getTanggalJawa(date);
     const mangsa = getMangsaInfo(date);
     const nasibKematian = NASIB_AHLI_WARIS[neptu % 4];
+
+    // Logika Pembagi 5 (Sri, Lungguh, Gendhong, Loro, Pati)
+    const sisa5 = neptu % 5;
+    const nasib5 = DATA_PEMBAGI_5[sisa5];
     
     // Safety check untuk DATA_WATAK_NEPTU
     const watakNeptu = (typeof DATA_WATAK_NEPTU !== 'undefined') ? DATA_WATAK_NEPTU[neptu] : null;
@@ -146,7 +159,7 @@ function updateDetail(date, pasaran) {
     const actionBtn = document.getElementById('actionButtons');
     if(actionBtn) actionBtn.style.display = 'flex';
 
-    // Ambil data pendukung (dengan pengecekan eksistensi variabel)
+    // Ambil data pendukung
     const teksWuku = (typeof DATA_WUKU !== 'undefined') ? (DATA_WUKU[wukuName] || "Detail wuku belum tersedia.") : "Data Wuku tidak ditemukan.";
     const teksHari = (typeof DATA_HARI !== 'undefined') ? (DATA_HARI[wetonKey] || "Data watak hari belum tersedia.") : "Data Hari tidak ditemukan.";
     const dataSriJati = (typeof TABEL_SRIJATI !== 'undefined') ? (TABEL_SRIJATI[neptu] || []) : [];
@@ -182,6 +195,12 @@ function updateDetail(date, pasaran) {
             <p style="margin:10px 0 0; font-size:1.15rem; font-weight:bold;">📅 ${tglMasehiLengkap}</p>
             <p style="margin:5px 0; color:#d30000; font-weight:500;"><strong>Jawa:</strong> ${infoJawa.tanggal} ${infoJawa.bulan.nama} ${infoJawa.tahun} AJ</p>
             
+            <div style="background:#e8f5e9; border:1px solid #c8e6c9; padding:12px; border-radius:8px; margin:15px 0;">
+                <h4 style="margin:0; color:#2e7d32; font-size:0.95rem;">💎 Ramalan Nasib (Pembagi 5)</h4>
+                <p style="font-size:1.1rem; font-weight:bold; margin:5px 0 2px; color:#1b5e20;">${nasib5.nama}</p>
+                <p style="font-size:0.85rem; margin:0; line-height:1.4; font-style:italic;">"${nasib5.arti}"</p>
+            </div>
+
             ${mangsa ? `
             <div style="background:#f0f7ff; border:1px solid #cfe2ff; padding:12px; border-radius:8px; margin:15px 0;">
                 <h4 style="margin:0; color:#084298; font-size:0.95rem;">🌾 Pranata Mangsa: ${mangsa.nama}</h4>
