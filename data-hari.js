@@ -1,8 +1,10 @@
 // data-hari.js
 const DATA_HARI = {
-    "Rabu Legi": `<b>Watak Rabu Legi:</b><br>
-        Bertanggung jawab, murah hati, enak dalam pergaulan, selalu gembira, luas wawasan (Sumur Sinaba), memiliki pesona daya tarik tinggi (Aras Kembang).`,
-    
-    "Minggu Pahing": `<b>Watak Minggu Pahing:</b><br>
-        Giat bekerja, mandiri, dan sangat menjaga kehormatan keluarga.`
+    "Senin": "Selalu berubah, indah, dan selalu mendapatkan simpati.",
+    "Selasa": "Pemarah dan pencemburu serta luas pergaulannya.",
+    "Rabu": "Pendiam, pemomong, dan penyabar.",
+    "Kamis": "Sangar dan menakutkan.",
+    "Jumat": "Energik dan mengagumkan.",
+    "Sabtu": "Membuat orang merasa senang dan susah ditebak.",
+    "Minggu": "Tekun, mandiri, dan berwibawa."
 };
