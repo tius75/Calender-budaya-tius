@@ -1,28 +1,42 @@
-import { WUKU_LIST, PASARAN, NEPTU_HARI, NEPTU_PASARAN } from './data.js';
+import { HARI, PASARAN, NEPTU_HARI, NEPTU_PASARAN } from './constants.js';
+import { getPasaran, getWuku } from './calendar-engine.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-    const mainApp = document.getElementById('mainApp');
-    
-    // MENGHILANGKAN LOCK: Menampilkan aplikasi secara otomatis
-    mainApp.classList.remove('hidden'); 
-    
-    console.log("Aplikasi Kalender Jawa Siap.");
-    
-    // Fungsi pencarian tanggal sederhana
-    window.searchDate = () => {
-        const dateInput = document.getElementById('dateInput').value;
-        if (!dateInput) return alert("Pilih tanggal dulu!");
-        
-        const selDate = new Date(dateInput);
-        const hari = selDate.toLocaleDateString('id-ID', { weekday: 'long' });
-        
-        // Rumus Pasaran
-        const baseDate = new Date('1900-01-01');
-        const diff = Math.floor((selDate - baseDate) / (1000 * 60 * 60 * 24));
-        const pasaran = PASARAN[(diff % 5 + 5) % 5];
-        
-        const detail = document.getElementById('detail');
-        detail.style.display = 'block';
-        detail.innerHTML = `<h3>Hasil: ${hari} ${pasaran}</h3><p>Neptu: ${NEPTU_HARI[hari] + NEPTU_PASARAN[pasaran]}</p>`;
-    };
-});
+// Import data terpisah
+import { DATA_WUKU } from './data-wuku.js';
+import { DATA_SRIJATI } from './data-srijati.js';
+import { DATA_HARI } from './data-hari.js';
+
+window.showDetail = function(date) {
+    const d = new Date(date);
+    const h = HARI[d.getDay()];
+    const p = getPasaran(d);
+    const w = getWuku(d);
+    const weton = `${h} ${p}`;
+    const nTotal = NEPTU_HARI[h] + NEPTU_PASARAN[p];
+
+    const detailDiv = document.getElementById('detail');
+    detailDiv.classList.add('active-show');
+
+    detailDiv.innerHTML = `
+        <div class="card">
+            <h3>HASIL ANALISIS</h3>
+            <p><strong>Weton:</strong> ${weton} (Neptu: ${nTotal})</p>
+            <p><strong>Wuku:</strong> ${w}</p>
+            
+            <div class="content-section">
+                <h4>📜 Sifat Wuku</h4>
+                <p>${DATA_WUKU[w] || "Data wuku belum diisi."}</p>
+            </div>
+
+            <div class="content-section">
+                <h4>✨ Ramalan Sri Jati</h4>
+                <p>${DATA_SRIJATI[weton] || "Data ramalan belum diisi."}</p>
+            </div>
+
+            <div class="content-section">
+                <h4>☀️ Sifat Hari</h4>
+                <p>${DATA_HARI[h] || "Data hari belum diisi."}</p>
+            </div>
+        </div>
+    `;
+};
