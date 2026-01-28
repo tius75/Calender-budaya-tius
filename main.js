@@ -76,6 +76,13 @@ function updateDetail(date, pasaran) {
     const wukuName = getWuku(date);
     const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
+const NASIB_AHLI_WARIS = {
+    1: { nama: "Gunung", arti: "Ahli waris yang ditinggalkan akan mendapatkan kehidupan yang mulia." },
+    2: { nama: "Guntur", arti: "Orang yang ditinggalkan atau ahli waris akan mendapat kesulitan." },
+    3: { nama: "Segoro", arti: "Ahli waris akan menghadapi situasi dimudahkannya mencari penghasilan atau rezeki." },
+    0: { nama: "Asat", arti: "Ahli waris yang ditinggalkan akan mengalami kesulitan mendapat rezeki." } // 0 adalah hasil sisa bagi 4 yang habis (seperti 12)
+};
+
     // Ambil data dari variabel global (file data-*.js)
     const teksWuku = (typeof DATA_WUKU !== 'undefined') ? (DATA_WUKU[wukuName] || "Detail wuku belum diinput.") : "File data-wuku.js belum terbaca.";
     const teksHari = (typeof DATA_HARI !== 'undefined') ? (DATA_HARI[wetonKey] || "Data watak belum tersedia.") : "File data-hari.js belum terbaca.";
