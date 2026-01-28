@@ -11,6 +11,12 @@ const PASARAN = ['Legi', 'Pahing', 'Pon', 'Wage', 'Kliwon'];
 const NEPTU_HARI = { 'Minggu': 5, 'Senin': 4, 'Selasa': 3, 'Rabu': 7, 'Kamis': 8, 'Jumat': 6, 'Sabtu': 9 };
 const NEPTU_PASARAN = { 'Pahing': 9, 'Pon': 7, 'Wage': 4, 'Kliwon': 8, 'Legi': 5 };
 
+// Saat membuat header (Sen, Sel, Rab...)
+if (index === 0) el.classList.add('sunday-red');
+
+// Saat membuat angka tanggal
+if (dateObj.getDay() === 0) cell.classList.add('sunday-red');
+
 const NASIB_AHLI_WARIS = { // Pembagi 4
     1: { nama: "Gunung", arti: "Kehidupan yang mulia bagi ahli waris." },
     2: { nama: "Guntur", arti: "Ahli waris akan mendapatkan kesulitan." },
@@ -118,6 +124,15 @@ function getMangsaInfo(date) {
     else if ((d >= 27 && m == 3) || (d <= 19 && m == 4)) id = 10;
     else if ((d >= 20 && m == 4) || (d <= 12 && m == 5)) id = 11;
     return (typeof DATA_MANGSA !== 'undefined') ? DATA_MANGSA[id] : null;
+}
+
+function searchWeton() {
+    const input = document.getElementById('dateInput');
+    if (!input.value) return alert("Pilih tanggal!");
+    const target = new Date(input.value);
+    current = new Date(target.getFullYear(), target.getMonth(), 1);
+    generateCalendar();
+    updateDetail(target, getPasaran(target));
 }
 
 // --- FITUR BARU: ARAH MEDITASI ---
