@@ -1,157 +1,32 @@
-:root {
-  --primary: #D30000;
-  --primary-soft: #fff5f5;
-  --dark: #2d3436;
-  --grey: #636e72;
-  --white: #ffffff;
-  --shadow: 0 10px 25px rgba(0,0,0,0.08);
-  --radius: 12px;
-}
-
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-body {
-  font-family: 'Inter', -apple-system, sans-serif;
-  background-color: #f0f2f5;
-  margin: 0;
-  padding: 15px;
-  color: var(--dark);
-  line-height: 1.6;
-}
-
-#mainApp {
-  max-width: 500px;
-  margin: 0 auto;
-  background: var(--white);
-  border-radius: 20px;
-  box-shadow: var(--shadow);
-  overflow: hidden;
-}
-
-/* Header & Search */
-.filter-container {
-  background: linear-gradient(135deg, #d30000, #800000);
-  color: white;
-  padding: 25px 20px;
-  text-align: center;
-}
-
-.filter-container h1 { margin: 0; font-size: 1.5rem; }
-.search-box { margin-top: 15px; display: flex; gap: 8px; justify-content: center; }
-
-.search-box input {
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  font-size: 14px;
-}
-
-.search-box button {
-  background: var(--dark);
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-/* Calendar Nav */
-.calendar-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 20px;
-}
-
-.calendar-nav button {
-  background: var(--primary-soft);
-  border: none;
-  color: var(--primary);
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-/* Grid Kalender */
+/* Pengaturan Grid agar Muncul Lagi */
 .calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  padding: 10px;
-  gap: 5px;
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    padding: 10px;
 }
 
-.calendar-grid div {
-  text-align: center;
-  padding: 12px 5px;
-  font-size: 14px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.2s;
+/* Styling Tanggal & Pasaran */
+.calendar-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 2px !important;
+    min-height: 50px;
+    border: 1px solid #f0f0f0;
 }
 
-/* State Hari */
-.calendar-day:hover { background: var(--primary-soft); color: var(--primary); }
-.sunday { color: var(--primary); font-weight: bold; }
-.today { background: var(--primary) !important; color: white !important; font-weight: bold; }
-
-/* Hasil Detail (Modular Design) */
-.detail-container {
-  display: none; /* Muncul via JS */
-  padding: 20px;
-  background: white;
-  border-top: 2px solid var(--primary-soft);
-  animation: slideUp 0.4s ease-out;
+.date-num {
+    font-size: 1.1rem;
+    font-weight: 600;
 }
 
-@keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+.pasaran-text {
+    font-size: 0.65rem; /* Teks kecil di bawah angka */
+    color: #d30000;
+    text-transform: uppercase;
+    margin-top: 2px;
 }
 
-.card-result {
-  background: #fff;
-  border: 1px solid #eee;
-  border-radius: var(--radius);
-  padding: 15px;
-}
-
-.info-section {
-  margin-top: 15px;
-  padding-top: 12px;
-  border-top: 1px dashed #ddd;
-}
-
-.info-section h4 {
-  color: var(--primary);
-  margin: 0 0 5px 0;
-  font-size: 14px;
-  text-transform: uppercase;
-}
-
-.info-section p {
-  margin: 0;
-  font-size: 13px;
-  color: #444;
-}
-
-footer {
-  text-align: center;
-  padding: 20px;
-  font-size: 12px;
-  color: var(--grey);
-}
-
-.btn-download {
-  width: 100%;
-  background: #27ae60;
-  color: white;
-  border: none;
-  padding: 12px;
-  border-radius: 8px;
-  margin-top: 20px;
-  font-weight: bold;
-  cursor: pointer;
-}
+.sunday .pasaran-text { color: #d30000; }
