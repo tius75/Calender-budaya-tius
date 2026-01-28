@@ -73,7 +73,6 @@ function getZodiak(date) {
 function getLunarShio(date) {
     const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
     const year = date.getFullYear();
-    // Shio berubah saat Imlek, biasanya akhir Januari/Februari
     const isEarly = (date.getMonth() === 0) || (date.getMonth() === 1 && date.getDate() < 10);
     const index = isEarly ? (year - 1) % 12 : year % 12;
     return { shio: shios[index], lunarYear: year + 3760 };
@@ -121,6 +120,35 @@ function getMangsaInfo(date) {
     return (typeof DATA_MANGSA !== 'undefined') ? DATA_MANGSA[id] : null;
 }
 
+// --- FITUR BARU: ARAH MEDITASI ---
+function getArahMeditasi(neptu) {
+    const map = {
+        7: "Kulon - Barat", 8: "Lor - Utara", 9: "Wetan - Timur", 10: "Kidul - Selatan",
+        11: "Kulon - Barat", 12: "Lor - Utara", 13: "Wetan - Timur", 14: "Kidul - Selatan",
+        15: "Kulon - Barat", 16: "Lor - Utara", 17: "Wetan - Timur", 18: "Kidul - Selatan"
+    };
+    return map[neptu] || "Pusat";
+}
+
+// --- FITUR BARU: HITUNG USIA ---
+function hitungUsiaLengkap(birthDate) {
+    let now = new Date();
+    let years = now.getFullYear() - birthDate.getFullYear();
+    let months = now.getMonth() - birthDate.getMonth();
+    let days = now.getDate() - birthDate.getDate();
+
+    if (days < 0) {
+        months--;
+        let lastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+        days += lastMonth.getDate();
+    }
+    if (months < 0) {
+        years--;
+        months += 12;
+    }
+    return `${years} Tahun, ${months} Bulan, ${days} Hari`;
+}
+
 // ==========================================
 // RENDER UI KALENDER
 // ==========================================
@@ -139,7 +167,6 @@ function generateCalendar() {
     HARI.forEach((h, i) => {
         const el = document.createElement('div');
         el.innerText = h.substring(0, 3);
-        // Tambahkan class sunday untuk mewarnai teks header Minggu jadi Merah
         el.className = 'header-day' + (i === 0 ? ' sunday' : '');
         grid.appendChild(el);
     });
@@ -155,13 +182,11 @@ function generateCalendar() {
         const cell = document.createElement('div');
         cell.className = 'calendar-day';
         
-        // Tetap tandai class sunday-block jika hari Minggu agar angka berwarna merah
         if (dateObj.getDay() === 0) cell.classList.add('sunday-block');
         if (dateObj.toDateString() === TODAY.toDateString()) cell.classList.add('today-highlight');
         
         cell.innerHTML = `<div class="date-num">${d}</div><div class="pasaran-text">${p}</div>`;
         cell.onclick = () => {
-            // Animasi penanda klik
             document.querySelectorAll('.calendar-day').forEach(c => c.classList.remove('selected-day'));
             cell.classList.add('selected-day');
             updateDetail(dateObj, p);
@@ -184,6 +209,8 @@ function updateDetail(date, pasaran) {
     const lunar = getLunarShio(date);
     const nasibKematian = NASIB_AHLI_WARIS[neptu % 4];
     const nasib5 = PEMBAGI_5[neptu % 5];
+    const arahMeditasi = getArahMeditasi(neptu);
+    const usia = hitungUsiaLengkap(date);
     
     const watakNeptu = (typeof DATA_WATAK_NEPTU !== 'undefined') ? DATA_WATAK_NEPTU[neptu] : null;
     const namaBulanMasehi = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
@@ -205,7 +232,6 @@ function updateDetail(date, pasaran) {
         </div>`;
     }
 
-    // Sri Jati Table
     let tabelHtml = `<table style="width:100%; border-collapse: collapse; margin-top:10px; font-size:0.85rem; border:1px solid #ddd;">
             <tr style="background:#f9f9f9;"><th style="border:1px solid #ddd; padding:8px;">Usia</th><th style="border:1px solid #ddd; padding:8px;">Nilai</th><th style="border:1px solid #ddd; padding:8px;">Nasib</th></tr>`;
     dataSriJati.forEach(item => {
@@ -215,13 +241,33 @@ function updateDetail(date, pasaran) {
 
     detailDiv.style.display = 'block';
     detailDiv.innerHTML = `
-        <div class="card-result" style="background:#fff; padding:20px; border-radius:12px; border:1px solid #eee; box-shadow: 0 4px 6px rgba(0,0,0,0.05); color:#000;">
+        <style>
+            @media print {
+                body * { visibility: hidden; }
+                #detail, #detail * { visibility: visible; }
+                #detail { position: absolute; left: 0; top: 0; width: 100%; }
+                .no-print { display: none !important; }
+            }
+        </style>
+
+        <div id="printableArea" class="card-result" style="background:#fff; padding:20px; border-radius:12px; border:1px solid #eee; box-shadow: 0 4px 6px rgba(0,0,0,0.05); color:#000;">
             ${warningNaas}
-            <h2 style="color:#D30000; margin-bottom:5px; border-bottom:2px solid #D30000; display:inline-block;">${wetonKey}</h2>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <h2 style="color:#D30000; margin:0 0 5px 0; border-bottom:2px solid #D30000; display:inline-block;">${wetonKey}</h2>
+                <div class="no-print">
+                   <button onclick="shareWhatsApp('${wetonKey}', '${tglMasehiLengkap}', '${usia}')" style="background:#25D366; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-size:0.8rem;">Share WA</button>
+                   <button onclick="window.print()" style="background:#D30000; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-size:0.8rem;">Cetak PDF</button>
+                </div>
+            </div>
             
             <p style="margin:10px 0 0; font-size:1.15rem; font-weight:bold;">📅 ${tglMasehiLengkap}</p>
             <p style="margin:5px 0; color:#d30000; font-weight:500;"><strong>Jawa:</strong> ${infoJawa.tanggal} ${infoJawa.bulan.nama} ${infoJawa.tahun} AJ</p>
             <p style="margin:5px 0; font-size:0.9rem;"><strong>Lunar:</strong> ${lunar.lunarYear} (Shio ${lunar.shio}) | <strong>Zodiak:</strong> ${zodiak}</p>
+            
+            <div style="background:#f0f7ff; border:1px solid #cfe2ff; padding:10px; border-radius:8px; margin:10px 0;">
+                <p style="margin:0; font-size:0.9rem;"><strong>⏳ Usia Saat Ini:</strong> ${usia}</p>
+                <p style="margin:5px 0 0; font-size:0.9rem;"><strong>🧘 Arah Meditasi:</strong> ${arahMeditasi}</p>
+            </div>
 
             <div style="background:#e8f5e9; border:1px solid #c8e6c9; padding:12px; border-radius:8px; margin:15px 0;">
                 <h4 style="margin:0; color:#2e7d32; font-size:0.95rem;">💎 Nasib Pembagi 5: ${nasib5.nama}</h4>
@@ -267,13 +313,19 @@ function updateDetail(date, pasaran) {
     detailDiv.scrollIntoView({ behavior: 'smooth' });
 }
 
+// --- FUNGSI SHARE ---
+function shareWhatsApp(weton, masehi, usia) {
+    const text = `*HASIL CEK WETON KALENDER JAWA*\n\n📅 Masehi: ${masehi}\n👹 Weton: ${weton}\n⏳ Usia: ${usia}\n\nCek selengkapnya di aplikasi Kalender Jawa Modern!`;
+    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+}
+
 // ==========================================
 // INITIAL START
 // ==========================================
 generateCalendar();
 updateDetail(TODAY, getPasaran(TODAY));
 
-// Pastikan elemen navigasi ada sebelum memanggil onclick
 const prev = document.getElementById('prevMonth');
 const next = document.getElementById('nextMonth');
 if(prev) prev.onclick = () => { current.setMonth(current.getMonth() - 1); generateCalendar(); };
