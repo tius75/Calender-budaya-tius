@@ -1,6 +1,6 @@
 /**
- * KALENDER JAWA MODERN - VERSI STABIL & LENGKAP
- * Integrasi: Weton, Shio, Zodiak, Pembagi 4 & 5, Wuku, Mangsa, dan Pal Jati.
+ * KALENDER JAWA MODERN - VERSI FINAL FIX 2026
+ * Perbaikan: Tombol Cari & Warna Merah Hari Minggu
  */
 
 // ==========================================
@@ -11,20 +11,14 @@ const PASARAN = ['Legi', 'Pahing', 'Pon', 'Wage', 'Kliwon'];
 const NEPTU_HARI = { 'Minggu': 5, 'Senin': 4, 'Selasa': 3, 'Rabu': 7, 'Kamis': 8, 'Jumat': 6, 'Sabtu': 9 };
 const NEPTU_PASARAN = { 'Pahing': 9, 'Pon': 7, 'Wage': 4, 'Kliwon': 8, 'Legi': 5 };
 
-// Saat membuat header (Sen, Sel, Rab...)
-if (index === 0) el.classList.add('sunday-red');
-
-// Saat membuat angka tanggal
-if (dateObj.getDay() === 0) cell.classList.add('sunday-red');
-
-const NASIB_AHLI_WARIS = { // Pembagi 4
+const NASIB_AHLI_WARIS = { 
     1: { nama: "Gunung", arti: "Kehidupan yang mulia bagi ahli waris." },
     2: { nama: "Guntur", arti: "Ahli waris akan mendapatkan kesulitan." },
     3: { nama: "Segoro", arti: "Kemudahan dalam mencari rezeki." },
     0: { nama: "Asat", arti: "Kesulitan dalam mendapatkan rezeki." }
 };
 
-const PEMBAGI_5 = { // Pembagi 5
+const PEMBAGI_5 = { 
     1: { nama: "Sri", arti: "Murah rezeki dan hidup makmur." },
     2: { nama: "Lungguh", arti: "Mendapatkan kedudukan atau pangkat tinggi." },
     3: { nama: "Gendhong", arti: "Mapan secara lahiriah dan dihargai orang." },
@@ -51,7 +45,7 @@ let current = new Date();
 const TODAY = new Date();
 
 // ==========================================
-// FUNGSI LOGIKA (Ditambahkan Shio & Zodiak)
+// FUNGSI LOGIKA DASAR
 // ==========================================
 
 function getPasaran(date) {
@@ -126,16 +120,6 @@ function getMangsaInfo(date) {
     return (typeof DATA_MANGSA !== 'undefined') ? DATA_MANGSA[id] : null;
 }
 
-function searchWeton() {
-    const input = document.getElementById('dateInput');
-    if (!input.value) return alert("Pilih tanggal!");
-    const target = new Date(input.value);
-    current = new Date(target.getFullYear(), target.getMonth(), 1);
-    generateCalendar();
-    updateDetail(target, getPasaran(target));
-}
-
-// --- FITUR BARU: ARAH MEDITASI ---
 function getArahMeditasi(neptu) {
     const map = {
         7: "Kulon - Barat", 8: "Lor - Utara", 9: "Wetan - Timur", 10: "Kidul - Selatan",
@@ -145,13 +129,11 @@ function getArahMeditasi(neptu) {
     return map[neptu] || "Pusat";
 }
 
-// --- FITUR BARU: HITUNG USIA ---
 function hitungUsiaLengkap(birthDate) {
     let now = new Date();
     let years = now.getFullYear() - birthDate.getFullYear();
     let months = now.getMonth() - birthDate.getMonth();
     let days = now.getDate() - birthDate.getDate();
-
     if (days < 0) {
         months--;
         let lastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
@@ -165,9 +147,22 @@ function hitungUsiaLengkap(birthDate) {
 }
 
 // ==========================================
+// FUNGSI CARI WETON (FIX)
+// ==========================================
+function searchWeton() {
+    const input = document.getElementById('dateInput');
+    if (!input || !input.value) return alert("Silakan pilih tanggal terlebih dahulu!");
+    
+    const target = new Date(input.value);
+    current = new Date(target.getFullYear(), target.getMonth(), 1);
+    
+    generateCalendar();
+    updateDetail(target, getPasaran(target));
+}
+
+// ==========================================
 // RENDER UI KALENDER
 // ==========================================
-
 function generateCalendar() {
     const grid = document.getElementById('calendar');
     const mNav = document.getElementById('monthYearNav');
@@ -179,10 +174,12 @@ function generateCalendar() {
     const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
     mNav.innerText = `${namaBulan[m]} ${y}`;
 
+    // Header Hari (Minggu Merah)
     HARI.forEach((h, i) => {
         const el = document.createElement('div');
         el.innerText = h.substring(0, 3);
-        el.className = 'header-day' + (i === 0 ? ' sunday' : '');
+        // FIX: Warna Merah di Header Minggu
+        el.className = 'header-day' + (i === 0 ? ' sunday-red' : '');
         grid.appendChild(el);
     });
 
@@ -197,7 +194,8 @@ function generateCalendar() {
         const cell = document.createElement('div');
         cell.className = 'calendar-day';
         
-        if (dateObj.getDay() === 0) cell.classList.add('sunday-block');
+        // FIX: Warna Merah di Tanggal Hari Minggu
+        if (dateObj.getDay() === 0) cell.classList.add('sunday-red');
         if (dateObj.toDateString() === TODAY.toDateString()) cell.classList.add('today-highlight');
         
         cell.innerHTML = `<div class="date-num">${d}</div><div class="pasaran-text">${p}</div>`;
@@ -256,92 +254,66 @@ function updateDetail(date, pasaran) {
 
     detailDiv.style.display = 'block';
     detailDiv.innerHTML = `
-        <style>
-            @media print {
-                body * { visibility: hidden; }
-                #detail, #detail * { visibility: visible; }
-                #detail { position: absolute; left: 0; top: 0; width: 100%; }
-                .no-print { display: none !important; }
-            }
-        </style>
-
         <div id="printableArea" class="card-result" style="background:#fff; padding:20px; border-radius:12px; border:1px solid #eee; box-shadow: 0 4px 6px rgba(0,0,0,0.05); color:#000;">
             ${warningNaas}
             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                 <h2 style="color:#D30000; margin:0 0 5px 0; border-bottom:2px solid #D30000; display:inline-block;">${wetonKey}</h2>
-                <div class="no-print">
-                   <button onclick="shareWhatsApp('${wetonKey}', '${tglMasehiLengkap}', '${usia}')" style="background:#25D366; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-size:0.8rem;">Share WA</button>
-                   <button onclick="window.print()" style="background:#D30000; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-size:0.8rem;">Cetak PDF</button>
-                </div>
             </div>
-            
             <p style="margin:10px 0 0; font-size:1.15rem; font-weight:bold;">📅 ${tglMasehiLengkap}</p>
             <p style="margin:5px 0; color:#d30000; font-weight:500;"><strong>Jawa:</strong> ${infoJawa.tanggal} ${infoJawa.bulan.nama} ${infoJawa.tahun} AJ</p>
             <p style="margin:5px 0; font-size:0.9rem;"><strong>Lunar:</strong> ${lunar.lunarYear} (Shio ${lunar.shio}) | <strong>Zodiak:</strong> ${zodiak}</p>
-            
             <div style="background:#f0f7ff; border:1px solid #cfe2ff; padding:10px; border-radius:8px; margin:10px 0;">
                 <p style="margin:0; font-size:0.9rem;"><strong>⏳ Usia Saat Ini:</strong> ${usia}</p>
                 <p style="margin:5px 0 0; font-size:0.9rem;"><strong>🧘 Arah Meditasi:</strong> ${arahMeditasi}</p>
             </div>
-
             <div style="background:#e8f5e9; border:1px solid #c8e6c9; padding:12px; border-radius:8px; margin:15px 0;">
                 <h4 style="margin:0; color:#2e7d32; font-size:0.95rem;">💎 Nasib Pembagi 5: ${nasib5.nama}</h4>
                 <p style="font-size:0.85rem; margin-top:5px;">${nasib5.arti}</p>
             </div>
-
             <p style="margin:10px 0;"><strong>Neptu:</strong> ${neptu} | <strong>Wuku:</strong> ${wukuName}</p>
-            
-            ${watakNeptu ? `
-            <div style="margin:15px 0; padding:12px; border:1px solid #e1bee7; border-radius:8px; background:#f3e5f5;">
-                <h4 style="color:#7b1fa2; margin:0 0 5px 0; border-bottom:1px solid #d1c4e9; font-size:0.95rem;">🌟 Watak Neptu ${neptu}</h4>
-                <p style="font-size:0.85rem; line-height:1.5; color:#4a148c;">${watakNeptu.watak}</p>
-            </div>` : ""}
-
-            <div style="margin:15px 0; padding:10px; background:#fffcf0; border-left:4px solid #f1c40f; border-radius:4px;">
-                <h4 style="margin:0; color:#856404; font-size:0.9rem;">🪦 Nasib Kematian (Ahli Waris)</h4>
-                <p style="margin:5px 0 0; font-weight:bold;">${nasibKematian.nama}</p>
-                <p style="margin:2px 0 0; font-size:0.85rem; font-style:italic;">"${nasibKematian.arti}"</p>
-            </div>
-
-            ${mangsa ? `
-            <div style="margin:15px 0; padding:12px; border:1px solid #cfe2ff; background:#f0f7ff; border-radius:8px;">
-                <h4 style="margin:0; color:#084298; font-size:0.95rem;">🌾 Pranata Mangsa: ${mangsa.nama}</h4>
-                <p style="font-size:0.85rem; margin-top:5px; line-height:1.4;">${mangsa.deskripsi}</p>
-            </div>` : ""}
-
-            <div style="margin-top:20px;">
-                <h4 style="color:#D30000; border-bottom:1px solid #eee; padding-bottom:5px;">🌸 Watak Hari Kelahiran</h4>
-                <div style="font-size:0.85rem; line-height:1.5;">${teksHari}</div>
-            </div>
-
-            <div style="margin-top:20px;">
-                <h4 style="color:#D30000; border-bottom:1px solid #eee; padding-bottom:5px;">🛡️ Analisis Wuku ${wukuName}</h4>
-                <div style="font-size:0.85rem; line-height:1.5;">${teksWuku}</div>
-            </div>
-
-            <div style="margin-top:20px;">
-                <h4 style="color:#D30000; border-bottom:1px solid #eee; padding-bottom:5px;">📈 Siklus Sri Jati (Rejeki)</h4>
-                ${dataSriJati.length > 0 ? tabelHtml : "<p style='color:#999;'>Data tidak tersedia.</p>"}
-            </div>
+            ${watakNeptu ? `<div style="margin:15px 0; padding:12px; border:1px solid #e1bee7; border-radius:8px; background:#f3e5f5;"><h4 style="color:#7b1fa2; margin:0 0 5px 0; border-bottom:1px solid #d1c4e9; font-size:0.95rem;">🌟 Watak Neptu ${neptu}</h4><p style="font-size:0.85rem; line-height:1.5; color:#4a148c;">${watakNeptu.watak}</p></div>` : ""}
+            <div style="margin:15px 0; padding:10px; background:#fffcf0; border-left:4px solid #f1c40f; border-radius:4px;"><h4 style="margin:0; color:#856404; font-size:0.9rem;">🪦 Nasib Kematian (Ahli Waris)</h4><p style="margin:5px 0 0; font-weight:bold;">${nasibKematian.nama}</p><p style="margin:2px 0 0; font-size:0.85rem; font-style:italic;">"${nasibKematian.arti}"</p></div>
+            ${mangsa ? `<div style="margin:15px 0; padding:12px; border:1px solid #cfe2ff; background:#f0f7ff; border-radius:8px;"><h4 style="margin:0; color:#084298; font-size:0.95rem;">🌾 Pranata Mangsa: ${mangsa.nama}</h4><p style="font-size:0.85rem; margin-top:5px; line-height:1.4;">${mangsa.deskripsi}</p></div>` : ""}
+            <div style="margin-top:20px;"><h4 style="color:#D30000; border-bottom:1px solid #eee; padding-bottom:5px;">🌸 Watak Hari Kelahiran</h4><div style="font-size:0.85rem; line-height:1.5;">${teksHari}</div></div>
+            <div style="margin-top:20px;"><h4 style="color:#D30000; border-bottom:1px solid #eee; padding-bottom:5px;">🛡️ Analisis Wuku ${wukuName}</h4><div style="font-size:0.85rem; line-height:1.5;">${teksWuku}</div></div>
+            <div style="margin-top:20px;"><h4 style="color:#D30000; border-bottom:1px solid #eee; padding-bottom:5px;">📈 Siklus Sri Jati (Rejeki)</h4>${dataSriJati.length > 0 ? tabelHtml : "<p style='color:#999;'>Data tidak tersedia.</p>"}</div>
         </div>
     `;
     detailDiv.scrollIntoView({ behavior: 'smooth' });
 }
 
-// --- FUNGSI SHARE ---
-function shareWhatsApp(weton, masehi, usia) {
-    const text = `*HASIL CEK WETON KALENDER JAWA*\n\n📅 Masehi: ${masehi}\n👹 Weton: ${weton}\n⏳ Usia: ${usia}\n\nCek selengkapnya di aplikasi Kalender Jawa Modern!`;
-    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
-    window.open(url, '_blank');
+// ==========================================
+// FITUR DOWNLOAD & SHARE
+// ==========================================
+function downloadPDF() {
+    const element = document.getElementById('printableArea');
+    if(!element) return;
+    const opt = {
+        margin: 0.5,
+        filename: 'Weton-Jawa.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
+}
+
+function shareWhatsApp() {
+    const detailArea = document.getElementById('printableArea');
+    if(!detailArea) return;
+    const text = `*HASIL CEK WETON KALENDER JAWA*\n\n${detailArea.innerText.substring(0, 500)}...\n\nCek selengkapnya di aplikasi!`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
 }
 
 // ==========================================
 // INITIAL START
 // ==========================================
-generateCalendar();
-updateDetail(TODAY, getPasaran(TODAY));
+document.addEventListener("DOMContentLoaded", () => {
+    generateCalendar();
+    updateDetail(TODAY, getPasaran(TODAY));
 
-const prev = document.getElementById('prevMonth');
-const next = document.getElementById('nextMonth');
-if(prev) prev.onclick = () => { current.setMonth(current.getMonth() - 1); generateCalendar(); };
-if(next) next.onclick = () => { current.setMonth(current.getMonth() + 1); generateCalendar(); };
+    const prev = document.getElementById('prevMonth');
+    const next = document.getElementById('nextMonth');
+    if(prev) prev.onclick = () => { current.setMonth(current.getMonth() - 1); generateCalendar(); };
+    if(next) next.onclick = () => { current.setMonth(current.getMonth() + 1); generateCalendar(); };
+});
