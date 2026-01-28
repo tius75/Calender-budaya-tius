@@ -30,126 +30,153 @@ let current = new Date();
 const TODAY = new Date();
 
 // ==========================================
-// 2. LOGIKA PERHITUNGAN (Core Engine)
+// 2. LOGIKA PERHITUNGAN
 // ==========================================
-
 function getPasaran(date) {
     const base = new Date(1900, 0, 1);
-    const diff = Math.floor((date.getTime() - base.getTime()) / (1000 * 60 * 60 * 24));
+    const diff = Math.floor((date - base) / 86400000);
     return PASARAN[(((diff + 1) % 5) + 5) % 5];
 }
 
 function getZodiak(date) {
     const d = date.getDate();
     const m = date.getMonth() + 1;
-    const zodiacs = [
-        { n: "Capricorn", r: [22, 12, 19, 1] }, { n: "Aquarius", r: [20, 1, 18, 2] },
-        { n: "Pisces", r: [19, 2, 20, 3] }, { n: "Aries", r: [21, 3, 19, 4] },
-        { n: "Taurus", r: [20, 4, 20, 5] }, { n: "Gemini", r: [21, 5, 20, 6] },
-        { n: "Cancer", r: [21, 6, 22, 7] }, { n: "Leo", r: [23, 7, 22, 8] },
-        { n: "Virgo", r: [23, 8, 22, 9] }, { n: "Libra", r: [23, 9, 22, 10] },
-        { n: "Scorpio", r: [23, 10, 21, 11] }, { n: "Sagittarius", r: [22, 11, 21, 12] }
+    const z = [
+        { n: "Capricorn", r: [22,12,19,1] }, { n: "Aquarius", r: [20,1,18,2] },
+        { n: "Pisces", r: [19,2,20,3] }, { n: "Aries", r: [21,3,19,4] },
+        { n: "Taurus", r: [20,4,20,5] }, { n: "Gemini", r: [21,5,20,6] },
+        { n: "Cancer", r: [21,6,22,7] }, { n: "Leo", r: [23,7,22,8] },
+        { n: "Virgo", r: [23,8,22,9] }, { n: "Libra", r: [23,9,22,10] },
+        { n: "Scorpio", r: [23,10,21,11] }, { n: "Sagittarius", r: [22,11,21,12] }
     ];
-    for (let z of zodiacs) {
-        if ((m == z.r[1] && d >= z.r[0]) || (m == z.r[3] && d <= z.r[2])) return z.n;
+    for (let i of z) {
+        if ((m === i.r[1] && d >= i.r[0]) || (m === i.r[3] && d <= i.r[2])) return i.n;
     }
     return "Capricorn";
 }
 
 function getLunarShio(date) {
-    const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
+    const shio = ["Monyet","Ayam","Anjing","Babi","Tikus","Kerbau","Macan","Kelinci","Naga","Ular","Kuda","Kambing"];
     const y = date.getFullYear();
-    return { shio: shios[y % 12], year: y + 3760 };
+    return { shio: shio[y % 12], year: y + 3760 };
 }
 
 // ==========================================
-// 3. RENDER UI & PDF (Anti-Gagal)
+// 3. RENDER KALENDER
 // ==========================================
-
 function generateCalendar() {
     const grid = document.getElementById('calendar');
-    const mNav = document.getElementById('monthYearNav');
-    if (!grid || !mNav) return;
+    const nav = document.getElementById('monthYearNav');
+    if (!grid || !nav) return;
 
     grid.innerHTML = '';
 
     const y = current.getFullYear();
     const m = current.getMonth();
+    nav.innerText = `${["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"][m]} ${y}`;
 
-    mNav.innerText = `${["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"][m]} ${y}`;
-
-    // HEADER HARI
     HARI.forEach((h, i) => {
         const el = document.createElement('div');
-        el.innerText = h.substring(0, 3);
         el.className = 'header-day' + (i === 0 ? ' sunday' : '');
+        el.textContent = h.substring(0,3);
         grid.appendChild(el);
     });
 
     const firstDay = new Date(y, m, 1).getDay();
-    const daysInMonth = new Date(y, m + 1, 0).getDate();
+    const days = new Date(y, m + 1, 0).getDate();
 
-    // ==== FIX UTAMA: EMPTY CELL HARUS ADA CLASS ====
     for (let i = 0; i < firstDay; i++) {
-        const empty = document.createElement('div');
-        empty.className = 'calendar-day empty-day';
-        empty.innerHTML = '&nbsp;';
-        grid.appendChild(empty);
+        const e = document.createElement('div');
+        e.className = 'calendar-day empty-day';
+        e.innerHTML = '&nbsp;';
+        grid.appendChild(e);
     }
 
-    for (let d = 1; d <= daysInMonth; d++) {
+    for (let d = 1; d <= days; d++) {
         const dateObj = new Date(y, m, d);
-        const p = getPasaran(dateObj);
+        const pasaran = getPasaran(dateObj);
 
         const cell = document.createElement('div');
         cell.className = 'calendar-day';
-
         if (dateObj.getDay() === 0) cell.classList.add('sunday-block');
         if (dateObj.toDateString() === TODAY.toDateString()) cell.classList.add('today-highlight');
 
-        cell.innerHTML = `
-            <div class="date-num">${d}</div>
-            <div class="pasaran-text">${p}</div>
-        `;
-
-        cell.onclick = () => updateDetail(dateObj, p);
+        cell.innerHTML = `<div class="date-num">${d}</div><div class="pasaran-text">${pasaran}</div>`;
+        cell.onclick = () => updateDetail(dateObj, pasaran);
         grid.appendChild(cell);
     }
 
-    // ==== GUARD GRID: PAKSA KELIPATAN 7 ====
-    const totalCell = grid.children.length;
-    const sisa = totalCell % 7;
+    const sisa = grid.children.length % 7;
     if (sisa !== 0) {
         for (let i = 0; i < 7 - sisa; i++) {
-            const filler = document.createElement('div');
-            filler.className = 'calendar-day empty-day';
-            filler.innerHTML = '&nbsp;';
-            grid.appendChild(filler);
+            const f = document.createElement('div');
+            f.className = 'calendar-day empty-day';
+            f.innerHTML = '&nbsp;';
+            grid.appendChild(f);
         }
     }
 }
 
+// ==========================================
+// 4. DETAIL (FIX TOTAL)
+// ==========================================
 function updateDetail(date, pasaran) {
-    /* === ISI FUNGSI TETAP SAMA, TIDAK DIUBAH === */
-    // (kode kamu di sini TIDAK DISENTUH)
+    const detail = document.getElementById('detail');
+    if (!detail) return;
+
+    detail.innerHTML = '';
+    detail.style.display = 'block';
+
+    const h = HARI[date.getDay()];
+    const weton = `${h} ${pasaran}`;
+    const neptu = NEPTU_HARI[h] + NEPTU_PASARAN[pasaran];
+    const zodiak = getZodiak(date);
+    const lunar = getLunarShio(date);
+    const wuku = (typeof getWuku === 'function') ? getWuku(date) : "Sinta";
+    const mangsa = (typeof getMangsaInfo === 'function')
+        ? getMangsaInfo(date)
+        : { nama: "Tidak Terdeteksi", deskripsi: "-" };
+
+    detail.innerHTML = `
+    <div id="pdf-container" style="background:#fff;padding:20px;color:#000">
+        <h2>${weton}</h2>
+        <p>📅 ${date.toLocaleDateString('id-ID')}</p>
+        <p>🌙 Lunar ${lunar.year} (${lunar.shio})</p>
+        <p>⭐ Zodiak ${zodiak}</p>
+        <hr>
+        <p><strong>Nasib 5:</strong> ${PEMBAGI_5[neptu % 5].n}</p>
+        <p>${PEMBAGI_5[neptu % 5].a}</p>
+        <p><strong>Nasib 4:</strong> ${PEMBAGI_4[neptu % 4].n}</p>
+        <p>${PEMBAGI_4[neptu % 4].a}</p>
+        <p><strong>Wuku:</strong> ${wuku}</p>
+        <p><strong>Mangsa:</strong> ${mangsa.nama}</p>
+    </div>`;
+
+    requestAnimationFrame(() => {
+        detail.scrollIntoView({ behavior: 'smooth' });
+    });
 }
 
-// Download PDF
+// ==========================================
+// 5. DOWNLOAD PDF (ANTI KOSONG)
+// ==========================================
 window.downloadPDF = () => {
-    const element = document.getElementById('pdf-container');
-    if (!element) return alert("Silakan pilih tanggal terlebih dahulu!");
-    const opt = {
-        margin: 0.5,
-        filename: 'Ramalan_Lengkap.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 3, useCORS: true },
-        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-    };
-    html2pdf().set(opt).from(element).save();
+    const el = document.getElementById('pdf-container');
+    if (!el) return alert("Silakan pilih tanggal dahulu");
+
+    setTimeout(() => {
+        html2pdf().set({
+            margin: 0.5,
+            filename: 'Ramalan_Lengkap.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 3, backgroundColor: '#ffffff' },
+            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+        }).from(el).save();
+    }, 300);
 };
 
 // ==========================================
-// 4. INIT
+// 6. INIT
 // ==========================================
 document.getElementById('prevMonth').onclick = () => {
     current.setMonth(current.getMonth() - 1);
