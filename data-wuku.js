@@ -195,7 +195,7 @@ const DATA_WUKU = {
         • Baik untuk: Menanam padi, pasang tumbal, memperbaiki rumah.<br>
         • Tidak baik untuk: Bekerja sambilan, berkasih-kasihan, pindah tempat.`,
 
-    "Tambir": `<b>Wuku TAMBIR: NYAWA</b><br><br>
+    "Tambir": `<b>Wuku Tambir: NYAWA</b><br><br>
         Hari Naas: Selasa (Anggara Kasih)<br>
         • Dewa Bumi: Bethara Siwah (Baik di lahir, pamrih di batin).<br>
         • Pohon: Upas (Tidak bisa jadi pelindung).<br>
@@ -217,7 +217,7 @@ const DATA_WUKU = {
         • Baik untuk: Menikah, mendirikan rumah, mencari solusi (srana).<br>
         • Tidak baik untuk: Bertengkar dan berkhianat.`,
 
-    "Maktal": `<b>Wuku MAKTAL: DONYA</b><br><br>
+    "Maktal": `<b>Wuku Maktal: DONYA</b><br><br>
         Hari Naas: Selasa, Jumat<br>
         • Dewa Bumi: Bethara Sakri.<br>
         • Pohon: Nagasari & Burung Ayam Alas (Banyak simpati, pandai berbakti).<br>
@@ -227,7 +227,7 @@ const DATA_WUKU = {
         • Baik untuk: Menikahkan, mengundang kerabat, memperbaiki barang.<br>
         • Tidak baik untuk: Bepergian jauh, pindah rumah, meminjamkan uang.`,
 
-    "Wuye": `<b>Wuku WUYE: MALIHAN</b><br><br>
+    "Wuye": `<b>Wuku Wuye: MALIHAN</b><br><br>
         Hari Naas: Senin, Kamis<br>
         • Dewa Bumi: Bethara Kuwera.<br>
         • Pohon: Tal (Panjang umur). Burung: Gogik (Ambisius).<br>
