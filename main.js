@@ -290,53 +290,59 @@ async function downloadPDF() {
     const source = document.getElementById('printableArea');
     if (!source) return alert("Data tidak ditemukan!");
 
-    // Simpan kondisi awal
+    // pastikan semua detail SUDAH TERBUKA
+    source.querySelectorAll('.show-detail').forEach(el => {
+        el.style.display = "block";
+        el.style.height = "auto";
+        el.style.maxHeight = "none";
+        el.style.overflow = "visible";
+    });
+
     const originalStyle = source.getAttribute("style");
     const originalParent = source.parentNode;
     const placeholder = document.createElement("div");
     originalParent.insertBefore(placeholder, source);
 
-    // Pindahkan ke body & paksa ukuran A4
     document.body.appendChild(source);
 
     Object.assign(source.style, {
         display: "block",
         position: "relative",
-        width: "794px",      // 🔥 KUNCI UTAMA
+        width: "794px",
         maxWidth: "794px",
-        boxSizing: "border-box",
-        padding: "20px",
         background: "#fff",
         color: "#000",
-        transform: "none",
-        overflow: "hidden"
+        overflow: "visible" // 🔥 WAJIB
     });
 
-    // Paksa child agar tidak overflow
+    // paksa semua child boleh tinggi bebas
     source.querySelectorAll("*").forEach(el => {
+        el.style.overflow = "visible";
+        el.style.maxHeight = "none";
         el.style.boxSizing = "border-box";
-        el.style.maxWidth = "100%";
-        el.style.wordBreak = "break-word";
+        el.style.pageBreakInside = "avoid";
     });
 
-    await new Promise(r => setTimeout(r, 500));
+    // tunggu render detail
+    await new Promise(r => setTimeout(r, 600));
 
     const opt = {
-        margin: 0,
+        margin: 20,
         filename: "Detail-Weton-Lengkap.pdf",
         image: { type: "jpeg", quality: 0.98 },
         html2canvas: {
             scale: 2,
             useCORS: true,
             backgroundColor: "#ffffff",
-            windowWidth: 794,   // 🔥 SAMA dengan width
-            scrollX: 0,
-            scrollY: 0
+            windowWidth: 794
         },
         jsPDF: {
             unit: "px",
-            format: [794, 1123], // 🔥 PAKSA A4 px
+            format: "a4",
             orientation: "portrait"
+        },
+        pagebreak: {
+            mode: ["css", "legacy"] // 🔥 AUTO MULTI PAGE
         }
     };
 
@@ -347,7 +353,6 @@ async function downloadPDF() {
         alert("Gagal membuat PDF");
     }
 
-    // Kembalikan posisi awal
     placeholder.replaceWith(source);
     if (originalStyle) {
         source.setAttribute("style", originalStyle);
