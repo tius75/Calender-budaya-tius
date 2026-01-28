@@ -296,7 +296,28 @@ const DATA_WUKU = {
         • Sifat: Tajam pikirannya, waspada, namun sering ragu.<br>
         • Baik untuk: Mencari ilmu, berdiplomasi.`
 
-  
+      "Kulawu": `<b>Wuku KULAWU: MALIHAN</b><br><br>
+        Hari Naas: Senin, Kamis<br>
+        • Dewa Bumi: Bethara Sadana.<br>
+        • Pohon: Tal (Panjang umurnya).<br>
+        • Burung: Nori (Boros, rela memberi tanpa ingin disanjung, keinginan besar).<br>
+        • Sifat: Embun jatuh di sendang agung (Serba tepat tempatnya).<br>
+        • Aral: Terkena bisa dan digigit ular.<br>
+        • Kala Jaya Bumi: Utara menghadap ke Selatan.<br>
+        • Baik untuk: Mengobati orang sakit, menikah/wayuh (poligami), berteman.<br>
+        • Tidak baik untuk: Bepergian jauh, pindah tempat, membuka hutan.`,
+
+    "Dukut": `<b>Wuku DUKUT: SONYA</b><br><br>
+        Hari Naas: Rabu, Sabtu, Minggu<br>
+        • Dewa Bumi: Bethara Sakri.<br>
+        • Pohon: Pandan (Tempatnya terpinggirkan/tersisihkan).<br>
+        • Burung: Ayam Alas (Disenangi orang berpangkat).<br>
+        • Sifat: Berhati tajam (mudah tersinggung), narima terhadap nasib, hati-hati soal uang (cenderung kikir).<br>
+        • Aral: Dalam peperangan.<br>
+        • Kala Jaya Bumi: Barat Daya.<br>
+        • Baik untuk: Memperbaiki rumah, membuka kebun, mencari jodoh, membuat obat.<br>
+        • Tidak baik untuk: Menghindari bepergian ke arah Barat Daya.`
+
 
   "Watugunung": `<b>Wuku WATUGUNUNG: SONYA</b><br><br>
         Hari Naas: Selasa, Jumat<br>
