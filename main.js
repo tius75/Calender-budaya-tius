@@ -1,42 +1,62 @@
 import { HARI, PASARAN, NEPTU_HARI, NEPTU_PASARAN } from './constants.js';
 import { getPasaran, getWuku } from './calendar-engine.js';
 
-// Import data terpisah
+// Import Data Terpisah (Pastikan file ini ada di Github Anda)
 import { DATA_WUKU } from './data-wuku.js';
 import { DATA_SRIJATI } from './data-srijati.js';
-import { DATA_HARI } from './data-hari.js';
+// Tambahkan import untuk data Chinese jika ada
 
-window.showDetail = function(date) {
-    const d = new Date(date);
-    const h = HARI[d.getDay()];
-    const p = getPasaran(d);
-    const w = getWuku(d);
-    const weton = `${h} ${p}`;
-    const nTotal = NEPTU_HARI[h] + NEPTU_PASARAN[p];
+let current = new Date();
 
-    const detailDiv = document.getElementById('detail');
-    detailDiv.classList.add('active-show');
+function generateCalendar() {
+    const grid = document.getElementById('calendar');
+    const monthNav = document.getElementById('monthYearNav');
+    if (!grid) return;
 
-    detailDiv.innerHTML = `
-        <div class="card">
-            <h3>HASIL ANALISIS</h3>
-            <p><strong>Weton:</strong> ${weton} (Neptu: ${nTotal})</p>
-            <p><strong>Wuku:</strong> ${w}</p>
-            
-            <div class="content-section">
-                <h4>📜 Sifat Wuku</h4>
-                <p>${DATA_WUKU[w] || "Data wuku belum diisi."}</p>
-            </div>
+    grid.innerHTML = '';
+    const y = current.getFullYear();
+    const m = current.getMonth();
 
-            <div class="content-section">
-                <h4>✨ Ramalan Sri Jati</h4>
-                <p>${DATA_SRIJATI[weton] || "Data ramalan belum diisi."}</p>
-            </div>
+    const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    monthNav.innerText = `${namaBulan[m]} ${y}`;
 
-            <div class="content-section">
-                <h4>☀️ Sifat Hari</h4>
-                <p>${DATA_HARI[h] || "Data hari belum diisi."}</p>
-            </div>
-        </div>
-    `;
-};
+    // Header Nama Hari
+    HARI.forEach((h, i) => {
+        const el = document.createElement('div');
+        el.innerText = h.substring(0, 3);
+        if (i === 0) el.classList.add('sunday');
+        grid.appendChild(el);
+    });
+
+    const firstDay = new Date(y, m, 1).getDay();
+    const daysInMonth = new Date(y, m + 1, 0).getDate();
+
+    // Padding awal bulan
+    for (let i = 0; i < firstDay; i++) grid.appendChild(document.createElement('div'));
+
+    // Loop Hari
+    for (let d = 1; d <= daysInMonth; d++) {
+        const dateObj = new Date(y, m, d);
+        const p = getPasaran(dateObj); // Ambil pasaran (Wage, Legi, dll)
+        
+        const cell = document.createElement('div');
+        cell.className = 'calendar-day';
+        if (dateObj.getDay() === 0) cell.classList.add('sunday');
+
+        // Menampilkan Angka Tanggal + Nama Pasaran di bawahnya
+        cell.innerHTML = `
+            <span class="date-num">${d}</span>
+            <span class="pasaran-text">${p}</span>
+        `;
+
+        cell.onclick = () => window.showDetail(dateObj);
+        grid.appendChild(cell);
+    }
+}
+
+// Inisialisasi Tombol Navigasi
+document.getElementById('prevMonth').onclick = () => { current.setMonth(current.getMonth() - 1); generateCalendar(); };
+document.getElementById('nextMonth').onclick = () => { current.setMonth(current.getMonth() + 1); generateCalendar(); };
+
+// Jalankan saat pertama dimuat
+generateCalendar();
