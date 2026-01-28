@@ -287,15 +287,14 @@ function updateDetail(date, pasaran) {
 // ==========================================
 
 async function downloadPDF() {
-    const source = document.getElementById('printableArea');
+    const source = document.getElementById("printableArea");
     if (!source) return alert("Data tidak ditemukan!");
 
-    // pastikan semua detail SUDAH TERBUKA
-    source.querySelectorAll('.show-detail').forEach(el => {
+    // pastikan detail tampil
+    source.querySelectorAll(".show-detail").forEach(el => {
         el.style.display = "block";
         el.style.height = "auto";
         el.style.maxHeight = "none";
-        el.style.overflow = "visible";
     });
 
     const originalStyle = source.getAttribute("style");
@@ -311,20 +310,16 @@ async function downloadPDF() {
         width: "794px",
         maxWidth: "794px",
         background: "#fff",
-        color: "#000",
-        overflow: "visible" // 🔥 WAJIB
+        color: "#000"
     });
 
-    // paksa semua child boleh tinggi bebas
-    source.querySelectorAll("*").forEach(el => {
-        el.style.overflow = "visible";
-        el.style.maxHeight = "none";
+    // ⚠️ HANYA SECTION UTAMA
+    source.querySelectorAll(".card, .box, .panel, table").forEach(el => {
         el.style.boxSizing = "border-box";
-        el.style.pageBreakInside = "avoid";
+        el.style.maxWidth = "100%";
     });
 
-    // tunggu render detail
-    await new Promise(r => setTimeout(r, 600));
+    await new Promise(r => setTimeout(r, 500));
 
     const opt = {
         margin: 20,
@@ -342,7 +337,7 @@ async function downloadPDF() {
             orientation: "portrait"
         },
         pagebreak: {
-            mode: ["css", "legacy"] // 🔥 AUTO MULTI PAGE
+            mode: ["css"]
         }
     };
 
