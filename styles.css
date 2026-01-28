@@ -247,31 +247,59 @@ td {
 .btn-pdf { background-color: #3d3d3d; }
 .btn-wa { background-color: #25D366; }
 
-/* ==========================================
-   KHUSUS CETAK PDF (ANTI-BLANK)
-   ========================================== */
-@media print {
-    body { background: white !important; padding: 0 !important; }
-    
-    #mainApp { 
-        box-shadow: none !important; 
-        max-width: 100% !important; 
-        overflow: visible !important; 
-    }
+/* =========================
+   MODE KHUSUS PDF (AMAN)
+========================= */
 
-    /* Sembunyikan elemen navigasi agar PDF bersih */
-    .filter-container, .calendar-nav, .calendar-grid, .action-buttons {
-        display: none !important;
-    }
+#printableArea.pdf-mode {
+    width: 794px !important;
+    max-width: 794px !important;
+    background: #fff !important;
+    color: #000 !important;
+    overflow: visible !important;
+    box-sizing: border-box;
+}
 
-    #printableArea,
-#printableArea * {
+/* HANYA CHILD LANGSUNG */
+#printableArea.pdf-mode > div,
+#printableArea.pdf-mode section,
+#printableArea.pdf-mode article {
+    max-width: 100% !important;
     overflow: visible !important;
 }
 
-.show-detail {
+/* DETAIL */
+#printableArea.pdf-mode .show-detail {
     display: block !important;
     height: auto !important;
     max-height: none !important;
+}
+
+/* CARD / BOX */
+#printableArea.pdf-mode .card,
+#printableArea.pdf-mode .box,
+#printableArea.pdf-mode .panel {
+    box-shadow: none !important;
+    border-radius: 6px;
+    margin-bottom: 12px;
+}
+
+/* FLEX & GRID → BLOCK */
+#printableArea.pdf-mode .row,
+#printableArea.pdf-mode .flex,
+#printableArea.pdf-mode .grid {
+    display: block !important;
+}
+
+/* TABEL */
+#printableArea.pdf-mode table {
+    width: 100% !important;
+    table-layout: fixed !important;
+}
+
+#printableArea.pdf-mode td,
+#printableArea.pdf-mode th {
+    word-break: break-word;
+    font-size: 12px;
 }
 
