@@ -97,38 +97,42 @@ function getMangsaInfo(date) {
 // ==========================================
 
 function generateCalendar() {
-    const grid = document.getElementById('calendar');
-    const mNav = document.getElementById('monthYearNav');
-    if (!grid) return;
-    
-    grid.innerHTML = '';
-    const y = current.getFullYear();
-    const m = current.getMonth();
-    const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    mNav.innerText = `${namaBulan[m]} ${y}`;
+    try {
+        const grid = document.getElementById('calendar');
+        const mNav = document.getElementById('monthYearNav');
+        if (!grid) return;
+        
+        grid.innerHTML = '';
+        const y = current.getFullYear();
+        const m = current.getMonth();
+        const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        mNav.innerText = `${namaBulan[m]} ${y}`;
 
-    HARI.forEach((h, i) => {
-        const el = document.createElement('div');
-        el.innerText = h.substring(0, 3);
-        el.className = 'header-day' + (i === 0 ? ' sunday' : '');
-        grid.appendChild(el);
-    });
+        HARI.forEach((h, i) => {
+            const el = document.createElement('div');
+            el.innerText = h.substring(0, 3);
+            el.className = 'header-day' + (i === 0 ? ' sunday' : '');
+            grid.appendChild(el);
+        });
 
-    const firstDay = new Date(y, m, 1).getDay();
-    const daysInMonth = new Date(y, m + 1, 0).getDate();
+        const firstDay = new Date(y, m, 1).getDay();
+        const daysInMonth = new Date(y, m + 1, 0).getDate();
 
-    for (let i = 0; i < firstDay; i++) grid.appendChild(document.createElement('div'));
+        for (let i = 0; i < firstDay; i++) grid.appendChild(document.createElement('div'));
 
-    for (let d = 1; d <= daysInMonth; d++) {
-        const dateObj = new Date(y, m, d);
-        const p = getPasaran(dateObj);
-        const cell = document.createElement('div');
-        cell.className = 'calendar-day';
-        if (dateObj.getDay() === 0) cell.classList.add('sunday-block');
-        if (dateObj.toDateString() === TODAY.toDateString()) cell.classList.add('today-highlight');
-        cell.innerHTML = `<div class="date-num">${d}</div><div class="pasaran-text">${p}</div>`;
-        cell.onclick = () => updateDetail(dateObj, p);
-        grid.appendChild(cell);
+        for (let d = 1; d <= daysInMonth; d++) {
+            const dateObj = new Date(y, m, d);
+            const p = getPasaran(dateObj);
+            const cell = document.createElement('div');
+            cell.className = 'calendar-day';
+            if (dateObj.getDay() === 0) cell.classList.add('sunday-block');
+            if (dateObj.toDateString() === TODAY.toDateString()) cell.classList.add('today-highlight');
+            cell.innerHTML = `<div class="date-num">${d}</div><div class="pasaran-text">${p}</div>`;
+            cell.onclick = () => updateDetail(dateObj, p);
+            grid.appendChild(cell);
+        }
+    } catch (e) {
+        console.error("Error generating calendar:", e);
     }
 }
 
@@ -145,29 +149,25 @@ function updateDetail(date, pasaran) {
     const mangsa = getMangsaInfo(date);
     const nasibKematian = NASIB_AHLI_WARIS[neptu % 4];
 
-    // Logika Pembagi 5 (Sri, Lungguh, Gendhong, Loro, Pati)
+    // Logika Pembagi 5
     const sisa5 = neptu % 5;
     const nasib5 = DATA_PEMBAGI_5[sisa5];
     
-    // Safety check untuk DATA_WATAK_NEPTU
+    // Safety check data eksternal
     const watakNeptu = (typeof DATA_WATAK_NEPTU !== 'undefined') ? DATA_WATAK_NEPTU[neptu] : null;
-
-    const namaBulanMasehi = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    const tglMasehiLengkap = `${date.getDate()} ${namaBulanMasehi[date.getMonth()]} ${date.getFullYear()}`;
-
-    // Show Action Buttons
-    const actionBtn = document.getElementById('actionButtons');
-    if(actionBtn) actionBtn.style.display = 'flex';
-
-    // Ambil data pendukung
     const teksWuku = (typeof DATA_WUKU !== 'undefined') ? (DATA_WUKU[wukuName] || "Detail wuku belum tersedia.") : "Data Wuku tidak ditemukan.";
     const teksHari = (typeof DATA_HARI !== 'undefined') ? (DATA_HARI[wetonKey] || "Data watak hari belum tersedia.") : "Data Hari tidak ditemukan.";
     const dataSriJati = (typeof TABEL_SRIJATI !== 'undefined') ? (TABEL_SRIJATI[neptu] || []) : [];
 
+    const namaBulanMasehi = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    const tglMasehiLengkap = `${date.getDate()} ${namaBulanMasehi[date.getMonth()]} ${date.getFullYear()}`;
+
+    const actionBtn = document.getElementById('actionButtons');
+    if(actionBtn) actionBtn.style.display = 'flex';
+
     const isNaas = infoJawa.bulan.naas.includes(infoJawa.tanggal);
     const isTaliWangke = (wetonKey === infoJawa.bulan.taliWangke);
 
-    // Warning Naas Section
     let warningNaas = "";
     if (isNaas || isTaliWangke) {
         warningNaas = `<div style="background:#ffebee; color:#c62828; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #d32f2f; font-size:0.85rem;">
@@ -177,7 +177,6 @@ function updateDetail(date, pasaran) {
         </div>`;
     }
 
-    // Sri Jati Table
     let tabelHtml = `<table style="width:100%; border-collapse: collapse; margin-top:10px; font-size:0.85rem; border:1px solid #ddd;">
             <tr style="background:#f9f9f9;"><th style="border:1px solid #ddd; padding:8px;">Usia</th><th style="border:1px solid #ddd; padding:8px;">Nilai</th><th style="border:1px solid #ddd; padding:8px;">Nasib</th></tr>`;
     dataSriJati.forEach(item => {
@@ -185,7 +184,6 @@ function updateDetail(date, pasaran) {
     });
     tabelHtml += `</table>`;
 
-    // Render Final HTML
     detailDiv.style.display = 'block';
     detailDiv.innerHTML = `
         <div class="card-result" style="background:#fff; padding:20px; border-radius:12px; border:1px solid #eee; box-shadow: 0 4px 6px rgba(0,0,0,0.05); color:#000;">
