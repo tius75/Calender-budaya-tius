@@ -11,26 +11,22 @@
     <header class="filter-container">
       <div class="mobile-header">
         <h1>Kalender Jawa Abadi</h1>
-        <p id="monthYearText">Januari 2026</p>
+        <p id="monthYearText"></p>
       </div>
       
       <div class="search-box">
         <input type="date" id="dateInput">
-        <button id="btnSearch">Cari Weton</button>
+        <button id="btnSearch" onclick="searchWeton()">Cari Weton</button>
       </div>
     </header>
 
     <nav class="calendar-nav">
       <button id="prevMonth">◀</button>
-      <h2 id="monthYearNav">Januari 2026</h2>
+      <h2 id="monthYearNav"></h2>
       <button id="nextMonth">▶</button>
     </nav>
 
-    <div class="calendar-grid" id="calendar">
-      </div>
-<div id="calendar" class="calendar-grid"></div>
-
-<div id="detail" class="detail-container"></div>
+    <div id="calendar" class="calendar-grid"></div>
 
     <div id="detail" class="detail-container"></div>
 
@@ -40,7 +36,6 @@
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
- <script src="main.js"></script>
-
+  <script src="main.js"></script>
 </body>
 </html>
