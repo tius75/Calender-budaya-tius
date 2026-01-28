@@ -1,18 +1,26 @@
-// Simpan sebagai data-srijati.js
-// JANGAN gunakan kata 'export'
+// data-srijati.js
+const SRI_JATI_DESC = {
+    0: "Kesakitan (Penderitaan dan Ujian Hidup)",
+    1: "Penghasilan Sedikit",
+    2: "Penghasilan sedang atau Cukup",
+    3: "Penghasilan Baik",
+    4: "Penghasilan Besar",
+    5: "Penghasilan Baik dan Hidup senang",
+    7: "Hidup mewah dan Sempurna",
+    8: "Hidup Berhasil dan Mewah berkelanjutan"
+};
+
 const TABEL_SRIJATI = {
-    12: [
-        { usia: "0-6", nilai: 2, ket: "Kekurangan" },
-        { usia: "6-12", nilai: 3, ket: "Cukup" },
-        { usia: "12-18", nilai: 5, ket: "Maju" },
-        { usia: "18-24", nilai: 1, ket: "Sangat Kurang" },
-        { usia: "24-30", nilai: 7, ket: "Sangat Baik" },
-        { usia: "30-36", nilai: 1, ket: "Sangat Kurang" }
-    ],
-    10: [
-        { usia: "0-6", nilai: 5, ket: "Maju" },
-        { usia: "6-12", nilai: 2, ket: "Kurang" },
-        { usia: "12-18", nilai: 1, ket: "Sangat Kurang" }
-    ]
-    // Tambahkan neptu lainnya di sini nanti
+    7: [{ age: "0-6", v: 4 }, { age: "7-12", v: 1 }, { age: "13-18", v: 4 }, { age: "19-24", v: 1 }, { age: "25-30", v: 0 }, { age: "31-36", v: 2 }, { age: "37-42", v: 2 }],
+    8: [{ age: "0-6", v: 4 }, { age: "7-12", v: 1 }, { age: "13-18", v: 0 }, { age: "19-24", v: 1 }, { age: "25-30", v: 0 }, { age: "31-36", v: 3 }, { age: "37-42", v: 0 }, { age: "43-48", v: 7 }],
+    9: [{ age: "0-6", v: 2 }, { age: "7-12", v: 5 }, { age: "13-18", v: 1 }, { age: "19-24", v: 0 }, { age: "25-30", v: 4 }, { age: "31-36", v: 1 }, { age: "37-42", v: 4 }, { age: "43-48", v: 0 }, { age: "49-54", v: 1 }],
+    10: [{ age: "0-6", v: 1 }, { age: "7-12", v: 0 }, { age: "13-18", v: 4 }, { age: "19-24", v: 1 }, { age: "25-30", v: 1 }, { age: "31-36", v: 3 }, { age: "37-42", v: 0 }, { age: "43-48", v: 0 }, { age: "49-54", v: 4 }, { age: "55-60", v: 4 }],
+    11: [{ age: "0-6", v: 2 }, { age: "7-12", v: 4 }, { age: "13-18", v: 1 }, { age: "19-24", v: 1 }, { age: "25-30", v: 8 }, { age: "31-36", v: 1 }, { age: "37-42", v: 0 }, { age: "43-48", v: 1 }, { age: "49-54", v: 2 }, { age: "55-60", v: 0 }, { age: "61-66", v: 2 }],
+    12: [{ age: "0-6", v: 0 }, { age: "7-12", v: 5 }, { age: "13-18", v: 1 }, { age: "19-24", v: 0 }, { age: "25-30", v: 4 }, { age: "31-36", v: 0 }, { age: "37-42", v: 1 }, { age: "43-48", v: 0 }, { age: "49-54", v: 1 }, { age: "55-60", v: 4 }, { age: "61-66", v: 4 }, { age: "67-72", v: 0 }],
+    13: [{ age: "0-6", v: 3 }, { age: "7-12", v: 1 }, { age: "13-18", v: 0 }, { age: "19-24", v: 5 }, { age: "25-30", v: 0 }, { age: "31-36", v: 1 }, { age: "37-42", v: 1 }, { age: "43-48", v: 5 }, { age: "49-54", v: 2 }, { age: "55-60", v: 0 }, { age: "61-66", v: 1 }, { age: "67-72", v: 2 }, { age: "73-78", v: 5 }],
+    14: [{ age: "0-6", v: 1 }, { age: "7-12", v: 0 }, { age: "13-18", v: 1 }, { age: "19-24", v: 4 }, { age: "25-30", v: 0 }, { age: "31-36", v: 0 }, { age: "37-42", v: 4 }, { age: "43-48", v: 4 }, { age: "49-54", v: 1 }, { age: "55-60", v: 4 }, { age: "61-66", v: 0 }, { age: "67-72", v: 1 }, { age: "73-78", v: 4 }],
+    15: [{ age: "0-6", v: 2 }, { age: "7-12", v: 0 }, { age: "13-18", v: 1 }, { age: "19-24", v: 1 }, { age: "25-30", v: 5 }, { age: "31-36", v: 2 }, { age: "37-42", v: 0 }, { age: "43-48", v: 2 }, { age: "49-54", v: 2 }, { age: "55-60", v: 5 }, { age: "61-66", v: 5 }, { age: "67-72", v: 1 }, { age: "73-78", v: 0 }, { age: "79-84", v: 4 }, { age: "85-90", v: 1 }],
+    16: [{ age: "0-6", v: 0 }, { age: "7-12", v: 3 }, { age: "13-18", v: 1 }, { age: "19-24", v: 2 }, { age: "25-30", v: 0 }, { age: "31-36", v: 1 }, { age: "37-42", v: 8 }, { age: "43-48", v: 1 }, { age: "49-54", v: 2 }, { age: "55-60", v: 7 }, { age: "61-66", v: 2 }, { age: "67-72", v: 0 }, { age: "73-78", v: 7 }, { age: "79-84", v: 1 }, { age: "85-90", v: 0 }, { age: "91-96", v: 2 }],
+    17: [{ age: "0-6", v: 1 }, { age: "7-12", v: 1 }, { age: "13-18", v: 0 }, { age: "19-24", v: 5 }, { age: "25-30", v: 0 }, { age: "31-36", v: 1 }, { age: "37-42", v: 1 }, { age: "43-48", v: 5 }, { age: "49-54", v: 2 }, { age: "55-60", v: 0 }, { age: "61-66", v: 1 }, { age: "67-72", v: 2 }, { age: "73-78", v: 5 }, { age: "79-84", v: 5 }, { age: "85-90", v: 1 }, { age: "91-96", v: 0 }, { age: "97-102", v: 4 }],
+    18: [{ age: "0-6", v: 2 }, { age: "7-12", v: 5 }, { age: "13-18", v: 1 }, { age: "19-24", v: 0 }, { age: "25-30", v: 4 }, { age: "31-36", v: 1 }, { age: "37-42", v: 4 }, { age: "43-48", v: 0 }, { age: "49-54", v: 1 }, { age: "55-60", v: 4 }, { age: "61-66", v: 4 }, { age: "67-72", v: 0 }, { age: "73-78", v: 0 }, { age: "79-84", v: 4 }, { age: "85-90", v: 1 }, { age: "91-96", v: 4 }, { age: "97-102", v: 0 }, { age: "103-108", v: 1 }]
 };
