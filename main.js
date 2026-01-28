@@ -50,3 +50,25 @@ function generateCalendar() {
         grid.appendChild(cell);
     }
 }
+
+// Di dalam fungsi updateDetail, tambahkan ini:
+function updateDetail(date, pasaran) {
+    const detailDiv = document.getElementById('detail');
+    const h = HARI[date.getDay()];
+    const wetonKey = `${h} ${p}`;
+    const wuku = getWuku(date); // Pastikan fungsi getWuku sudah ada di engine
+
+    detailDiv.style.display = 'block';
+    detailDiv.innerHTML = `
+        <div class="card-result">
+            <h3 style="color:#d30000;">${date.getDate()} ${namaBulan[date.getMonth()]} ${date.getFullYear()}</h3>
+            <p><strong>Weton:</strong> ${h} ${pasaran}</p>
+            <p><strong>Wuku:</strong> ${wuku}</p>
+            <hr>
+            <div class="isi-ramalan">
+                <p>${DATA_WUKU ? DATA_WUKU[wuku] : 'Sifat Wuku sedang dimuat...'}</p>
+            </div>
+        </div>
+    `;
+}
+
