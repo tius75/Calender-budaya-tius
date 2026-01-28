@@ -1,10 +1,8 @@
 import { HARI, PASARAN, NEPTU_HARI, NEPTU_PASARAN } from './constants.js';
 import { getPasaran, getWuku } from './calendar-engine.js';
-
-// Import Data Terpisah (Pastikan file ini ada di Github Anda)
-import { DATA_WUKU } from './data-wuku.js';
+// Pastikan file data di bawah ini sudah Anda upload di Github
+import { DATA_WUKU } from './data-wuku.js'; 
 import { DATA_SRIJATI } from './data-srijati.js';
-// Tambahkan import untuk data Chinese jika ada
 
 let current = new Date();
 
@@ -20,43 +18,82 @@ function generateCalendar() {
     const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
     monthNav.innerText = `${namaBulan[m]} ${y}`;
 
-    // Header Nama Hari
+    // Render Nama Hari (Header)
     HARI.forEach((h, i) => {
         const el = document.createElement('div');
         el.innerText = h.substring(0, 3);
-        if (i === 0) el.classList.add('sunday');
+        el.className = i === 0 ? 'header-day sunday' : 'header-day';
         grid.appendChild(el);
     });
 
     const firstDay = new Date(y, m, 1).getDay();
     const daysInMonth = new Date(y, m + 1, 0).getDate();
 
-    // Padding awal bulan
-    for (let i = 0; i < firstDay; i++) grid.appendChild(document.createElement('div'));
+    // Kolom kosong awal bulan
+    for (let i = 0; i < firstDay; i++) {
+        grid.appendChild(document.createElement('div'));
+    }
 
-    // Loop Hari
+    // Render Tanggal
     for (let d = 1; d <= daysInMonth; d++) {
         const dateObj = new Date(y, m, d);
-        const p = getPasaran(dateObj); // Ambil pasaran (Wage, Legi, dll)
+        const p = getPasaran(dateObj);
         
         const cell = document.createElement('div');
         cell.className = 'calendar-day';
         if (dateObj.getDay() === 0) cell.classList.add('sunday');
 
-        // Menampilkan Angka Tanggal + Nama Pasaran di bawahnya
+        // Menampilkan Angka Tanggal + Pasaran
         cell.innerHTML = `
-            <span class="date-num">${d}</span>
-            <span class="pasaran-text">${p}</span>
+            <div class="date-num">${d}</div>
+            <div class="pasaran-text">${p}</div>
         `;
 
-        cell.onclick = () => window.showDetail(dateObj);
+        cell.onclick = () => showDetail(dateObj);
         grid.appendChild(cell);
     }
 }
 
-// Inisialisasi Tombol Navigasi
-document.getElementById('prevMonth').onclick = () => { current.setMonth(current.getMonth() - 1); generateCalendar(); };
-document.getElementById('nextMonth').onclick = () => { current.setMonth(current.getMonth() + 1); generateCalendar(); };
+// Fungsi Detail dengan Kalender Chinese
+window.showDetail = function(date) {
+    const h = HARI[date.getDay()];
+    const p = getPasaran(date);
+    const w = getWuku(date);
+    const weton = `${h} ${p}`;
+    
+    // Logika Kalender Chinese Sederhana
+    const chineseDate = new Intl.DateTimeFormat('id-ID-u-ca-chinese', {
+        day: 'numeric', month: 'long', year: 'numeric'
+    }).format(date);
 
-// Jalankan saat pertama dimuat
+    const detailDiv = document.getElementById('detail');
+    detailDiv.style.display = 'block';
+    detailDiv.innerHTML = `
+        <div class="card-result">
+            <h3>${weton}</h3>
+            <p><strong>Wuku:</strong> ${w} | <strong>Chinese:</strong> ${chineseDate}</p>
+            <div class="info-section">
+                <h4>📜 Sifat Wuku ${w}</h4>
+                <p>${DATA_WUKU[w] || 'Memuat data...'}</p>
+            </div>
+            <div class="info-section">
+                <h4>✨ Ramalan Sri Jati</h4>
+                <p>${DATA_SRIJATI[weton] || 'Memuat data...'}</p>
+            </div>
+        </div>
+    `;
+    detailDiv.scrollIntoView({ behavior: 'smooth' });
+};
+
+// Event Listener Navigasi
+document.getElementById('prevMonth').addEventListener('click', () => {
+    current.setMonth(current.getMonth() - 1);
+    generateCalendar();
+});
+document.getElementById('nextMonth').addEventListener('click', () => {
+    current.setMonth(current.getMonth() + 1);
+    generateCalendar();
+});
+
+// Jalankan Pertama Kali
 generateCalendar();
