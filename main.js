@@ -174,3 +174,23 @@ window.searchWeton = () => {
 // ==========================================
 generateCalendar();
 updateDetail(TODAY, getPasaran(TODAY));
+
+// --- Fungsi Download PDF ---
+window.downloadPDF = () => {
+    const element = document.getElementById('detail');
+    const opt = {
+        margin:       1,
+        filename:     'Ramalan_Srijati.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
+};
+
+// --- Fungsi Share WhatsApp ---
+window.shareWhatsApp = () => {
+    const detailText = document.getElementById('detail').innerText;
+    const url = "https://api.whatsapp.com/send?text=" + encodeURIComponent("Hasil Ramalan Sri Jati:\n\n" + detailText);
+    window.open(url, '_blank');
+};
