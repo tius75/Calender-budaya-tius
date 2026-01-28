@@ -286,37 +286,56 @@ function updateDetail(date, pasaran) {
 // FITUR DOWNLOAD & SHARE (VERSI FINAL FIX)
 // ==========================================
 
-function downloadPDF() {
-    const element = document.getElementById('printableArea');
-    if (!element) {
-        alert("Data tidak ditemukan!");
-        return;
-    }
+async function downloadPDF() {
+    // 1. Ambil elemen sumber
+    const source = document.getElementById('printableArea');
+    if (!source) return alert("Data tidak ditemukan!");
 
-    // Opsi konfigurasi untuk mencegah hasil blank/putih
+    // 2. Buat "Clone" atau salinan sementara agar tidak terganggu CSS layar
+    const clone = source.cloneNode(true);
+    
+    // 3. Modifikasi clone agar pasti terlihat oleh library
+    Object.assign(clone.style, {
+        position: "absolute",
+        left: "-9999px",
+        top: "0",
+        display: "block",
+        width: "800px", // Paksa lebar standar A4 agar tabel tidak berantakan
+        background: "white",
+        color: "black",
+        overflow: "visible"
+    });
+
+    document.body.appendChild(clone);
+
+    // 4. Konfigurasi PDF
     const opt = {
-        margin:       0.3,
-        filename:     'Detail-Weton-Lengkap.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { 
+        margin: [0.5, 0.5],
+        filename: 'Detail-Weton-Lengkap.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
             scale: 2, 
             useCORS: true, 
             logging: false,
-            letterRendering: true,
-            windowWidth: element.scrollWidth,
-            windowHeight: element.scrollHeight
+            backgroundColor: "#ffffff",
+            scrollY: 0,
+            windowWidth: 800 // Samakan dengan lebar clone
         },
-        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
     };
 
-    // Proses konversi dengan penanganan error
-    html2pdf().set(opt).from(element).save().then(() => {
-        console.log("PDF Berhasil diunduh");
-    }).catch(err => {
+    try {
+        // 5. Proses cetak dari clone, bukan dari elemen asli yang mungkin tersembunyi
+        await html2pdf().set(opt).from(clone).save();
+    } catch (err) {
         console.error("PDF Error: ", err);
-        alert("Gagal mengunduh PDF, pastikan koneksi internet stabil.");
-    });
+        alert("Gagal mengunduh PDF.");
+    } finally {
+        // 6. Hapus clone dari dokumen agar tidak memenuhi memori
+        document.body.removeChild(clone);
+    }
 }
+
 
 function shareWhatsApp() {
     const detailArea = document.getElementById('printableArea');
