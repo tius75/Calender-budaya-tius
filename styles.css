@@ -182,3 +182,24 @@ body {
     font-weight: 900;
 }
 
+
+/* Pastikan detail memiliki warna dan lebar saat diunduh */
+#detail {
+    min-height: 100px;
+    background-color: white !important;
+    color: black !important;
+    width: 100%;
+}
+
+/* Memastikan tabel terlihat jelas di PDF */
+#detail table {
+    border-collapse: collapse;
+    width: 100%;
+    color: black !important;
+}
+
+#detail th, #detail td {
+    border: 1px solid #333 !important;
+    padding: 8px;
+}
+
