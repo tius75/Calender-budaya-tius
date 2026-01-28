@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Kalender Jawa dan Wuku Abadi</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* CSS Penanda Warna */
+    .sunday { color: #D30000 !important; font-weight: bold; background-color: #fff0f0; }
+    .holiday { color: #D30000 !important; font-weight: bold; }
+    .today { background-color: #ffeb3b !important; border: 2px solid #D30000 !important; border-radius: 50%; color: #000 !important; font-weight: bold; }
+    
+    /* Memastikan detail muncul dan sesuai dengan styles.css */
+    #detail.active-show { 
+        display: grid !important; 
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+  </style>
+</head>
+<body>
+  <div id="mainApp">
+    <div class="filter-container">
+      <div class="mobile-header">
+        <h2>Kalender Jawa Dan Wuku Abadi</h2>
+        <h2 id="monthYear"></h2>
+      </div>
+      <div class="search-date-container">
+        <div class="input-date">
+          <input type="date" id="dateInput">
+          <button onclick="searchDate()">Cari</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="nav">
+      <button onclick="changeMonth(-1)">◀</button>
+      <span id="monthYearNav"></span>
+      <button onclick="changeMonth(1)">▶</button>
+    </div>
+
+    <div class="calendar" id="calendar"></div>
+    
+    <div id="detail"></div>
+    <div id="pancatan-results"></div>
+    
+    <footer style="text-align:center; margin-top: 30px; font-size: 0.9em; color: #555;">By Tius</footer>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  
+  <script>
+    // --- DATABASE INTERNAL (MENGGANTIKAN main.js) ---
+    const PASARAN = ['Legi', 'Pahing', 'Pon', 'Wage', 'Kliwon'];
+    const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const NEPTU_HARI = { 'Minggu': 5, 'Senin': 4, 'Selasa': 3, 'Rabu': 7, 'Kamis': 8, 'Jumat': 6, 'Sabtu': 9 };
+    const NEPTU_PASARAN = { 'Legi': 5, 'Pahing': 9, 'Pon': 7, 'Wage': 4, 'Kliwon': 8 };
+
+    const LIBUR_NASIONAL = {
+        "2024-08-17": "Hari Kemerdekaan RI",
+        "2024-12-25": "Hari Natal",
+        "2025-01-01": "Tahun Baru Masehi",
+        "2025-03-29": "Idul Fitri 1446H"
+    };
+
+    let current = new Date();
+
+    function getPasaran(date) {
+        const base = new Date('1900-01-01');
+        const diff = Math.floor((date - base) / (1000 * 60 * 60 * 24));
+        return PASARAN[(((diff + 1) % 5) + 5) % 5];
+    }
+
+    function generateCalendar() {
+        const grid = document.getElementById('calendar');
+        const mYear = document.getElementById('monthYear');
+        const mNav = document.getElementById('monthYearNav');
+        
+        grid.innerHTML = '';
+        const y = current.getFullYear();
+        const m = current.getMonth();
+        const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+        mYear.innerText = `${namaBulan[m]} ${y}`;
+        mNav.innerText = `${namaBulan[m]} ${y}`;
+
+        // Header Hari
+        HARI.forEach((h, i) => {
+            const el = document.createElement('div');
+            el.innerText = h.substring(0, 3);
+            if (i === 0) el.style.color = 'red';
+            grid.appendChild(el);
+        });
+
+        const firstDay = new Date(y, m, 1).getDay();
+        const daysInMonth = new Date(y, m + 1, 0).getDate();
+        const todayStr = new Date().toISOString().split('T')[0];
+
+        for (let i = 0; i < firstDay; i++) grid.appendChild(document.createElement('div'));
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            const dateObj = new Date(y, m, d);
+            const dateStr = dateObj.toLocaleDateString('en-CA'); 
+            const cell = document.createElement('div');
+            cell.innerText = d;
+            cell.className = 'calendar-day';
+            
+            if (dateObj.getDay() === 0) cell.classList.add('sunday'); 
+            if (LIBUR_NASIONAL[dateStr]) cell.classList.add('holiday'); 
+            if (dateStr === todayStr) cell.classList.add('today'); 
+
+            cell.onclick = () => showDetail(dateObj);
+            grid.appendChild(cell);
+        }
+    }
+
+    function showDetail(date) {
+        const h = HARI[date.getDay()];
+        const p = getPasaran(date);
+        const nH = NEPTU_HARI[h];
+        const nP = NEPTU_PASARAN[p];
+        const dateStr = date.toLocaleDateString('en-CA');
+        
+        const detail = document.getElementById('detail');
+        detail.classList.add('active-show'); 
+        
+        // MENGGUNAKAN STRUKTUR UL/LI AGAR CSS styles.css BISA MEMBACA DATA
+        detail.innerHTML = `
+            <h3>HASIL PERHITUNGAN WETON</h3>
+            <ul>
+                <li><strong>Tanggal:</strong> ${date.toLocaleDateString('id-ID', {dateStyle:'full'})}</li>
+                <li><strong>Weton:</strong> ${h} ${p}</li>
+                <li><strong>Neptu Hari:</strong> ${nH}</li>
+                <li><strong>Neptu Pasaran:</strong> ${nP}</li>
+                <li><strong>Total Neptu:</strong> ${nH + nP}</li>
+                ${LIBUR_NASIONAL[dateStr] ? `<li style="color:red; font-weight:bold;"><strong>Keterangan:</strong> ${LIBUR_NASIONAL[dateStr]}</li>` : ''}
+            </ul>
+            <div style="grid-column: 1/-1; text-align:center; margin-top:15px;">
+                <button onclick="downloadJPG()" style="background:#D30000; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer;">Simpan JPG</button>
+            </div>
+        `;
+        detail.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    window.searchDate = () => {
+        const val = document.getElementById('dateInput').value;
+        if (val) showDetail(new Date(val));
+    };
+
+    window.changeMonth = (dir) => {
+        current.setMonth(current.getMonth() + dir);
+        generateCalendar();
+    };
+
+    async function downloadJPG() {
+        const canvas = await html2canvas(document.getElementById('detail'));
+        const link = document.createElement('a');
+        link.download = 'Weton_Hasil.jpg';
+        link.href = canvas.toDataURL();
+        link.click();
+    }
+
+    generateCalendar();
+  </script>
+</body>
+</html>

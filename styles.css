@@ -1,0 +1,183 @@
+:root {
+  --primary-color: #D30000;
+  --primary-dark: #a00000;
+  --bg-color: #f8f9fa;
+  --text-dark: #2d3436;
+  --text-light: #636e72;
+  --white: #ffffff;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  --radius: 16px;
+}
+
+body {
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-color);
+  margin: 0;
+  padding: 20px;
+  color: var(--text-dark);
+}
+
+#mainApp {
+  max-width: 500px;
+  margin: 20px auto;
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Header & Filter */
+.filter-container {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  color: var(--white);
+  padding: 30px 20px;
+  text-align: center;
+}
+
+.mobile-header h2 {
+  margin: 0;
+  font-size: 1.4em;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+#monthYear {
+  font-size: 1.1em;
+  opacity: 0.9;
+  margin-top: 5px;
+  font-weight: 400;
+}
+
+/* Input Area */
+.search-date-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.input-date input {
+  padding: 10px 15px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  font-size: 0.9em;
+}
+
+.input-date button {
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: none;
+  background: var(--text-dark);
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.2s;
+}
+
+.input-date button:hover {
+  transform: translateY(-2px);
+}
+
+/* Navigation */
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: #fff;
+}
+
+.nav button {
+  background: #f1f2f6;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--primary-color);
+  font-size: 1.2em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nav button:hover {
+  background: var(--primary-color);
+  color: white;
+}
+
+#monthYearNav {
+  font-weight: 700;
+  font-size: 1.1em;
+  color: var(--text-dark);
+}
+
+/* Calendar Grid */
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  padding: 15px;
+  background: #fff;
+}
+
+.calendar div {
+  text-align: center;
+  padding: 12px 0;
+  font-size: 0.9em;
+  font-weight: 600;
+  border-radius: 12px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+/* Nama Hari */
+.calendar div:nth-child(-n+7) {
+  color: var(--text-light);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75em;
+  cursor: default;
+}
+
+.calendar-day:hover {
+  background-color: #f1f2f6;
+  color: var(--primary-color);
+}
+
+/* Detail Section */
+#detail {
+  margin: 20px;
+  padding: 20px;
+  background: #fff;
+  border-radius: var(--radius);
+  border-left: 5px solid var(--primary-color);
+  display: none;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+#detail h3 {
+  margin-top: 0;
+  font-size: 1.1em;
+  color: var(--primary-color);
+}
+
+#detail ul {
+  list-style: none;
+  padding: 0;
+}
+
+#detail li {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 0.95em;
+}
+
+#detail li:last-child { border: none; }
+
+/* Responsive */
+@media (max-width: 480px) {
+  body { padding: 10px; }
+  .calendar { gap: 4px; padding: 10px; }
+  .calendar div { padding: 10px 0; font-size: 0.85em; }
+}
