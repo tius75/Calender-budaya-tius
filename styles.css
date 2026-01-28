@@ -161,3 +161,24 @@ body {
     font-weight: bold;
     margin-top: 2px;
 }
+
+/* Warna Blok Minggu */
+.sunday-block {
+    background-color: #fff0f0 !important;
+}
+
+/* Penanda Hari Ini */
+.today-highlight {
+    background-color: #ffd700 !important; /* Warna Kuning Emas */
+    border: 2px solid #d30000 !important;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(211, 0, 0, 0.3);
+    position: relative;
+}
+
+/* Tambahan agar angka hari ini lebih tegas */
+.today-highlight .date-num {
+    color: #000;
+    font-weight: 900;
+}
+
