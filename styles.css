@@ -274,3 +274,47 @@ td {
     height: auto !important;
     max-height: none !important;
 }
+
+/* MODE KHUSUS PDF */
+.pdf-mode,
+.pdf-mode * {
+    box-sizing: border-box !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+}
+
+/* MATIKAN FLEX & GRID */
+.pdf-mode .row,
+.pdf-mode .flex,
+.pdf-mode .grid {
+    display: block !important;
+}
+
+/* CARD */
+.pdf-mode .card,
+.pdf-mode .box,
+.pdf-mode .panel {
+    box-shadow: none !important;
+    border-radius: 6px !important;
+    margin-bottom: 12px !important;
+}
+
+/* TABEL */
+.pdf-mode table {
+    width: 100% !important;
+    table-layout: fixed !important;
+}
+
+.pdf-mode td,
+.pdf-mode th {
+    word-break: break-word !important;
+    font-size: 12px;
+}
+
+/* JUDUL */
+.pdf-mode h1,
+.pdf-mode h2,
+.pdf-mode h3 {
+    margin-top: 16px !important;
+    margin-bottom: 8px !important;
+}
