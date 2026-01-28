@@ -316,7 +316,7 @@ const DATA_WUKU = {
         • Aral: Dalam peperangan.<br>
         • Kala Jaya Bumi: Barat Daya.<br>
         • Baik untuk: Memperbaiki rumah, membuka kebun, mencari jodoh, membuat obat.<br>
-        • Tidak baik untuk: Menghindari bepergian ke arah Barat Daya.`
+        • Tidak baik untuk: Menghindari bepergian ke arah Barat Daya.`,
 
 
   "Watugunung": `<b>Wuku WATUGUNUNG: SONYA</b><br><br>
