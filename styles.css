@@ -264,13 +264,13 @@ td {
         display: none !important;
     }
 
-    #detail, #printableArea {
-        display: block !important;
-        visibility: visible !important;
-        overflow: visible !important;
-        width: 100% !important;
-    }
+    #printableArea,
+#printableArea * {
+    overflow: visible !important;
+}
 
-    table { page-break-inside: auto; }
-    tr { page-break-inside: avoid; page-break-after: auto; }
+.show-detail {
+    display: block !important;
+    height: auto !important;
+    max-height: none !important;
 }
