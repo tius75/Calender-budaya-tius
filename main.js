@@ -1,22 +1,10 @@
-// DATABASE LOKAL (Agar tidak perlu import file luar)
+// main.js
+import { TABEL_SRIJATI } from './data-srijati.js';
+
 const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 const PASARAN = ['Legi', 'Pahing', 'Pon', 'Wage', 'Kliwon'];
 const NEPTU_HARI = { 'Minggu': 5, 'Senin': 4, 'Selasa': 3, 'Rabu': 7, 'Kamis': 8, 'Jumat': 6, 'Sabtu': 9 };
 const NEPTU_PASARAN = { 'Pahing': 9, 'Pon': 7, 'Wage': 4, 'Kliwon': 8, 'Legi': 5 };
-
-// Database Sri Jati (Contoh Neptu 12 & 10)
-const TABEL_SRIJATI = {
-    12: [
-        { usia: "0-6", nilai: 2, ket: "Kekurangan" }, { usia: "6-12", nilai: 3, ket: "Cukup" },
-        { usia: "12-18", nilai: 5, ket: "Maju" }, { usia: "18-24", nilai: 1, ket: "Sangat Kurang" },
-        { usia: "24-30", nilai: 7, ket: "Sangat Baik" }, { usia: "30-36", nilai: 1, ket: "Sangat Kurang" }
-    ],
-    10: [
-        { usia: "0-6", nilai: 5, ket: "Maju" }, { usia: "6-12", nilai: 2, ket: "Kurang" },
-        { usia: "12-18", nilai: 1, ket: "Sangat Kurang" }, { usia: "18-24", nilai: 3, ket: "Cukup" },
-        { usia: "24-30", nilai: 5, ket: "Maju" }, { usia: "30-36", nilai: 2, ket: "Kurang" }
-    ]
-};
 
 let current = new Date();
 const TODAY = new Date();
@@ -71,15 +59,19 @@ function updateDetail(date, pasaran) {
     const detailDiv = document.getElementById('detail');
     const h = HARI[date.getDay()];
     const neptu = NEPTU_HARI[h] + NEPTU_PASARAN[pasaran];
-    const dataRejeki = TABEL_SRIJATI[neptu] || [];
+    
+    // Proteksi: Cek apakah TABEL_SRIJATI sudah terisi dari import
+    const dataRejeki = (typeof TABEL_SRIJATI !== 'undefined') ? (TABEL_SRIJATI[neptu] || []) : [];
     
     let tabelHtml = `<table style="width:100%; border-collapse: collapse; margin-top:10px; font-size:0.8rem; border:1px solid #ddd;">
         <tr style="background:#eee;"><th>Usia</th><th>Nilai</th><th>Nasib</th></tr>`;
 
     dataRejeki.forEach(item => {
-        tabelHtml += `<tr><td style="border:1px solid #ddd;padding:5px;text-align:center;">${item.usia}</td>
+        tabelHtml += `<tr>
+            <td style="border:1px solid #ddd;padding:5px;text-align:center;">${item.usia}</td>
             <td style="border:1px solid #ddd;padding:5px;text-align:center;color:red;font-weight:bold;">${item.nilai}</td>
-            <td style="border:1px solid #ddd;padding:5px;">${item.ket}</td></tr>`;
+            <td style="border:1px solid #ddd;padding:5px;">${item.ket}</td>
+        </tr>`;
     });
     tabelHtml += `</table>`;
 
@@ -89,25 +81,27 @@ function updateDetail(date, pasaran) {
             <h3 style="color:#D30000;">Neptu: ${neptu}</h3>
             <p><strong>Weton:</strong> ${h} ${pasaran}</p>
             <div style="margin-top:10px;">
-                <h4 style="color:#D30000; border-bottom:1px solid #eee;">📈 Siklus Rejeki (Sri Jati)</h4>
-                ${dataRejeki.length > 0 ? tabelHtml : "<p>Data neptu ini belum diinput.</p>"}
+                <h4 style="color:#D30000; border-bottom:1px solid #eee;">📈 Siklus Sri Jati (Rejeki)</h4>
+                ${dataRejeki.length > 0 ? tabelHtml : "<p>Data neptu ini belum tersedia.</p>"}
             </div>
         </div>
     `;
     detailDiv.scrollIntoView({ behavior: 'smooth' });
 }
 
-// FUNGSI CARI: Pindah View Tahun & Bulan
+// Fungsi Cari Weton (Pindah View)
 window.searchWeton = () => {
     const val = document.getElementById('dateInput').value;
     if (val) {
         const targetDate = new Date(val);
+        // INI KUNCI AGAR VIEW BERPINDAH TAHUN/BULAN
         current = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
         generateCalendar();
         updateDetail(targetDate, getPasaran(targetDate));
     }
 };
 
+// Navigasi
 document.getElementById('prevMonth').onclick = () => { current.setMonth(current.getMonth() - 1); generateCalendar(); };
 document.getElementById('nextMonth').onclick = () => { current.setMonth(current.getMonth() + 1); generateCalendar(); };
 
