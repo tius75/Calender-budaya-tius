@@ -283,59 +283,62 @@ function updateDetail(date, pasaran) {
 }
 
 // ==========================================
-// FITUR DOWNLOAD & SHARE (VERSI PERBAIKAN)
+// FITUR DOWNLOAD & SHARE (VERSI FINAL FIX)
 // ==========================================
 
 function downloadPDF() {
     const element = document.getElementById('printableArea');
     if (!element) {
-        alert("Data tidak ditemukan untuk diunduh!");
+        alert("Data tidak ditemukan!");
         return;
     }
 
-    // Opsi konfigurasi untuk mencegah hasil blank
+    // Opsi konfigurasi untuk mencegah hasil blank/putih
     const opt = {
-        margin:       [0.5, 0.5],
-        filename:     'Hasil-Weton-Jawa.pdf',
+        margin:       0.3,
+        filename:     'Detail-Weton-Lengkap.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { 
             scale: 2, 
             useCORS: true, 
+            logging: false,
             letterRendering: true,
-            scrollY: 0 
+            windowWidth: element.scrollWidth,
+            windowHeight: element.scrollHeight
         },
-        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
     };
 
-    // Gunakan Promise untuk memastikan elemen siap
-    html2pdf().set(opt).from(element).toPdf().get('pdf').save();
+    // Proses konversi dengan penanganan error
+    html2pdf().set(opt).from(element).save().then(() => {
+        console.log("PDF Berhasil diunduh");
+    }).catch(err => {
+        console.error("PDF Error: ", err);
+        alert("Gagal mengunduh PDF, pastikan koneksi internet stabil.");
+    });
 }
 
 function shareWhatsApp() {
-    // Ambil data langsung dari variabel agar tidak mengambil isi tabel Sri Jati yang panjang
-    const inputDate = document.getElementById('dateInput').value;
-    const dateObj = inputDate ? new Date(inputDate) : new Date();
+    const detailArea = document.getElementById('printableArea');
+    if (!detailArea) {
+        alert("Data tidak ditemukan!");
+        return;
+    }
+
+    // Mengambil SEMUA teks dari show detail (termasuk isi tabel rejeki)
+    // Menghilangkan spasi berlebih agar pesan tidak terlalu berantakan
+    const fullText = detailArea.innerText.replace(/\n\s*\n/g, '\n');
+
+    const header = "*HASIL LENGKAP CEK WETON JAWA*\n" + "=".repeat(20) + "\n\n";
+    const footer = "\n\n" + "=".repeat(20) + "\n_Dikirim melalui Aplikasi Kalender Jawa_";
     
-    const h = HARI[dateObj.getDay()];
-    const p = getPasaran(dateObj);
-    const neptu = NEPTU_HARI[h] + NEPTU_PASARAN[p];
-    const wuku = getWuku(dateObj);
-    const masehi = dateObj.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
+    const pesanLengkap = header + fullText + footer;
 
-    // Susun pesan WhatsApp yang rapi (Tanpa isi tabel yang panjang)
-    const pesan = 
-`*HASIL CEK WETON JAWA*
----------------------------
-📅 *Masehi:* ${masehi}
-👹 *Weton:* ${h} ${p}
-🔢 *Neptu:* ${neptu}
-🌀 *Wuku:* ${wuku}
----------------------------
-Cek detail lengkapnya di aplikasi Kalender Jawa!`;
-
-    const url = `https://wa.me/?text=${encodeURIComponent(pesan)}`;
+    // Mengirim ke WhatsApp
+    const url = `https://wa.me/?text=${encodeURIComponent(pesanLengkap)}`;
     window.open(url, '_blank');
 }
+
 
 
 // ==========================================
