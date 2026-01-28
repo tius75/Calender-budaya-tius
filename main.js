@@ -1,6 +1,6 @@
 /**
- * KALENDER JAWA MODERN - FINAL & FIX
- * Memperbaiki: Fitur Klik, Fungsi Cari, dan Show Detail Lengkap.
+ * KALENDER JAWA MODERN - FINAL REVISION
+ * Fix: Red Sunday, Search Button, WhatsApp Share, & Clean PDF Print.
  */
 
 // --- DATA REFERENSI ---
@@ -49,7 +49,8 @@ function generateCalendar() {
     HARI.forEach((h, i) => {
         const el = document.createElement('div');
         el.innerText = h.substring(0, 3);
-        el.className = 'header-day' + (i === 0 ? ' sunday' : '');
+        // FIX: Warna Merah Hari Minggu di Header
+        el.className = 'header-day' + (i === 0 ? ' sunday-text' : '');
         grid.appendChild(el);
     });
 
@@ -63,21 +64,22 @@ function generateCalendar() {
         const p = getPasaran(dateObj);
         const cell = document.createElement('div');
         cell.className = 'calendar-day';
+        
+        // FIX: Warna Merah Hari Minggu di Angka
+        if (dateObj.getDay() === 0) cell.classList.add('sunday-text');
         if (dateObj.toDateString() === TODAY.toDateString()) cell.classList.add('today-highlight');
         
         cell.innerHTML = `<strong>${d}</strong><br><small>${p}</small>`;
-        
-        // Event Klik Tanggal
-        cell.onclick = function() {
-            document.querySelectorAll('.calendar-day').forEach(c => c.style.border = "1px solid #eee");
-            cell.style.border = "2px solid #D30000";
+        cell.onclick = () => {
+            document.querySelectorAll('.calendar-day').forEach(c => c.classList.remove('selected-day'));
+            cell.classList.add('selected-day');
             updateDetail(dateObj, p);
         };
         grid.appendChild(cell);
     }
 }
 
-// --- TAMPILKAN DETAIL ---
+// --- TAMPILKAN DETAIL (LENGKAP) ---
 function updateDetail(date, pasaran) {
     const detailDiv = document.getElementById('detail');
     if (!detailDiv) return;
@@ -86,8 +88,6 @@ function updateDetail(date, pasaran) {
     const neptu = NEPTU_HARI[h] + NEPTU_PASARAN[pasaran];
     const kam = KAMAROKAM_6[neptu % 6];
     const shio = getLunarShio(date.getFullYear());
-    
-    // Ambil data Sri Jati dari database luar jika ada
     const dataSriJati = (typeof TABEL_SRIJATI !== 'undefined') ? (TABEL_SRIJATI[neptu] || []) : [];
 
     let tabelSriJati = `<table style="width:100%; border-collapse:collapse; margin-top:10px; font-size:12px; border:1px solid #ddd;">
@@ -99,48 +99,61 @@ function updateDetail(date, pasaran) {
 
     detailDiv.style.display = 'block';
     detailDiv.innerHTML = `
-        <div id="fullReport" style="background:#fff; padding:20px; border-radius:10px; border:1px solid #ddd;">
+        <style>
+            @media print {
+                body * { visibility: hidden; }
+                #printArea, #printArea * { visibility: visible; }
+                #printArea { position: absolute; left: 0; top: 0; width: 100%; padding: 20px; }
+                .no-print { display: none !important; }
+            }
+            .sunday-text { color: red !important; }
+        </style>
+
+        <div id="printArea" style="background:#fff; padding:20px; border-radius:10px; border:1px solid #ddd; color: #000;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h2 style="color:#D30000; margin:0;">${h} ${pasaran}</h2>
-                <button onclick="window.print()" class="no-print" style="background:#333; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">Cetak PDF</button>
+                <div class="no-print">
+                    <button onclick="shareWA('${h} ${pasaran}', '${date.toLocaleDateString()}', '${neptu}')" style="background:#25D366; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;">Share WA</button>
+                    <button onclick="window.print()" style="background:#333; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;">Cetak PDF</button>
+                </div>
             </div>
             <p><strong>Masehi:</strong> ${date.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'})}</p>
             <p><strong>Neptu:</strong> ${neptu} | <strong>Shio:</strong> ${shio}</p>
             <hr>
-            <div style="background:#fff3e0; padding:15px; border-radius:8px; margin:10px 0;">
+            <div style="background:#fff3e0; padding:15px; border-radius:8px; margin:10px 0; border-left: 5px solid #ff9800;">
                 <h4 style="margin:0; color:#e65100;">⚖️ KAMAROKAM: ${kam.nama}</h4>
-                <p style="font-size:13px; margin:5px 0;">${kam.arti}</p>
+                <p style="font-size:13px; margin:5px 0; color: #333;">${kam.arti}</p>
             </div>
             <div style="margin-top:20px;">
                 <h4 style="color:#D30000; border-bottom:2px solid #D30000; padding-bottom:5px;">📈 TABEL SRI JATI (REJEKI)</h4>
-                ${dataSriJati.length > 0 ? tabelSriJati : "<p style='color:#999;'>Data rejeki tidak ditemukan.</p>"}
+                ${dataSriJati.length > 0 ? tabelSriJati : "<p style='color:#999; font-style:italic;'>Data rejeki tidak ditemukan.</p>"}
             </div>
         </div>
     `;
     detailDiv.scrollIntoView({ behavior: 'smooth' });
 }
 
-// --- FUNGSI CARI TANGGAL ---
+// --- FUNGSI TOOLS ---
 function cariTanggal() {
     const input = document.getElementById('inputTgl');
-    if (!input || !input.value) {
-        alert("Pilih tanggal dulu!");
-        return;
-    }
+    if (!input || !input.value) return alert("Pilih tanggal dulu!");
     const target = new Date(input.value);
-    // Pindahkan kalender ke bulan yang dicari
     current = new Date(target.getFullYear(), target.getMonth(), 1);
     generateCalendar();
-    // Jalankan detailnya
     updateDetail(target, getPasaran(target));
 }
 
+function shareWA(weton, tgl, neptu) {
+    const text = `*KALENDER JAWA MODERN*\n\n📅 *Weton:* ${weton}\n📆 *Masehi:* ${tgl}\n🔢 *Neptu:* ${neptu}\n\nCek selengkapnya di: ${window.location.href}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+}
+
 // --- INISIALISASI ---
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", () => {
     generateCalendar();
     updateDetail(TODAY, getPasaran(TODAY));
 
-    // Pasang event ke tombol-tombol
+    // FIX: Binding Tombol Cari
     const btnCari = document.getElementById('btnCari');
     if(btnCari) btnCari.onclick = cariTanggal;
 
