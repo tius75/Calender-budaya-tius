@@ -32,7 +32,7 @@ let current = new Date();
 const TODAY = new Date();
 
 // ==========================================
-// FUNGSI PENDUKUNG LOGIKA
+// FUNGSI LOGIKA (CALCULATION)
 // ==========================================
 
 function getPasaran(date) {
@@ -53,7 +53,7 @@ function getWuku(date) {
 function getTanggalJawa(date) {
     const refDate = new Date(2026, 0, 28); 
     const refTglJawa = 9;
-    const refBulanIdx = 7; // Ruwah
+    const refBulanIdx = 7; 
     const refTahunJawa = 1959;
     const diffDays = Math.floor((date.getTime() - refDate.getTime()) / (1000 * 60 * 60 * 24));
     let totalHariJawa = refTglJawa + diffDays;
@@ -68,8 +68,7 @@ function getTanggalJawa(date) {
 function getMangsaInfo(date) {
     const d = date.getDate();
     const m = date.getMonth() + 1;
-    let id = 12; // Default Saddha
-
+    let id = 12; 
     if ((d >= 22 && m == 6) || (m == 7) || (d <= 1 && m == 8)) id = 1;
     else if (d >= 2 && m == 8 && d <= 25) id = 2;
     else if ((d >= 26 && m == 8) || (d <= 18 && m == 9)) id = 3;
@@ -81,12 +80,11 @@ function getMangsaInfo(date) {
     else if (m == 3 && d <= 26) id = 9;
     else if ((d >= 27 && m == 3) || (d <= 19 && m == 4)) id = 10;
     else if ((d >= 20 && m == 4) || (d <= 12 && m == 5)) id = 11;
-
     return (typeof DATA_MANGSA !== 'undefined') ? DATA_MANGSA[id] : null;
 }
 
 // ==========================================
-// RENDER KALENDER
+// RENDER UI & INTERACTION
 // ==========================================
 
 function generateCalendar() {
@@ -120,10 +118,6 @@ function generateCalendar() {
     }
 }
 
-// ==========================================
-// UPDATE DETAIL (SHOW DETAIL)
-// ==========================================
-
 function updateDetail(date, pasaran) {
     const detailDiv = document.getElementById('detail');
     if (!detailDiv) return;
@@ -135,6 +129,7 @@ function updateDetail(date, pasaran) {
     const infoJawa = getTanggalJawa(date);
     const mangsa = getMangsaInfo(date);
     const nasibKematian = NASIB_AHLI_WARIS[neptu % 4];
+    const watakNeptu = (typeof DATA_WATAK_NEPTU !== 'undefined') ? DATA_WATAK_NEPTU[neptu] : null;
 
     const namaBulanMasehi = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
     const tglMasehiLengkap = `${date.getDate()} ${namaBulanMasehi[date.getMonth()]} ${date.getFullYear()}`;
@@ -182,6 +177,14 @@ function updateDetail(date, pasaran) {
 
             <p><strong>Neptu:</strong> ${neptu} | <strong>Wuku:</strong> ${wukuName}</p>
             
+            ${watakNeptu ? `
+            <div style="margin-top:15px; padding:12px; border:1px solid #e1bee7; border-radius:8px; background:#f3e5f5;">
+                <h4 style="color:#7b1fa2; margin:0 0 5px 0; border-bottom:1px solid #d1c4e9;">🌟 Watak Berdasarkan Neptu ${neptu}</h4>
+                <p style="font-size:0.85rem; font-weight:bold; margin-bottom:5px;">Sebutan: ${watakNeptu.sebutan}</p>
+                <div style="font-size:0.85rem; line-height:1.5; color:#4a148c;">${watakNeptu.watak}</div>
+            </div>
+            ` : ""}
+
             <div style="margin:15px 0; padding:10px; background:#fffcf0; border-left:4px solid #f1c40f; border-radius:4px;">
                 <h4 style="margin:0; color:#856404; font-size:0.9rem;">🪦 Nasib Ahli Waris (Kematian)</h4>
                 <p style="margin:5px 0 0; font-weight:bold;">Kategori: ${nasibKematian.nama}</p>
@@ -189,7 +192,7 @@ function updateDetail(date, pasaran) {
             </div>
 
             <div style="margin-top:20px;">
-                <h4 style="color:#D30000; border-bottom:1px solid #eee; padding-bottom:3px;">🌸 Watak Kelahiran</h4>
+                <h4 style="color:#D30000; border-bottom:1px solid #eee; padding-bottom:3px;">🌸 Watak Kelahiran (${wetonKey})</h4>
                 <div style="font-size:0.85rem; line-height:1.5;">${teksHari}</div>
             </div>
 
@@ -242,18 +245,6 @@ window.shareWhatsApp = () => {
     window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent("📌 Hasil Ramalan:\n\n" + detailText), '_blank');
 };
 
-// Start
+// Start Apps
 generateCalendar();
 updateDetail(TODAY, getPasaran(TODAY));
-
-// Di dalam fungsi updateDetail
-const watakNeptu = (typeof DATA_WATAK_NEPTU !== 'undefined') ? DATA_WATAK_NEPTU[neptu] : null;
-
-// Lalu di bagian innerHTML (di bawah bagian Pranata Mangsa), tambahkan:
-${watakNeptu ? `
-<div style="margin-top:20px; padding:12px; border:1px solid #e1bee7; border-radius:8px; background:#f3e5f5;">
-    <h4 style="color:#7b1fa2; margin:0 0 5px 0; border-bottom:1px solid #d1c4e9;">🌟 Watak Berdasarkan Neptu ${neptu}</h4>
-    <p style="font-size:0.85rem; font-weight:bold; margin-bottom:5px;">Sebutan: ${watakNeptu.sebutan}</p>
-    <div style="font-size:0.85rem; line-height:1.5; color:#4a148c;">${watakNeptu.watak}</div>
-</div>
-` : ""}
