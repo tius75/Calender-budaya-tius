@@ -245,7 +245,7 @@ function updateDetail(date, pasaran) {
         </div>`;
     }
 
-    // KODE BARU (SINKRON DENGAN data-srijati.js)
+    // BAGIAN TABEL SRI JATI YANG SUDAH DIPERBAIKI
 let tabelHtml = `<table style="width:100%; border-collapse: collapse; margin-top:10px; font-size:0.85rem; border:1px solid #ddd;">
         <thead>
             <tr style="background:#f9f9f9;">
@@ -256,18 +256,28 @@ let tabelHtml = `<table style="width:100%; border-collapse: collapse; margin-top
         </thead>
         <tbody>`;
 
-dataSriJati.forEach(item => {
-    // SRI_JATI_DESC diambil dari file data-srijati.js
-    const deskripsi = (typeof SRI_JATI_DESC !== 'undefined') ? (SRI_JATI_DESC[item.nilai] || "Data tidak ada") : "Deskripsi Error";
-    
-    tabelHtml += `
-        <tr>
-            <td style="border:1px solid #ddd; padding:8px; text-align:center;">${item.usia} Thn</td>
-            <td style="border:1px solid #ddd; padding:8px; text-align:center; color:#D30000; font-weight:bold;">${item.nilai}</td>
-            <td style="border:1px solid #ddd; padding:8px;">${deskripsi}</td>
-        </tr>`;
-});
+if (dataSriJati && dataSriJati.length > 0) {
+    dataSriJati.forEach(item => {
+        // Ambil nilai, jika undefined beri angka 0
+        const skor = item.nilai !== undefined ? item.nilai : (item.v !== undefined ? item.v : 0);
+        // Ambil usia, jika undefined beri teks "-"
+        const rangeUsia = item.usia || item.age || "-";
+        
+        // Ambil deskripsi dari SRI_JATI_DESC
+        const deskripsi = (typeof SRI_JATI_DESC !== 'undefined') ? (SRI_JATI_DESC[skor] || "Data tidak ada") : "Deskripsi Error";
+        
+        tabelHtml += `
+            <tr>
+                <td style="border:1px solid #ddd; padding:8px; text-align:center;">${rangeUsia} Thn</td>
+                <td style="border:1px solid #ddd; padding:8px; text-align:center; color:#D30000; font-weight:bold;">${skor}</td>
+                <td style="border:1px solid #ddd; padding:8px;">${deskripsi}</td>
+            </tr>`;
+    });
+} else {
+    tabelHtml += `<tr><td colspan="3" style="text-align:center; padding:10px;">Data tidak ditemukan</td></tr>`;
+}
 tabelHtml += `</tbody></table>`;
+
 
 
     detailDiv.style.display = 'block';
