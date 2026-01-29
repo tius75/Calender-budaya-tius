@@ -19,19 +19,7 @@ const DATA_SIFAT_PASARAN = {
     'WAGE': 'Menarik tetapi angkuh, setia dan penurut, malas mencari nafkah perlu dibantu orang lain, kaku hati, tidak bisa berpikir panjang, sering gelap pikiran dan mendapat fitnah.'
 };
 
-// CONTOH NYATA PEMAKAIAN
-const today = new Date();
 
-const china = ImlekEngine.getTanggalChina(today);
-
-console.log(
-  "Kalender China:",
-  china.tanggal,
-  "Bulan",
-  china.bulan,
-  "Tahun",
-  china.tahun
-);
 
 const DATA_SIFAT_HARI = {
     'Minggu': 'Tekun, mandiri dan berwibawa.',
