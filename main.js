@@ -133,36 +133,23 @@ function getTanggalJawa(date) {
     return { tanggal: tglJawa, bulan: DATA_BULAN_JAWA[bulanIdx], tahun: tahunJawa };
 }
 
-function getSiklusBesar(tahunJawa) {
+function getDetailLengkap(dateObj = new Date()) {
+    const solar = Solar.fromDate(dateObj);
+    const lunar = solar.getLunar();
 
-    // Safety (tidak bikin hang)
-    if (typeof tahunJawa !== "number" || tahunJawa < 2000 || tahunJawa > 3000) {
-        tahunJawa = 2576;
-    }
+    const tahunKongzili = lunar.getYear() + 551;
 
-    // Patokan
-    const REF_TAHUN_JAWA = 2576;
-    const REF_TAHUN_IDX = 4; // Dal
-    const REF_WINDU_IDX = 2; // Sancaya
-
-    const diffYears = tahunJawa - REF_TAHUN_JAWA;
-
-    // === Tahun (8 tahunan) ===
-    let tahunIdx = (REF_TAHUN_IDX + diffYears) % 8;
-    if (tahunIdx < 0) tahunIdx += 8;
-
-    // === Windu (8 tahun per windu) ===
-    let winduIdx = (REF_WINDU_IDX + Math.floor(diffYears / 8)) % 4;
-    if (winduIdx < 0) winduIdx += 4;
-
-    // === Konzili (32 tahun, TIDAK BOLEH < 1) ===
-    let konzili = Math.floor(diffYears / 32) + 1;
-    if (konzili < 1) konzili = 1;
+    const siklusJawa = getSiklusBesar(tahunKongzili);
 
     return {
-        tahun: DATA_SIKLUS_TAHUN[tahunIdx],
-        windu: WINDU_LIST[winduIdx],
-        konzili: konzili
+        tahunJawa: siklusJawa.tahun,
+        windu: siklusJawa.windu,
+        chinese: {
+            hari: lunar.getDay(),
+            bulan: lunar.getMonth(),
+            tahun: tahunKongzili,
+            teks: `${lunar.getDay()} / ${lunar.getMonth()} / ${tahunKongzili}`
+        }
     };
 }
 
