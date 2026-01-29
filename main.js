@@ -332,7 +332,7 @@ function updateDetail(date, pasaran) {
             <div style="background:#fff3e0; padding:12px; border-radius:8px; margin:10px 0; border:1px solid #ffe0b2;">
                 <p style="margin:0; color:#e65100; font-weight:bold; font-size:1rem;">✨ Siklus Tahun & Windu</p>
                 <p style="margin:5px 0; font-size:0.9rem;"><strong>Tahun:</strong> ${siklusBesar.tahun.nama} (${siklusBesar.tahun.makna})</p>
-                <p style="margin:5px 0; font-size:0.9rem;"><strong>Windu:</strong> ${siklusBesar.windu} | <strong>Konzili:</strong> ${siklusBesar.konzili}</p>
+                <p style="margin:5px 0; font-size:0.9rem;"><strong>Windu:</strong> ${siklusBesar.windu} | <strong>:</strong> ${siklusBesar.konzili}</p>
                 <p style="margin:8px 0 0; font-size:0.8rem; font-style:italic; color:#6d4c41; line-height:1.4;">"${siklusBesar.tahun.deskripsi}"</p>
             </div>
 
