@@ -103,40 +103,10 @@ function getZodiak(date) {
 
 function getLunarShio(date) {
     const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
-    
-    try {
-        // 1. Ambil data Lunar dari sistem
-        const formatter = new Intl.DateTimeFormat('id-ID-u-ca-chinese', {
-            day: 'numeric',
-            month: 'numeric',
-            year: 'numeric'
-        });
-
-        const parts = formatter.formatToParts(date);
-        const lDay = parts.find(p => p.type === 'day').value.padStart(2, '0');
-        const lMonth = parts.find(p => p.type === 'month').value.padStart(2, '0');
-        const lYearSystem = parseInt(parts.find(p => p.type === 'year').value);
-
-        // 2. Logika Tahun Imlek:
-        // Jika tahun sistem 2025 -> Imlek 2576
-        // Jika tahun sistem 2026 -> Imlek 2577
-        // Rumus: Tahun Sistem + 551
-        const lunarYearValue = lYearSystem + 551;
-        
-        // 3. Penentuan Shio berdasarkan tahun sistem Lunar
-        const shioIndex = lYearSystem % 12;
-
-        // 4. Format akhir dd:mm:yyyy (Contoh: 11:12:2576)
-        const fullFormat = `${lDay}:${lMonth}:${lunarYearValue}`;
-
-        return { 
-            shio: shios[shioIndex], 
-            lunarYear: fullFormat 
-        };
-    } catch (e) {
-        // Fallback jika sistem gagal
-        return { shio: "Kuda", lunarYear: "01:01:2577" };
-    }
+    const year = date.getFullYear();
+    const isEarly = (date.getMonth() === 0) || (date.getMonth() === 1 && date.getDate() < 10);
+    const index = isEarly ? (year - 1) % 12 : year % 12;
+    return { shio: shios[index], lunarYear: year + 550 };
 }
 
 
