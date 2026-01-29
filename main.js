@@ -989,40 +989,7 @@ function formatSriJatiTable(data) {
     return tableText;
 }
 
-// ==========================================
-// FUNGSI SHARE VERSI SIMPLE (BACKUP)
-// ==========================================
 
-function shareWhatsAppSimple() {
-    const detailArea = document.getElementById('printableArea');
-    if (!detailArea) return alert("Data tidak ditemukan!");
-    
-    // Clone dan hapus tombol
-    const tempDiv = detailArea.cloneNode(true);
-    const buttons = tempDiv.querySelectorAll('button');
-    buttons.forEach(btn => btn.remove());
-    
-    // Ambil teks dan format sederhana
-    let text = tempDiv.textContent || tempDiv.innerText;
-    
-    text = text
-        .replace(/\s+/g, ' ')
-        .replace(/\n\s*\n/g, '\n\n')
-        .replace(/([.!?])\s+/g, '$1\n')
-        .replace(/•\s*/g, '\n• ')
-        .trim();
-    
-    // Tambahkan header dan footer
-    const header = "📅 *HASIL CEK WETON JAWA*\n" +
-                   "═══════════════════════\n\n";
-    
-    const footer = "\n═══════════════════════\n" +
-                   "via Kalender Jawa App";
-    
-    const finalText = header + text.substring(0, 1500) + footer;
-    
-    window.open(`https://wa.me/?text=${encodeURIComponent(finalText)}`, '_blank');
-}
 
 // ==========================================
 // INITIAL START
