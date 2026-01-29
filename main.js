@@ -102,41 +102,43 @@ function getZodiak(date) {
 }
 
 function getLunarDetails(date) {
-    const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
-    
-    // 1. Ambil Tanggal & Bulan Imlek menggunakan kalender Chinese
-    const lunarParts = new Intl.DateTimeFormat('id-ID-u-ca-chinese', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-    }).formatToParts(date);
+    try {
+        // Daftar Shio
+        const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
+        
+        // 1. Ambil data Lunar menggunakan Intl (Standard Modern JS)
+        const formatter = new Intl.DateTimeFormat('id-ID-u-ca-chinese', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
 
-    // Mengambil data dari partisi format
-    const day = lunarParts.find(p => p.type === 'day').value;
-    const month = lunarParts.find(p => p.type === 'month').value;
-    
-    // 2. Hitung Tahun Imlek & Shio
-    const yearMasehi = date.getFullYear();
-    // Cek apakah tanggal sekarang sudah masuk tahun baru imlek atau belum
-    // Kita gunakan perbandingan tahun dari Intl (biasanya formatnya 20xx atau cycle)
-    const isEarly = date.getMonth() < 2 && parseInt(day) > 15; 
-    
-    const lunarYear = yearMasehi + 551;
-    const shioIndex = yearMasehi % 12;
+        const parts = formatter.formatToParts(date);
+        const lunarDay = parts.find(p => p.type === 'day').value;
+        const lunarMonth = parts.find(p => p.type === 'month').value;
+        
+        // 2. Logika Tahun & Shio
+        const yearMasehi = date.getFullYear();
+        const lunarYear = yearMasehi + 551;
+        
+        // Koreksi Shio jika tanggal masehi masih di awal tahun (sebelum Imlek)
+        // Kita bandingkan tahun dari Intl dengan tahun Masehi
+        const intlYear = parseInt(parts.find(p => p.type === 'year').value);
+        const shioIndex = intlYear % 12;
 
-    return {
-        tanggal: day,
-        bulan: month,
-        tahunImlek: lunarYear,
-        shio: shios[shioIndex],
-        fullDate: `${day} ${month} ${lunarYear}`
-    };
+        return {
+            day: lunarDay,
+            month: lunarMonth,
+            year: lunarYear,
+            shio: shios[shioIndex],
+            display: `${lunarDay} ${lunarMonth} ${lunarYear}`
+        };
+    } catch (e) {
+        console.error("Gagal memuat data lunar:", e);
+        return { day: "", month: "", year: "", shio: "" }; // Fallback agar tidak crash
+    }
 }
 
-// Contoh penggunaan:
-const info = getLunarDetails(new Date());
-console.log(info.fullDate); // Contoh: "11 bulan 12 2576"
-console.log("Shio: " + info.shio);
 
 
 function getWuku(date) {
