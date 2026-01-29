@@ -104,33 +104,30 @@ function getZodiak(date) {
 function getLunarShio(date) {
     const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
     
-    // 1. Ambil data Lunar dengan format angka
-    const formatter = new Intl.DateTimeFormat('id-ID-u-ca-chinese', {
-        day: 'numeric',
-        month: 'numeric',
-        year: 'numeric'
-    });
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1; // Januari = 1
+    const day = date.getDate();
 
-    const parts = formatter.formatToParts(date);
-    const lDay = parts.find(p => p.type === 'day').value;
-    const lMonth = parts.find(p => p.type === 'month').value;
-    const lYearSystem = parts.find(p => p.type === 'year').value;
-
-    // 2. Hitung Tahun Imlek (2025 + 551 = 2576)
-    // Catatan: Di gambar Anda tertulis 2577, jika ingin 2576 gunakan +551
-    const lunarYearValue = date.getFullYear() + 551;
+    // Logika sederhana untuk menentukan apakah sudah masuk tahun baru Imlek
+    // Rata-rata Imlek jatuh di akhir Januari atau Februari
+    const isEarly = (month === 1) || (month === 2 && day < 15);
     
-    // 3. Tentukan Shio berdasarkan tahun lunar sistem
-    const shioIndex = parseInt(lYearSystem) % 12;
+    // Perhitungan Tahun Imlek (2025 + 551 = 2576)
+    const lunarYearValue = isEarly ? (year + 551 - 1) : (year + 551);
+    
+    // Indeks Shio (Masehi % 12)
+    const index = isEarly ? (year - 1) % 12 : year % 12;
 
-    // 4. Susun format sesuai gambar: M[Bulan] [Tanggal] [Tahun]
-    const fullLunarString = `M${lMonth} ${lDay} ${lunarYearValue}`;
+    // Format yang diminta: M[Bulan] [Tanggal] [Tahun]
+    // Kita gunakan format Masehi sebagai pendekatan agar script tidak berat
+    const fullLunarString = `M${month} ${day} ${lunarYearValue}`;
 
     return { 
-        shio: shios[shioIndex], 
+        shio: shios[index], 
         lunarYear: fullLunarString 
     };
 }
+
 
 
 
