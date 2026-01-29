@@ -1,6 +1,6 @@
 /**
  * KALENDER JAWA MODERN - VERSI FINAL FIX 2026
- * Perbaikan: Fitur Salin Teks (Menggantikan PDF)
+ * Update: Detail Perhitungan Neptu & Info Lengkap Bulan Jawa
  */
 
 // ==========================================
@@ -229,7 +229,10 @@ function updateDetail(date, pasaran) {
 
     const h = HARI[date.getDay()];
     const wetonKey = `${h} ${pasaran}`;
-    const neptu = NEPTU_HARI[h] + NEPTU_PASARAN[pasaran];
+    const nHari = NEPTU_HARI[h];
+    const nPasaran = NEPTU_PASARAN[pasaran];
+    const neptu = nHari + nPasaran;
+    
     const wukuName = getWuku(date);
     const infoJawa = getTanggalJawa(date);
     const mangsa = getMangsaInfo(date);
@@ -285,9 +288,27 @@ function updateDetail(date, pasaran) {
                 <h2 style="color:#D30000; margin:0 0 5px 0; border-bottom:2px solid #D30000; display:inline-block;">${wetonKey}</h2>
                 <button onclick="copyToClipboard()" style="background:#D30000; color:#fff; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">📋 Salin Hasil</button>
             </div>
-            <p style="margin:10px 0 0; font-size:1.15rem; font-weight:bold;">📅 ${tglMasehiLengkap}</p>
-            <p style="margin:5px 0; color:#d30000; font-weight:500;"><strong>Jawa:</strong> ${infoJawa.tanggal} ${infoJawa.bulan.nama} ${infoJawa.tahun} AJ</p>
             
+            <p style="margin:10px 0 0; font-size:1.15rem; font-weight:bold;">📅 ${tglMasehiLengkap}</p>
+            
+            <div style="background:#fff9f9; padding:10px; border-radius:8px; margin:10px 0; border:1px solid #ffeded;">
+                <p style="margin:0; color:#d30000; font-weight:bold; font-size:1rem;">🌙 Kalender Jawa</p>
+                <p style="margin:5px 0; font-size:0.9rem;"><strong>Tanggal:</strong> ${infoJawa.tanggal} ${infoJawa.bulan.nama} ${infoJawa.tahun} AJ</p>
+                <p style="margin:5px 0; font-size:0.9rem;"><strong>Status Bulan:</strong> <span style="color:${infoJawa.bulan.status === 'Baik' || infoJawa.bulan.status === 'Sangat Baik' ? '#2e7d32' : '#c62828'}">${infoJawa.bulan.status}</span></p>
+                <p style="margin:5px 0; font-size:0.85rem; color:#666;"><strong>Tanggal Naas:</strong> ${infoJawa.bulan.naas.join(', ')}</p>
+                <p style="margin:5px 0; font-size:0.85rem; color:#666;"><strong>Tali Wangke:</strong> ${infoJawa.bulan.taliWangke}</p>
+            </div>
+
+            <div style="background:#f8f9fa; padding:12px; border-radius:8px; margin:10px 0; border:1px solid #e9ecef;">
+                <h4 style="margin:0 0 8px 0; color:#333; font-size:0.95rem;">🔢 Perhitungan Neptu</h4>
+                <p style="margin:0; font-family: monospace; font-size:0.9rem;">
+                    Hari ${h} = ${nHari}<br>
+                    Pasaran ${pasaran} = ${nPasaran}<br>
+                    --------------------- +<br>
+                    <strong>Total Neptu = ${neptu}</strong>
+                </p>
+            </div>
+
             <div style="margin:15px 0; padding:12px; border:1px solid #ffe0b2; background:#fff8e1; border-radius:8px;">
                 <h4 style="margin:0 0 5px 0; color:#e65100; font-size:0.95rem;">🎭 Karakter Hari & Pasaran</h4>
                 <p style="font-size:0.85rem; margin:0;"><strong>Sifat ${h}:</strong> ${sifatHariIni}</p>
@@ -322,12 +343,11 @@ function copyToClipboard() {
     const detailArea = document.getElementById('printableArea');
     if (!detailArea) return alert("Data tidak ditemukan!");
 
-    // Menghapus elemen tombol dari teks yang akan disalin
     const clone = detailArea.cloneNode(true);
     const button = clone.querySelector('button');
     if (button) button.remove();
 
-    const textToCopy = "*HASIL CEK WETON JAWA*\n" + 
+    const textToCopy = "*HASIL LENGKAP CEK WETON JAWA*\n" + 
                        "━━━━━━━━━━━━━━━━━━━━━━\n\n" + 
                        clone.innerText.trim() + 
                        "\n\n━━━━━━━━━━━━━━━━━━━━━━\n" +
@@ -348,7 +368,7 @@ function shareWhatsApp() {
     }
 
     let content = detailArea.innerText
-        .replace(/📋 Salin Hasil/g, "") // Hapus teks tombol jika ikut terbawa
+        .replace(/📋 Salin Hasil/g, "")
         .replace(/\r\n/g, "\n")
         .replace(/Wuku\s*:/gi, "\nWuku : ")
         .replace(/Pal\.?\s*Jati\s*:/gi, "\n\nPal. Jati : ")
