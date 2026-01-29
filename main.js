@@ -355,10 +355,16 @@ function shareWhatsApp() {
     }
 
     let content = detailArea.innerText
-        .replace(/\r\n/g, "\n")              // normalisasi enter
-        .replace(/Wuku\s*:/gi, "\nWuku : ")  // paksa Wuku baris baru
-        .replace(/Pal\.?\s*Jati\s*:/gi, "\n\nPal. Jati : ") // JEDA JELAS
-        .replace(/\n{3,}/g, "\n\n")          // max 2 enter
+        .replace(/\r\n/g, "\n")
+        // Rapikan Wuku & Pal Jati
+        .replace(/Wuku\s*:/gi, "\nWuku : ")
+        .replace(/Pal\.?\s*Jati\s*:/gi, "\n\nPal. Jati : ")
+
+        // 🔥 PAKSA SECTION BARU UNTUK SRI JATI
+        .replace(/(📈\s*)?Siklus\s+Sri\s+Jati/gi, "\n\n📈 *Siklus Sri Jati (Rejeki)*\n")
+
+        // Rapikan enter berlebih
+        .replace(/\n{3,}/g, "\n\n")
         .trim();
 
     const header =
