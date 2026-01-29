@@ -101,13 +101,43 @@ function getZodiak(date) {
     return "Pisces";
 }
 
-function getLunarShio(date) {
+function getLunarDetails(date) {
     const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
-    const year = date.getFullYear();
-    const isEarly = (date.getMonth() === 0) || (date.getMonth() === 1 && date.getDate() < 10);
-    const index = isEarly ? (year - 1) % 12 : year % 12;
-    return { shio: shios[index], lunarYear: year + 550 };
+    
+    // 1. Ambil Tanggal & Bulan Imlek menggunakan kalender Chinese
+    const lunarParts = new Intl.DateTimeFormat('id-ID-u-ca-chinese', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    }).formatToParts(date);
+
+    // Mengambil data dari partisi format
+    const day = lunarParts.find(p => p.type === 'day').value;
+    const month = lunarParts.find(p => p.type === 'month').value;
+    
+    // 2. Hitung Tahun Imlek & Shio
+    const yearMasehi = date.getFullYear();
+    // Cek apakah tanggal sekarang sudah masuk tahun baru imlek atau belum
+    // Kita gunakan perbandingan tahun dari Intl (biasanya formatnya 20xx atau cycle)
+    const isEarly = date.getMonth() < 2 && parseInt(day) > 15; 
+    
+    const lunarYear = yearMasehi + 551;
+    const shioIndex = yearMasehi % 12;
+
+    return {
+        tanggal: day,
+        bulan: month,
+        tahunImlek: lunarYear,
+        shio: shios[shioIndex],
+        fullDate: `${day} ${month} ${lunarYear}`
+    };
 }
+
+// Contoh penggunaan:
+const info = getLunarDetails(new Date());
+console.log(info.fullDate); // Contoh: "11 bulan 12 2576"
+console.log("Shio: " + info.shio);
+
 
 function getWuku(date) {
     const wukuList = ["Sinta", "Landep", "Wukir", "Kurantil", "Tolu", "Gumbreg", "Warigalit", "Wariagung", "Julungwangi", "Sungsang", "Galungan", "Kuningan", "Langkir", "Mandasiya", "Julungpujut", "Pahang", "Kuruwelut", "Marakeh", "Tambir", "Medangkungan", "Maktal", "Wuye", "Manahil", "Prangbakat", "Bala", "Wugu", "Wayang", "Kulawu", "Dukut", "Watugunung"];
