@@ -281,6 +281,18 @@ function updateDetail(date, pasaran) {
     const arahMeditasi = getArahMeditasi(neptu);
     const usia = hitungUsiaLengkap(date);
     
+// LOGIKA IMLEK
+        let imlekHtml = "";
+        if (window.ImlekEngine) {
+            const china = ImlekEngine.getTanggalChina(date);
+            imlekHtml = `
+                <div style="background:#fff1f0; padding:12px; border-radius:8px; margin:15px 0; border:1px solid #ffa39e; border-left:5px solid #cf1322;">
+                    <p style="margin:0; color:#cf1322; font-weight:bold;">🏮 Kalender Imlek / China</p>
+                    <p style="margin:5px 0; font-size:1.1rem; color:#000;"><strong>${china.tanggal} ${china.namaBulan || china.bulan} ${china.tahun}</strong></p>
+                    <p style="margin:0; font-size:0.85rem; color:#666;">Tahun Lunar: ${lunar.lunarYear} (Shio ${lunar.shio})</p>
+                </div>`;
+        }
+
     const sifatHariIni = DATA_SIFAT_HARI[h] || "-";
     const sifatPasaranIni = DATA_SIFAT_PASARAN[pasaran.toUpperCase()] || "-";
 
