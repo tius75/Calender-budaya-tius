@@ -1,6 +1,6 @@
 /**
  * KALENDER JAWA MODERN - VERSI UPDATE 2026
- * Fitur: Detail Neptu, Status Bulan Jawa (Naas & Tali Wangke), Copy to Clipboard
+ * Fitur: Detail Neptu, Status Bulan Jawa (Naas & Tali Wangke), Salin ke Clipboard
  */
 
 // ==========================================
@@ -166,28 +166,7 @@ function hitungUsiaLengkap(birthDate) {
 }
 
 // ==========================================
-// FUNGSI BARU: SALIN KE GOOGLE DOCS
-// ==========================================
-function copyToClipboard() {
-    const area = document.getElementById('printableArea');
-    if (!area) return;
-    
-    // Gunakan navigator clipboard untuk menyalin teks murni
-    navigator.clipboard.writeText(area.innerText).then(() => {
-        const btn = document.getElementById('btnCopy');
-        const oldText = btn.innerHTML;
-        btn.innerHTML = "✅ Tersalin!";
-        btn.style.backgroundColor = "#2e7d32";
-        
-        setTimeout(() => {
-            btn.innerHTML = oldText;
-            btn.style.backgroundColor = "#D30000";
-        }, 2000);
-    });
-}
-
-// ==========================================
-// FUNGSI CARI WETON
+// FUNGSI CARI WETON (FIX)
 // ==========================================
 function searchWeton() {
     const input = document.getElementById('dateInput');
@@ -265,6 +244,7 @@ function updateDetail(date, pasaran) {
     const arahMeditasi = getArahMeditasi(neptuTotal);
     const usia = hitungUsiaLengkap(date);
     
+    // Ambil Sifat Hari & Pasaran
     const sifatHariIni = DATA_SIFAT_HARI[h] || "-";
     const sifatPasaranIni = DATA_SIFAT_PASARAN[pasaran.toUpperCase()] || "-";
 
@@ -273,21 +253,23 @@ function updateDetail(date, pasaran) {
     const tglMasehiLengkap = `${date.getDate()} ${namaBulanMasehi[date.getMonth()]} ${date.getFullYear()}`;
 
     const teksWuku = (typeof DATA_WUKU !== 'undefined') ? (DATA_WUKU[wukuName] || "Detail wuku belum tersedia.") : "Data Wuku tidak ditemukan.";
+    const teksHari = (typeof DATA_HARI !== 'undefined') ? (DATA_HARI[wetonKey] || "Data watak hari belum tersedia.") : "Data Hari tidak ditemukan.";
     const dataSriJati = (typeof TABEL_SRIJATI !== 'undefined') ? (TABEL_SRIJATI[neptuTotal] || []) : [];
 
     const isNaas = infoJawa.bulan.naas.includes(infoJawa.tanggal);
     const isTaliWangke = (wetonKey === infoJawa.bulan.taliWangke);
 
-    let colorStatus = "#2e7d32"; 
-    if (infoJawa.bulan.status.includes("Tidak")) colorStatus = "#d32f2f";
-    else if (infoJawa.bulan.status.includes("Kurang")) colorStatus = "#ed6c02";
+    // Styling khusus untuk status Bulan
+    let colorStatus = "#2e7d32"; // Hijau (Baik)
+    if (infoJawa.bulan.status.includes("Tidak")) colorStatus = "#d32f2f"; // Merah
+    else if (infoJawa.bulan.status.includes("Kurang")) colorStatus = "#ed6c02"; // Oranye
 
     let warningNaas = "";
     if (isNaas || isTaliWangke) {
         warningNaas = `<div style="background:#ffebee; color:#c62828; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #d32f2f; font-size:0.85rem;">
             <strong>⚠️ PERINGATAN HARI KRITIS</strong><br>
-            ${isNaas ? `• Tanggal ${infoJawa.tanggal} ${infoJawa.bulan.nama} merupakan Hari Naas.<br>` : ""}
-            ${isTaliWangke ? `• Hari ini merupakan Tali Wangke.` : ""}
+            ${isNaas ? `• Tanggal ${infoJawa.tanggal} ${infoJawa.bulan.nama} merupakan <b>Hari Naas</b>.<br>` : ""}
+            ${isTaliWangke ? `• Hari ini merupakan <b>Tali Wangke</b>.` : ""}
         </div>`;
     }
 
@@ -308,13 +290,13 @@ function updateDetail(date, pasaran) {
 
     detailDiv.style.display = 'block';
     detailDiv.innerHTML = `
-        <div style="margin-bottom:15px;">
-            <button id="btnCopy" onclick="copyToClipboard()" style="background:#D30000; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:bold;">📋 Salin Detail (Untuk Google Docs)</button>
-        </div>
         <div id="printableArea" class="card-result" style="background:#fff; padding:20px; border-radius:12px; border:1px solid #eee; box-shadow: 0 4px 6px rgba(0,0,0,0.05); color:#000;">
             ${warningNaas}
             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                 <h2 style="color:#D30000; margin:0 0 5px 0; border-bottom:2px solid #D30000; display:inline-block;">${wetonKey}</h2>
+                <button onclick="copyToClipboard()" style="background:#4CAF50; color:white; border:none; padding:8px 16px; border-radius:6px; font-size:0.9rem; cursor:pointer; display:flex; align-items:center; gap:5px;">
+                    📋 Salin ke Google Docs
+                </button>
             </div>
             <p style="margin:10px 0 0; font-size:1.15rem; font-weight:bold;">📅 ${tglMasehiLengkap}</p>
             <p style="margin:5px 0; color:#d30000; font-weight:500;"><strong>Jawa:</strong> ${infoJawa.tanggal} ${infoJawa.bulan.nama} ${infoJawa.tahun} AJ</p>
@@ -356,10 +338,247 @@ function updateDetail(date, pasaran) {
             <div style="margin:15px 0; padding:10px; background:#fffcf0; border-left:4px solid #f1c40f; border-radius:4px;"><h4 style="margin:0; color:#856404; font-size:0.9rem;">🪦 Nasib Kematian (Ahli Waris)</h4><p style="margin:5px 0 0; font-weight:bold;">${nasibKematian.nama}</p><p style="margin:2px 0 0; font-size:0.85rem; font-style:italic;">"${nasibKematian.arti}"</p></div>
             ${mangsa ? `<div style="margin:15px 0; padding:12px; border:1px solid #cfe2ff; background:#f0f7ff; border-radius:8px;"><h4 style="margin:0; color:#084298; font-size:0.95rem;">🌾 Pranata Mangsa: ${mangsa.nama}</h4><p style="font-size:0.85rem; margin-top:5px; line-height:1.4;">${mangsa.deskripsi}</p></div>` : ""}
             <div style="margin-top:20px;"><h4 style="color:#D30000; border-bottom:1px solid #eee; padding-bottom:5px;">🛡️ Analisis Wuku ${wukuName}</h4><div style="font-size:0.85rem; line-height:1.5;">${teksWuku}</div></div>
-            <div style="margin-top:20px;">
-                <h4 style="color:#D30000; border-bottom:1px solid #eee; padding-bottom:5px;">💰 Analisis Sri Jati (Rezeki)</h4>
-                ${tabelHtml}
-            </div>
+            <div style="margin-top:20px;"><h4 style="color:#D30000; border-bottom:1px solid #eee; padding-bottom:5px;">📈 Siklus Sri Jati (Rejeki)</h4>${dataSriJati.length > 0 ? tabelHtml : "<p style='color:#999;'>Data tidak tersedia.</p>"}</div>
         </div>
     `;
+    detailDiv.scrollIntoView({ behavior: 'smooth' });
 }
+
+// ==========================================
+// FUNGSI SALIN KE CLIPBOARD (UNTUK GOOGLE DOCS)
+// ==========================================
+function copyToClipboard() {
+    const source = document.getElementById("printableArea");
+    if (!source) {
+        alert("Data tidak ditemukan!");
+        return;
+    }
+
+    const btn = event.target;
+    const originalBtnText = btn.innerText;
+    btn.innerText = "⏳ Menyalin...";
+    btn.disabled = true;
+
+    try {
+        // Buat salinan untuk memanipulasi konten
+        const tempDiv = source.cloneNode(true);
+        
+        // Hapus tombol salin dari konten yang akan disalin
+        const buttonToRemove = tempDiv.querySelector('button[onclick*="copyToClipboard"]');
+        if (buttonToRemove) {
+            buttonToRemove.remove();
+        }
+        
+        // Konversi ke format yang mudah dibaca untuk Google Docs
+        const contentToCopy = formatForGoogleDocs(tempDiv);
+        
+        // Gunakan Clipboard API untuk menyalin teks
+        navigator.clipboard.writeText(contentToCopy)
+            .then(() => {
+                alert("✅ Data berhasil disalin ke clipboard!\nAnda dapat paste (Ctrl+V) langsung ke Google Docs.");
+            })
+            .catch(err => {
+                console.error("Gagal menyalin: ", err);
+                // Fallback untuk browser lama
+                fallbackCopyTextToClipboard(contentToCopy);
+            });
+    } catch (e) {
+        console.error("Error saat menyalin: ", e);
+        alert("❌ Gagal menyalin data. Silakan coba lagi.");
+    } finally {
+        btn.innerText = originalBtnText;
+        btn.disabled = false;
+    }
+}
+
+function formatForGoogleDocs(element) {
+    let result = "";
+    
+    // Fungsi rekursif untuk mengurai elemen
+    function parseNode(node, depth = 0) {
+        // Skip elemen skrip, style, tombol
+        if (node.tagName === 'SCRIPT' || node.tagName === 'STYLE' || 
+            (node.tagName === 'BUTTON' && node.onclick && node.onclick.toString().includes('copyToClipboard'))) {
+            return;
+        }
+        
+        // Tambahkan padding berdasarkan kedalaman
+        const indent = " ".repeat(depth * 2);
+        
+        // Tangani berbagai jenis node
+        if (node.nodeType === Node.TEXT_NODE) {
+            const text = node.textContent.trim();
+            if (text) {
+                result += indent + text + "\n";
+            }
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+            const tag = node.tagName.toLowerCase();
+            
+            // Tangani heading
+            if (tag.startsWith('h') && tag.length === 2 && !isNaN(tag[1])) {
+                result += "\n" + indent + node.textContent.trim().toUpperCase() + "\n";
+                result += indent + "=".repeat(node.textContent.trim().length) + "\n\n";
+            }
+            
+            // Tangani paragraf
+            else if (tag === 'p') {
+                const text = node.textContent.trim();
+                if (text) {
+                    result += indent + text + "\n\n";
+                }
+            }
+            
+            // Tangani div dengan konten khusus
+            else if (tag === 'div') {
+                // Cek apakah ini container khusus
+                const style = node.getAttribute('style') || '';
+                if (style.includes('background:#f5f5f5') || style.includes('background:#fff8e1') || 
+                    style.includes('background:#f0f7ff') || style.includes('background:#e8f5e9') ||
+                    style.includes('background:#fffcf0') || style.includes('background:#f3e5f5')) {
+                    result += "\n" + indent + "─".repeat(50) + "\n";
+                    for (let child of node.childNodes) {
+                        parseNode(child, depth + 1);
+                    }
+                    result += indent + "─".repeat(50) + "\n";
+                    return;
+                }
+            }
+            
+            // Tangani tabel
+            else if (tag === 'table') {
+                result += "\n" + indent + "TABEL SIKLUS SRI JATI\n";
+                
+                // Ambil header
+                const headers = [];
+                const rows = [];
+                
+                // Proses header
+                const ths = node.querySelectorAll('th');
+                ths.forEach(th => {
+                    headers.push(th.textContent.trim());
+                });
+                
+                // Proses baris data
+                const trs = node.querySelectorAll('tbody tr');
+                trs.forEach(tr => {
+                    const row = [];
+                    const tds = tr.querySelectorAll('td');
+                    tds.forEach(td => {
+                        row.push(td.textContent.trim());
+                    });
+                    rows.push(row);
+                });
+                
+                // Format tabel sebagai teks dengan kolom yang rapi
+                if (headers.length > 0) {
+                    // Hitung lebar kolom
+                    const colWidths = headers.map((h, i) => {
+                        const maxContent = Math.max(
+                            h.length,
+                            ...rows.map(row => row[i] ? row[i].length : 0)
+                        );
+                        return Math.min(maxContent + 2, 30); // Batasi maksimal 30 karakter
+                    });
+                    
+                    // Header
+                    let headerLine = "";
+                    headers.forEach((h, i) => {
+                        headerLine += h.padEnd(colWidths[i], " ");
+                    });
+                    result += indent + headerLine + "\n";
+                    
+                    // Garis pemisah
+                    let separatorLine = "";
+                    colWidths.forEach(width => {
+                        separatorLine += "─".repeat(width);
+                    });
+                    result += indent + separatorLine + "\n";
+                    
+                    // Data
+                    rows.forEach(row => {
+                        let rowLine = "";
+                        row.forEach((cell, i) => {
+                            rowLine += cell.padEnd(colWidths[i], " ");
+                        });
+                        result += indent + rowLine + "\n";
+                    });
+                }
+                result += "\n";
+                return;
+            }
+            
+            // Lanjutkan ke child nodes
+            for (let child of node.childNodes) {
+                parseNode(child, depth);
+            }
+        }
+    }
+    
+    // Parse seluruh konten
+    for (let child of element.childNodes) {
+        parseNode(child);
+    }
+    
+    // Bersihkan hasil akhir
+    result = result.replace(/\n{3,}/g, "\n\n");
+    
+    // Tambahkan header
+    const header = "=".repeat(60) + "\n" +
+                  "LAPORAN DETAIL WETON JAWA\n" +
+                  "=".repeat(60) + "\n\n" +
+                  `Dibuat pada: ${new Date().toLocaleDateString('id-ID')}\n\n`;
+    
+    return header + result;
+}
+
+// Fallback untuk browser lama
+function fallbackCopyTextToClipboard(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-999999px";
+    textArea.style.top = "-999999px";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+            alert("✅ Data berhasil disalin ke clipboard!\nAnda dapat paste (Ctrl+V) langsung ke Google Docs.");
+        } else {
+            alert("❌ Gagal menyalin data. Silakan coba manual dengan Ctrl+C.");
+        }
+    } catch (err) {
+        console.error('Fallback copy error: ', err);
+        alert("❌ Gagal menyalin data.");
+    }
+    
+    document.body.removeChild(textArea);
+}
+
+// ==========================================
+// FITUR SHARE (TETAP ADA)
+// ==========================================
+
+function shareWhatsApp() {
+    const detailArea = document.getElementById('printableArea');
+    if (!detailArea) return alert("Data tidak ditemukan!");
+    // Pembersihan teks agar rapi di WA
+    const fullText = detailArea.innerText.replace(/\n\s*\n/g, '\n');
+    const header = "*HASIL LENGKAP CEK WETON JAWA*\n" + "=".repeat(20) + "\n\n";
+    const footer = "\n\n" + "=".repeat(20) + "\n_Dikirim melalui Aplikasi Kalender Jawa_";
+    window.open(`https://wa.me/?text=${encodeURIComponent(header + fullText + footer)}`, '_blank');
+}
+
+// ==========================================
+// INITIAL START
+// ==========================================
+document.addEventListener("DOMContentLoaded", () => {
+    generateCalendar();
+    updateDetail(TODAY, getPasaran(TODAY));
+    const prev = document.getElementById('prevMonth');
+    const next = document.getElementById('nextMonth');
+    if(prev) prev.onclick = () => { current.setMonth(current.getMonth() - 1); generateCalendar(); };
+    if(next) next.onclick = () => { current.setMonth(current.getMonth() + 1); generateCalendar(); };
+});
