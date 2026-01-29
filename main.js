@@ -101,43 +101,28 @@ function getZodiak(date) {
     return "Pisces";
 }
 
-function getLunarDetails(date) {
-    try {
-        // Daftar Shio
-        const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
-        
-        // 1. Ambil data Lunar menggunakan Intl (Standard Modern JS)
-        const formatter = new Intl.DateTimeFormat('id-ID-u-ca-chinese', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric'
-        });
+function getLunarShio(date) {
+    const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
+    
+    // Gunakan Intl untuk ambil tanggal & bulan saja
+    const options = { day: 'numeric', month: 'long' };
+    const lunarString = new Intl.DateTimeFormat('id-ID-u-ca-chinese', options).format(date);
+    
+    // Ambil tahun masehi untuk perhitungan
+    const year = date.getFullYear();
+    
+    // Penentuan Shio yang lebih akurat (berdasarkan tahun lunar dari sistem)
+    const yearLunarSystem = new Intl.DateTimeFormat('id-ID-u-ca-chinese', {year: 'numeric'}).format(date);
+    const index = parseInt(yearLunarSystem) % 12;
 
-        const parts = formatter.formatToParts(date);
-        const lunarDay = parts.find(p => p.type === 'day').value;
-        const lunarMonth = parts.find(p => p.type === 'month').value;
-        
-        // 2. Logika Tahun & Shio
-        const yearMasehi = date.getFullYear();
-        const lunarYear = yearMasehi + 551;
-        
-        // Koreksi Shio jika tanggal masehi masih di awal tahun (sebelum Imlek)
-        // Kita bandingkan tahun dari Intl dengan tahun Masehi
-        const intlYear = parseInt(parts.find(p => p.type === 'year').value);
-        const shioIndex = intlYear % 12;
-
-        return {
-            day: lunarDay,
-            month: lunarMonth,
-            year: lunarYear,
-            shio: shios[shioIndex],
-            display: `${lunarDay} ${lunarMonth} ${lunarYear}`
-        };
-    } catch (e) {
-        console.error("Gagal memuat data lunar:", e);
-        return { day: "", month: "", year: "", shio: "" }; // Fallback agar tidak crash
-    }
+    // Return format yang mirip dengan kode lama Anda agar tidak merusak UI
+    return { 
+        shio: shios[index], 
+        lunarYear: year + 551,
+        lunarDate: lunarString // Ini untuk memunculkan Tanggal & Bulan
+    };
 }
+
 
 
 
