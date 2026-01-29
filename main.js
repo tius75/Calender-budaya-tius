@@ -292,6 +292,19 @@ function updateDetail(date, pasaran) {
     const namaBulanMasehi = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
     const tglMasehiLengkap = `${date.getDate()} ${namaBulanMasehi[date.getMonth()]} ${date.getFullYear()}`;
 
+// --- SISIPKAN LOGIKA IMLEK DI SINI ---
+    let imlekHtml = "";
+    if (window.ImlekEngine) {
+        const china = ImlekEngine.getTanggalChina(date);
+        imlekHtml = `
+            <div style="background:#fff1f0; padding:12px; border-radius:8px; margin:10px 0; border:1px solid #ffa39e;">
+                <p style="margin:0; color:#cf1322; font-weight:bold; font-size:1rem;">🏮 Kalender Imlek / China</p>
+                <p style="margin:5px 0; font-size:0.95rem;"><strong>Tanggal:</strong> ${china.tanggal} ${china.namaBulan || china.bulan} ${china.tahun}</p>
+                <p style="margin:0; font-size:0.85rem; color:#666;">Shio ${lunar.shio} (${lunar.lunarYear})</p>
+            </div>
+        `;
+    }
+
     const teksWuku = (typeof DATA_WUKU !== 'undefined') ? (DATA_WUKU[wukuName] || "Detail wuku belum tersedia.") : "Data Wuku tidak ditemukan.";
     const dataSriJati = (typeof TABEL_SRIJATI !== 'undefined') ? (TABEL_SRIJATI[neptu] || []) : [];
 
