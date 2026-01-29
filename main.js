@@ -19,6 +19,20 @@ const DATA_SIFAT_PASARAN = {
     'WAGE': 'Menarik tetapi angkuh, setia dan penurut, malas mencari nafkah perlu dibantu orang lain, kaku hati, tidak bisa berpikir panjang, sering gelap pikiran dan mendapat fitnah.'
 };
 
+// CONTOH NYATA PEMAKAIAN
+const today = new Date();
+
+const china = ImlekEngine.getTanggalChina(today);
+
+console.log(
+  "Kalender China:",
+  china.tanggal,
+  "Bulan",
+  china.bulan,
+  "Tahun",
+  china.tahun
+);
+
 const DATA_SIFAT_HARI = {
     'Minggu': 'Tekun, mandiri dan berwibawa.',
     'Senin': 'Selalu berubah, indah dan selalu mendapatkan simpati.',
@@ -284,19 +298,7 @@ function updateDetail(date, pasaran) {
     const sifatHariIni = DATA_SIFAT_HARI[h] || "-";
     const sifatPasaranIni = DATA_SIFAT_PASARAN[pasaran.toUpperCase()] || "-";
 
-// CONTOH NYATA PEMAKAIAN
-const today = new Date();
 
-const china = ImlekEngine.getTanggalChina(today);
-
-console.log(
-  "Kalender China:",
-  china.tanggal,
-  "Bulan",
-  china.bulan,
-  "Tahun",
-  china.tahun
-);
 
     const watakNeptu = (typeof DATA_WATAK_NEPTU !== 'undefined') ? DATA_WATAK_NEPTU[neptu] : null;
     const namaBulanMasehi = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
