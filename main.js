@@ -101,13 +101,39 @@ function getZodiak(date) {
     return "Pisces";
 }
 
-function getLunarShio(date) {
-    const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
-    const year = date.getFullYear();
-    const isEarly = (date.getMonth() === 0) || (date.getMonth() === 1 && date.getDate() < 10);
-    const index = isEarly ? (year - 1) % 12 : year % 12;
-    return { shio: shios[index], lunarYear: year + 3760 };
+function getLunarDetails(date) {
+    const shios = ["Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing", "Monyet", "Ayam", "Anjing", "Babi"];
+
+    // Menggunakan Intl.DateTimeFormat untuk mendapatkan data kalender Lunar
+    const formatter = new Intl.DateTimeFormat('id-u-ca-chinese', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    });
+
+    const parts = formatter.formatToParts(date);
+    const detail = {};
+    parts.forEach(({ type, value }) => {
+        detail[type] = value;
+    });
+
+    // Menghitung Shio: Tahun Tikus dimulai pada tahun 4 (siklus 60 tahunan)
+    // Rumus: (Tahun_Lunar - 4) % 12
+    const lunarYear = parseInt(detail.year);
+    const shioIndex = (lunarYear - 4) % 12;
+
+    return {
+        tanggalLengkap: formatter.format(date),
+        tanggal: detail.day,
+        bulan: detail.month,
+        tahunLunar: lunarYear,
+        shio: shios[shioIndex]
+    };
 }
+
+// Contoh Penggunaan:
+const hariIni = new Date();
+console.log(getLunarDetails(hariIni));
 
 function getWuku(date) {
     const wukuList = ["Sinta", "Landep", "Wukir", "Kurantil", "Tolu", "Gumbreg", "Warigalit", "Wariagung", "Julungwangi", "Sungsang", "Galungan", "Kuningan", "Langkir", "Mandasiya", "Julungpujut", "Pahang", "Kuruwelut", "Marakeh", "Tambir", "Medangkungan", "Maktal", "Wuye", "Manahil", "Prangbakat", "Bala", "Wugu", "Wayang", "Kulawu", "Dukut", "Watugunung"];
