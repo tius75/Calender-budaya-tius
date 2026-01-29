@@ -135,32 +135,44 @@ function getTanggalJawa(date) {
 
 function getHasilKalender(dateObj) {
 
-    // === 1. HITUNG TANGGAL CHINESE ===
-    const solar = Solar.fromDate(dateObj);
-    const lunar = solar.getLunar();
+    try {
+        // === 1. HITUNG TANGGAL CHINESE ===
+        const solar = Solar.fromDate(dateObj);
+        const lunar = solar.getLunar();
 
-    const hari = lunar.getDay();
-    const bulan = lunar.getMonth();
-    const tahunChinese = lunar.getYear() + 551;
+        const hari = lunar.getDay();
+        const bulan = lunar.getMonth();
+        const tahunChinese = lunar.getYear() + 551;
 
-    // === 2. HITUNG TAHUN JAWA & WINDU ===
-    const REF_TAHUN_JAWA = 2576;
-    const REF_TAHUN_IDX = 4; // Dal
-    const REF_WINDU_IDX = 2; // Sancaya
+        // === 2. HITUNG TAHUN JAWA & WINDU ===
+        const REF_TAHUN_JAWA = 2576;
+        const REF_TAHUN_IDX = 4; // Dal
+        const REF_WINDU_IDX = 2; // Sancaya
 
-    const diffYears = tahunChinese - REF_TAHUN_JAWA;
+        const diffYears = tahunChinese - REF_TAHUN_JAWA;
 
-    let tahunIdx = (REF_TAHUN_IDX + diffYears) % 8;
-    if (tahunIdx < 0) tahunIdx += 8;
+        let tahunIdx = (REF_TAHUN_IDX + diffYears) % 8;
+        if (tahunIdx < 0) tahunIdx += 8;
 
-    let winduIdx = (REF_WINDU_IDX + Math.floor(diffYears / 8)) % 4;
-    if (winduIdx < 0) winduIdx += 4;
+        let winduIdx = (REF_WINDU_IDX + Math.floor(diffYears / 8)) % 4;
+        if (winduIdx < 0) winduIdx += 4;
 
-    return {
-        tahunJawa: DATA_SIKLUS_TAHUN[tahunIdx],
-        windu: WINDU_LIST[winduIdx],
-        chinese: `${hari} / ${bulan} / ${tahunChinese}`
-    };
+        return {
+            tahunJawa: DATA_SIKLUS_TAHUN[tahunIdx],
+            windu: WINDU_LIST[winduIdx],
+            chinese: `${hari} / ${bulan} / ${tahunChinese}`
+        };
+
+    } catch (err) {
+        console.error("Gagal hitung kalender:", err);
+
+        // ⬇️ PENTING: fallback supaya klik tidak mati
+        return {
+            tahunJawa: "-",
+            windu: "-",
+            chinese: "-"
+        };
+    }
 }
 
 function getMangsaInfo(date) {
