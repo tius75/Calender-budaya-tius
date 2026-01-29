@@ -272,147 +272,87 @@ function updateDetail(date, pasaran) {
     
     const wukuName = getWuku(date);
     const infoJawa = getTanggalJawa(date);
-    const siklusBesar = getSiklusBesar(infoJawa.tahun); // Gunakan tahun Jawa
-    const mangsa = getMangsaInfo(date);
+    const siklusBesar = getSiklusBesar(infoJawa.tahun);
     const zodiak = getZodiak(date);
-    const lunar = getLunarShio(date);
-    const nasibKematian = NASIB_AHLI_WARIS[neptu % 4];
-    const nasib5 = PEMBAGI_5[neptu % 5];
-    const arahMeditasi = getArahMeditasi(neptu);
     const usia = hitungUsiaLengkap(date);
-    
-        // --- 🏮 DETEKSI & LOGIKA IMLEK // Di dalam function updateDetail(date, pasaran)
-let imlekHtml = "";
+    const arahMeditasi = getArahMeditasi(neptu);
 
-if (window.ImlekEngine && typeof window.ImlekEngine.getTanggalChina === 'function') {
-    const china = window.ImlekEngine.getTanggalChina(date);
-    if (china) {
-        const se = window.ImlekEngine.getShioElemen(china.tahun);
-        const namaBulanChina = ["", "Cia Gwee", "Ji Gwee", "Sa Gwee", "Si Gwee", "Go Gwee", "Lak Gwee", "Tjit Gwee", "Pe Gwee", "Kauw Gwee", "Tjap Gwee", "Tjap It Gwee", "Tjap Ji Gwee"];
-        
-        imlekHtml = `
-            <div style="background:#fff1f0; padding:12px; border-radius:8px; margin:15px 0; border:1px solid #ffa39e; border-left:5px solid #cf1322;">
-                <p style="margin:0; color:#cf1322; font-weight:bold;">🏮 Kalender Imlek / Kongzili</p>
-                <p style="margin:5px 0; font-size:1.1rem; color:#000;">
-                    <strong>${china.tanggal} ${namaBulanChina[china.bulan] || 'Bulan '+china.bulan} ${china.tahun}</strong>
-                </p>
-                <p style="margin:0; font-size:0.85rem; color:#666;">Tahun: <strong>${se.elemen} ${se.shio}</strong></p>
-            </div>`;
-    }
-}
-
-
-
-    const sifatHariIni = DATA_SIFAT_HARI[h] || "-";
-    const sifatPasaranIni = DATA_SIFAT_PASARAN[pasaran.toUpperCase()] || "-";
-
-    const watakNeptu = (typeof DATA_WATAK_NEPTU !== 'undefined') ? DATA_WATAK_NEPTU[neptu] : null;
-    const namaBulanMasehi = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    const tglMasehiLengkap = `${date.getDate()} ${namaBulanMasehi[date.getMonth()]} ${date.getFullYear()}`;
-
-    const teksWuku = (typeof DATA_WUKU !== 'undefined') ? (DATA_WUKU[wukuName] || "Detail wuku belum tersedia.") : "Data Wuku tidak ditemukan.";
-    const dataSriJati = (typeof TABEL_SRIJATI !== 'undefined') ? (TABEL_SRIJATI[neptu] || []) : [];
-
-    const isNaas = infoJawa.bulan.naas.includes(infoJawa.tanggal);
-    const isTaliWangke = (wetonKey === infoJawa.bulan.taliWangke);
-
-    let warningNaas = "";
-    if (isNaas || isTaliWangke) {
-        warningNaas = `<div style="background:#ffebee; color:#c62828; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #d32f2f; font-size:0.85rem;">
-            <strong>⚠️ PERINGATAN HARI NAAS</strong><br>
-            ${isNaas ? `• Tanggal ${infoJawa.tanggal} ${infoJawa.bulan.nama} dilarang untuk hajat.<br>` : ""}
-            ${isTaliWangke ? `• Hari ini Tali Wangke (${infoJawa.bulan.taliWangke}).` : ""}
+    // --- 🏮 LOGIKA IMLEK (INTEGRASI ULANG) ---
+    let imlekHtml = "";
+    // Pastikan memanggil "ImlekEngine" dengan huruf kapital sesuai isi file Anda
+    if (window.ImlekEngine) {
+        const china = window.ImlekEngine.getTanggalChina(date);
+        if (china) {
+            const se = window.ImlekEngine.getShioElemen(china.tahun);
+            const namaBulanChina = ["", "Cia Gwee", "Ji Gwee", "Sa Gwee", "Si Gwee", "Go Gwee", "Lak Gwee", "Tjit Gwee", "Pe Gwee", "Kauw Gwee", "Tjap Gwee", "Tjap It Gwee", "Tjap Ji Gwee"];
+            
+            imlekHtml = `
+                <div style="background:#fff1f0; padding:12px; border-radius:8px; margin:15px 0; border:1px solid #ffa39e; border-left:5px solid #cf1322;">
+                    <p style="margin:0; color:#cf1322; font-weight:bold; font-size:1rem;">🏮 Kalender Imlek / Kongzili</p>
+                    <p style="margin:5px 0; font-size:1.1rem; color:#000;">
+                        <strong>${china.tanggal} ${namaBulanChina[china.bulan] || 'Bulan '+china.bulan} ${china.tahun}</strong>
+                    </p>
+                    <p style="margin:0; font-size:0.85rem; color:#666;">Tahun: <strong>${se.elemen} ${se.shio}</strong></p>
+                </div>`;
+        }
+    } else {
+        // Jika file imlek-engine.global.js belum benar, munculkan pesan ini (seperti gambar 1)
+        imlekHtml = `<div style="background:#fffbe6; border:1px dashed #ffe58f; padding:10px; border-radius:8px; margin:15px 0; font-size:0.8rem; color:#856404;">
+            ⚠️ ImlekEngine tidak terdeteksi. Pastikan file imlek-engine.global.js sudah benar.
         </div>`;
     }
 
-    let tabelHtml = `<table style="width:100%; border-collapse: collapse; margin-top:10px; font-size:0.85rem; border:1px solid #ddd;">
-        <thead><tr style="background:#f9f9f9;"><th style="border:1px solid #ddd; padding:8px;">Usia</th><th style="border:1px solid #ddd; padding:8px;">Nilai</th><th style="border:1px solid #ddd; padding:8px;">Nasib</th></tr></thead><tbody>`;
+    const tglMasehiLengkap = `${date.getDate()} ${["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"][date.getMonth()]} ${date.getFullYear()}`;
 
-    if (dataSriJati.length > 0) {
-        dataSriJati.forEach(item => {
-            const skor = item.nilai !== undefined ? item.nilai : (item.v !== undefined ? item.v : 0);
-            const rangeUsia = item.usia || item.age || "-";
-            const deskripsi = (typeof SRI_JATI_DESC !== 'undefined') ? (SRI_JATI_DESC[skor] || "Data tidak ada") : "Deskripsi Error";
-            tabelHtml += `<tr><td style="border:1px solid #ddd; padding:8px; text-align:center;">${rangeUsia} Thn</td><td style="border:1px solid #ddd; padding:8px; text-align:center; color:#D30000; font-weight:bold;">${skor}</td><td style="border:1px solid #ddd; padding:8px;">${deskripsi}</td></tr>`;
-        });
-    } else {
-        tabelHtml += `<tr><td colspan="3" style="text-align:center; padding:10px;">Data tidak ditemukan</td></tr>`;
-    }
-    tabelHtml += `</tbody></table>`;
-
+    // RENDER KE HTML (Sesuai Urutan Gambar Anda)
     detailDiv.style.display = 'block';
     detailDiv.innerHTML = `
-        <div id="printableArea" class="card-result" style="background:#fff; padding:20px; border-radius:12px; border:1px solid #eee; box-shadow: 0 4px 6px rgba(0,0,0,0.05); color:#000;">
-            ${warningNaas}
+        <div id="printableArea" class="card-result" style="background:#fff; padding:20px; border-radius:12px; border:1px solid #eee; color:#000;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                <h2 style="color:#D30000; margin:0 0 5px 0; border-bottom:2px solid #D30000; display:inline-block;">${wetonKey}</h2>
+                <h2 style="color:#D30000; margin:0; border-bottom:2px solid #D30000; display:inline-block;">${wetonKey}</h2>
                 <button onclick="copyToClipboard()" style="background:#D30000; color:#fff; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">📋 Salin Hasil</button>
             </div>
             
-            <p style="margin:10px 0 0; font-size:1.15rem; font-weight:bold;">📅 ${tglMasehiLengkap}</p>
+            <p style="margin:15px 0; font-size:1.15rem; font-weight:bold;">📅 ${tglMasehiLengkap}</p>
 
             ${imlekHtml}
-            
-            <div style="background:#fff3e0; padding:12px; border-radius:8px; margin:10px 0; border:1px solid #ffe0b2;">
-                <p style="margin:0; color:#e65100; font-weight:bold; font-size:1rem;">✨ Siklus Tahun & Windu</p>
-                <p style="margin:5px 0; font-size:0.9rem;"><strong>Tahun:</strong> ${siklusBesar.tahun.nama} (${siklusBesar.tahun.makna})</p>
-                <p style="margin:5px 0; font-size:0.9rem;"><strong>Windu:</strong> ${siklusBesar.windu} </p>
-                <p style="margin:8px 0 0; font-size:0.8rem; font-style:italic; color:#6d4c41; line-height:1.4;">"${siklusBesar.tahun.deskripsi}"</p>
+
+            <div style="background:#fff3e0; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #ffe0b2;">
+                <p style="margin:0; color:#e65100; font-weight:bold;">✨ Siklus Tahun & Windu</p>
+                <p style="margin:5px 0;"><strong>Tahun:</strong> ${siklusBesar.tahun.nama} (${siklusBesar.tahun.makna})</p>
+                <p style="margin:5px 0;"><strong>Windu:</strong> ${siklusBesar.windu}</p>
+                <p style="margin:10px 0 0; font-size:0.85rem; font-style:italic; color:#6d4c41; line-height:1.4;">"${siklusBesar.tahun.deskripsi}"</p>
             </div>
 
-            <div style="background:#fff9f9; padding:10px; border-radius:8px; margin:10px 0; border:1px solid #ffeded;">
-                <p style="margin:0; color:#d30000; font-weight:bold; font-size:1rem;">🌙 Kalender Jawa</p>
-                <p style="margin:5px 0; font-size:0.9rem;"><strong>Tanggal:</strong> ${infoJawa.tanggal} ${infoJawa.bulan.nama} ${infoJawa.tahun} AJ</p>
-                <p style="margin:5px 0; font-size:0.9rem;"><strong>Status Bulan:</strong> <span style="color:${infoJawa.bulan.status === 'Baik' || infoJawa.bulan.status === 'Sangat Baik' ? '#2e7d32' : '#c62828'}">${infoJawa.bulan.status}</span></p>
+            <div style="background:#fff9f9; padding:12px; border-radius:8px; margin-bottom:15px; border:1px solid #ffeded;">
+                <p style="margin:0; color:#d30000; font-weight:bold;">🌙 Kalender Jawa</p>
+                <p style="margin:5px 0;"><strong>Tanggal:</strong> ${infoJawa.tanggal} ${infoJawa.bulan.nama} ${infoJawa.tahun} AJ</p>
+                <p style="margin:5px 0;"><strong>Status Bulan:</strong> <span style="color:#2e7d32;">${infoJawa.bulan.status}</span></p>
             </div>
 
-            <div style="background:#f8f9fa; padding:12px; border-radius:8px; margin:10px 0; border:1px solid #e9ecef;">
-                <h4 style="margin:0 0 8px 0; color:#333; font-size:0.95rem;">🔢 Perhitungan Neptu</h4>
-                <p style="margin:0; font-family: monospace; font-size:0.9rem;">
-                    Hari ${h} = ${nHari}<br>
-                    Pasaran ${pasaran} = ${nPasaran}<br>
-                    --------------------- +<br>
-                    <strong>Total Neptu = ${neptu}</strong>
-                </p>
+            <div style="background:#f8f9fa; padding:12px; border-radius:8px; margin-bottom:15px; border:1px solid #e9ecef;">
+                <p style="margin:0; font-weight:bold; color:#333;">🔢 Perhitungan Neptu</p>
+                <p style="margin:5px 0; font-family:monospace;">Hari ${h} = ${nHari}</p>
+                <p style="margin:0; font-family:monospace;">Pasaran ${pasaran} = ${nPasaran}</p>
+                <p style="margin:0; font-family:monospace;">---------------------- +</p>
+                <p style="margin:5px 0; font-weight:bold;">Total Neptu = ${neptu}</p>
             </div>
 
-            <div style="margin:15px 0; padding:12px; border:1px solid #ffe0b2; background:#fff8e1; border-radius:8px;">
-                <h4 style="margin:0 0 5px 0; color:#e65100; font-size:0.95rem;">🎭 Karakter Hari & Pasaran</h4>
-                <p style="font-size:0.85rem; margin:0;"><strong>Sifat ${h}:</strong> ${sifatHariIni}</p>
-                <p style="font-size:0.85rem; margin:5px 0 0 0;"><strong>Sifat ${pasaran}:</strong> ${sifatPasaranIni}</p>
+            <div style="background:#fff8e1; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #ffe0b2;">
+                <p style="margin:0; color:#e65100; font-weight:bold;">🎭 Karakter Hari & Pasaran</p>
+                <p style="margin:8px 0 0; font-size:0.9rem;"><strong>Sifat ${h}:</strong> ${DATA_SIFAT_HARI[h]}</p>
+                <p style="margin:8px 0 0; font-size:0.9rem;"><strong>Sifat ${pasaran}:</strong> ${DATA_SIFAT_PASARAN[pasaran.toUpperCase()]}</p>
             </div>
 
-            <div style="background:#f0f7ff; border:1px solid #cfe2ff; padding:10px; border-radius:8px; margin:10px 0;">
-                <p style="margin:0; font-size:0.9rem;"><strong>⏳ Usia Saat Ini:</strong> ${usia}</p>
-                <p style="margin:5px 0 0; font-size:0.9rem;"><strong>🧘 Arah Meditasi:</strong> ${arahMeditasi}</p>
-            </div>
-
-            <div style="background:#e8f5e9; border:1px solid #c8e6c9; padding:12px; border-radius:8px; margin:15px 0;">
-                <h4 style="margin:0; color:#2e7d32; font-size:0.95rem;">💎 Nasib Pembagi 5: ${nasib5.nama}</h4>
-                <p style="font-size:0.85rem; margin-top:5px;">${nasib5.arti}</p>
-            </div>
-
-            <div style="margin:15px 0; padding:10px; background:#fffcf0; border-left:4px solid #f1c40f; border-radius:4px;">
-                <h4 style="margin:0; color:#856404; font-size:0.9rem;">🪦 Nasib Kematian (Ahli Waris)</h4>
-                <p style="margin:5px 0 0; font-weight:bold;">${nasibKematian.nama}</p>
-                <p style="margin:2px 0 0; font-size:0.85rem; font-style:italic;">"${nasibKematian.arti}"</p>
-            </div>
-
-            ${mangsa ? `<div style="margin:15px 0; padding:12px; border:1px solid #cfe2ff; background:#f0f7ff; border-radius:8px;"><h4 style="margin:0; color:#084298; font-size:0.95rem;">🌾 Pranata Mangsa: ${mangsa.nama}</h4><p style="font-size:0.85rem; margin-top:5px; line-height:1.4;">${mangsa.deskripsi}</p></div>` : ""}
-
-            <div style="margin-top:20px;">
-                <h4 style="color:#D30000; border-bottom:1px solid #eee; padding-bottom:5px;">🛡️ Analisis Wuku ${wukuName}</h4>
-                <div style="font-size:0.85rem; line-height:1.5;">${teksWuku}</div>
-            </div>
-
-            <div style="margin-top:20px;">
-                <h4 style="color:#D30000; border-bottom:1px solid #eee; padding-bottom:5px;">📈 Siklus Sri Jati (Rejeki)</h4>
-                ${dataSriJati.length > 0 ? tabelHtml : "<p style='color:#999;'>Data tidak tersedia.</p>"}
+            <div style="background:#f0f7ff; padding:12px; border-radius:8px; border:1px solid #cfe2ff;">
+                <p style="margin:0; font-size:0.9rem;">⏳ <strong>Usia Saat Ini:</strong> ${usia}</p>
+                <p style="margin:5px 0 0; font-size:0.9rem;">🧘 <strong>Arah Meditasi:</strong> ${arahMeditasi}</p>
             </div>
         </div>
     `;
     detailDiv.scrollIntoView({ behavior: 'smooth' });
 }
+
 
 
 // ==========================================
