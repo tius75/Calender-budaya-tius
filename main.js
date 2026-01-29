@@ -287,6 +287,22 @@ function updateDetail(date, pasaran) {
     const arahMeditasi = getArahMeditasi(neptu);
     const usia = hitungUsiaLengkap(date);
     
+detailDiv.innerHTML = `
+        <div id="printableArea" class="card-result" ... >
+            <div style="background:#fff1f0; padding:12px; border-radius:8px; margin-bottom:15px; border:1px solid #ffa39e;">
+                <p style="margin:0; color:#cf1322; font-weight:bold; font-size:1rem;">🧧 Penanggalan Imlek</p>
+                <p style="margin:5px 0; font-size:0.9rem;">Tahun ${imlek.tahun}, Bulan ${imlek.bulan}, Tanggal ${imlek.tanggal} (Shio ${imlek.shio})</p>
+            </div>
+
+            ${warningNaas} 
+            <div style="display:flex; justify-content:space-between; ...">
+                <h2 ...>${wetonKey}</h2>
+                ...
+            </div>
+            
+            ...
+    `;
+}
     const sifatHariIni = DATA_SIFAT_HARI[h] || "-";
     const sifatPasaranIni = DATA_SIFAT_PASARAN[pasaran.toUpperCase()] || "-";
 
