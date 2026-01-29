@@ -345,48 +345,45 @@ function updateDetail(date, pasaran) {
 // FITUR DOWNLOAD & SHARE (FIXED PDF)
 // ==========================================
 
-async function downloadPDF(event) {
+async function copyToClipboard() {
     const source = document.getElementById("printableArea");
-    if (!source) {
-        alert("Data tidak ditemukan!");
-        return;
-    }
+    if (!source) return alert("Pilih tanggal terlebih dahulu!");
 
-    const btn = event ? event.target : null;
-    const originalBtnText = btn ? btn.innerText : null;
-    if (btn) {
-        btn.innerText = "⏳ Sedang Memproses...";
-        btn.disabled = true;
-    }
-
-    const opt = {
-        margin: [10, 10, 10, 10],
-        filename: "Detail-Weton-Lengkap.pdf",
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { 
-            scale: 2,
-            useCORS: true,
-            allowTaint: true,
-            backgroundColor: "#ffffff",
-            logging: false
-        },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
-    };
-
+    const btn = event.target;
+    const originalBtnText = btn.innerText;
+    btn.innerText = "⏳ Menyalin...";
+    
     try {
-        // beri jeda sebentar agar konten/gambar sempat render
-        await new Promise(r => setTimeout(r, 300));
-        await html2pdf().from(source).set(opt).save();
-    } catch (e) {
-        console.error("PDF Error: ", e);
-        alert("Gagal membuat PDF. Cek console untuk detail error.");
-    } finally {
-        if (btn) {
-            btn.innerText = originalBtnText;
-            btn.disabled = false;
+        // Logika menyalin Rich Text (Teks + Format Tabel)
+        const range = document.createRange();
+        range.selectNode(source);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+
+        // Eksekusi perintah salin
+        const successful = document.execCommand('copy');
+        
+        if (successful) {
+            btn.innerText = "✅ Tersalin!";
+            alert("Data (termasuk Tabel Pal Jati) berhasil disalin! Silakan tempel (Paste/Ctrl+V) di Google Docs.");
+        } else {
+            throw new Error("Gagal menyalin");
         }
+        
+        // Bersihkan seleksi
+        selection.removeAllRanges();
+        
+    } catch (err) {
+        console.error("Copy Error: ", err);
+        alert("Gagal menyalin otomatis. Silakan blok teks secara manual dan tekan salin.");
+    } finally {
+        setTimeout(() => {
+            btn.innerText = originalBtnText;
+        }, 2000);
     }
 }
+
 
 function shareWhatsApp() {
     const detailArea = document.getElementById('printableArea');
