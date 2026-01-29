@@ -97,19 +97,15 @@ function getTahunKonzili(date) {
 
 // FITUR 2: TAHUN WINDU JAWA
 function getWinduJawa(tahunJawa) {
-    /**
-     * Siklus 8 tahun: Alip(1), Ehe(2), Jimawal(3), Je(4), Dal(5), Be(6), Wawu(7), Jimakir(0/8)
-     * Untuk menjadikan 1959 sebagai tahun Dal (index 4 dalam array 0-based), 
-     * kita menggunakan rumus: (tahunJawa + offset) % 8
-     */
+    // Urutan Siklus 8 Tahun (Sultan Agungan):
+    // 1:Alip, 2:Ehe, 3:Jimawal, 4:Je, 5:Dal, 6:Be, 7:Wawu, 8/0:Jimakir
+    const DATA_WINDU_JAWA = ["Jimakir", "Alip", "Ehe", "Jimawal", "Je", "Dal", "Be", "Wawu"];
+
+    // Menggunakan offset +6 agar tahun 1959 menghasilkan sisa bagi 5 (Dal)
+    // Hitungan: (1959 + 6) % 8 = 1965 % 8 = 5
+    const index = (tahunJawa + 6) % 8; 
     
-    // DATA_WINDU_JAWA = ["Jimakir", "Alip", "Ehe", "Jimawal", "Je", "Dal", "Be", "Wawu"]
-    // Dengan (1959 + 1) % 8 = 0 -> Menghasilkan Jimakir (Jika menggunakan array standar)
-    
-    // Rekomendasi logika agar 1959 menghasilkan 'Dal' (urutan ke-5):
-    const index = (tahunJawa + 2) % 8; 
-    
-    return DATA_WINDU_JAWA[index];
+    return DATA_WINDU_JAWA[index]; // Akan mengembalikan "Dal"
 }
 function getPasaran(date) {
     const base = new Date(1900, 0, 1);
