@@ -298,23 +298,31 @@ if (ie && typeof ie.getTanggalChina === 'function' && typeof ie.getShioElemen ==
             const shioElemen = ie.getShioElemen(imlekInfo.tahun);
             const tahunSiklus = date.getFullYear() + 550; // 2026 → 2576
 
+            // ========== INTEGRASI IMLEK ENGINE — SAFE MODE ==========
+let imlekDisplay = "";
+const ie = window?.ImlekEngine;
+if (ie && typeof ie.getTanggalChina === 'function') {
+    try {
+        const imlekInfo = ie.getTanggalChina(date);
+        if (imlekInfo && typeof imlekInfo.tanggal === 'number') {
+            const shioElemen = ie.getShioElemen?.(imlekInfo.tahun) || { shio: '?', elemen: '?' };
+            const tahunSiklus = date.getFullYear() + 550;
+
             imlekDisplay = `
                 <p style="margin:5px 0; font-size:0.9rem;">
                     <strong>Imlek:</strong> Tanggal ${imlekInfo.tanggal} Bulan ${imlekInfo.bulan} Tahun ${tahunSiklus} 
-                    (Shio ${shioElemen?.shio || '?'}, Elemen ${shioElemen?.elemen || '?'})
-                    ${(imlekInfo.tanggal === 1 && imlekInfo.bulan === 1) ? ' 🎉 HARI RAYA IMLEK!' : ''}
+                    (Shio ${shioElemen.shio}, Elemen ${shioElemen.elemen})
+                    ${imlekInfo.tanggal === 1 && imlekInfo.bulan === 1 ? ' 🎉 HARI RAYA IMLEK!' : ''}
                 </p>
             `;
-        } else {
-            imlekDisplay = `<p style="color:#999; font-size:0.85rem;"><em>⚠️ ImlekEngine: Data lunar tidak ditemukan untuk tanggal ini.</em></p>`;
         }
     } catch (e) {
-        imlekDisplay = `<p style="color:#d32f2f; font-size:0.85rem;">❌ ImlekEngine error: ${e.message}</p>`;
-        console.error("ImlekEngine error:", e);
+        // JANGAN LEWATKAN ERROR — tapi jangan hentikan skrip!
+        console.warn("[Imlek] Gagal render:", e.message);
+        imlekDisplay = `<p style="color:#666; font-size:0.85rem;"><em>Imlek: ⚠️ Data tidak tersedia</em></p>`;
     }
 } else {
-    imlekDisplay = `<p style="color:#999; font-size:0.85rem;"><em>🔍 ImlekEngine belum siap — pastikan imlek-engine.js dimuat & bebas error.</em></p>`;
-    console.warn("ImlekEngine not found. Check: window.ImlekEngine =", ie);
+    imlekDisplay = ""; // diam saja, jangan ganggu
 }
 // ===========================================
     const sifatHariIni = DATA_SIFAT_HARI[h] || "-";
