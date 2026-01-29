@@ -134,28 +134,28 @@ function getTanggalJawa(date) {
 }
 
 function getSiklusBesar(tahunJawa) {
-    /*
-      PATOKAN ABSOLUT:
-      Tahun Jawa 2576 = Tahun Dal
-      Windu Sancaya
-      Konzili ke-1
-    */
 
+    // KUNCI INPUT (anti salah kirim Date / timestamp)
+    if (typeof tahunJawa !== "number" || tahunJawa < 2000 || tahunJawa > 3000) {
+        throw new Error("Input harus TAHUN JAWA (contoh: 2576)");
+    }
+
+    // PATOKAN
     const REF_TAHUN_JAWA = 2576;
-    const REF_TAHUN_IDX = 4;   // Dal
-    const REF_WINDU_IDX = 2;   // Sancaya
+    const REF_TAHUN_IDX = 4; // Dal
+    const REF_WINDU_IDX = 2; // Sancaya
 
     const diffYears = tahunJawa - REF_TAHUN_JAWA;
 
-    // === Tahun (Siklus 8 Tahun) ===
+    // === Tahun (8 tahunan) ===
     let tahunIdx = (REF_TAHUN_IDX + diffYears) % 8;
     if (tahunIdx < 0) tahunIdx += 8;
 
-    // === Windu (8 Tahun per Windu) ===
+    // === Windu (8 tahun per windu) ===
     let winduIdx = (REF_WINDU_IDX + Math.floor(diffYears / 8)) % 4;
     if (winduIdx < 0) winduIdx += 4;
 
-    // === Konzili (32 Tahun) ===
+    // === Konzili (32 tahun) ===
     let konzili = 1 + Math.floor(diffYears / 32);
 
     return {
