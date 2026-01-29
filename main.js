@@ -443,3 +443,25 @@ document.addEventListener("DOMContentLoaded", () => {
     if(prev) prev.onclick = () => { current.setMonth(current.getMonth() - 1); generateCalendar(); };
     if(next) next.onclick = () => { current.setMonth(current.getMonth() + 1); generateCalendar(); };
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+    generateCalendar();
+    updateDetail(TODAY, getPasaran(TODAY));
+
+    // ✅ TEST IMLEK (AMAN)
+    if (window.ImlekEngine) {
+        const today = new Date();
+        const china = ImlekEngine.getTanggalChina(today);
+
+        console.log(
+          "Kalender China:",
+          china.tanggal,
+          "Bulan",
+          china.bulan,
+          "Tahun",
+          china.tahun
+        );
+    } else {
+        console.error("ImlekEngine BELUM TERLOAD");
+    }
+});
