@@ -104,42 +104,49 @@ function getZodiak(date) {
 function getLunarShio(date) {
     const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
     
-    try {
-        // Menggunakan toLocaleString untuk mendapatkan data kalender Chinese
-        // Cara ini lebih kompatibel dengan banyak perangkat
-        const chineseDate = date.toLocaleString('en-US', { calendar: 'chinese' });
-        
-        // chineseDate biasanya berformat: "M/D/YYYY, HH:MM:SS" 
-        // Contoh: "12/11/2025, ..."
-        const datePart = chineseDate.split(',')[0];
-        const [lMonth, lDay, lYearSystem] = datePart.split('/');
+    // 1. Ambil waktu milidetik
+    const time = date.getTime();
+    
+    // 2. Referensi: 29 Januari 2025 adalah 11:12 (Bulan 12 hari ke-11)
+    // Kita hitung selisih hari dari tanggal referensi ini
+    const refDate = new Date(2025, 0, 29).getTime(); 
+    const diffDays = Math.floor((time - refDate) / (1000 * 60 * 60 * 24));
 
-        // 1. Tahun Imlek (2025 + 551 = 2576)
-        const lunarYearValue = date.getFullYear() + 551;
-        
-        // 2. Shio
-        const shioIndex = parseInt(lYearSystem) % 12;
+    // 3. Estimasi Tanggal Lunar (Siklus 29.5 hari)
+    // Ini adalah pendekatan matematika agar ringan dan tidak membuat kalender hang
+    let lDay = 11 + diffDays;
+    let lMonth = 12;
+    let lYear = date.getFullYear() + 551;
 
-        // 3. Format dd:mm:yyyy (Contoh: 11:12:2576)
-        const dd = lDay.padStart(2, '0');
-        const mm = lMonth.padStart(2, '0');
-        const yy = lunarYearValue;
-
-        return { 
-            shio: shios[shioIndex], 
-            lunarYear: `${dd}:${mm}:${yy}` 
-        };
-    } catch (e) {
-        // Jika cara di atas masih gagal, gunakan hitungan manual sederhana 
-        // agar kalender TIDAK BLANK dan tetap bisa diklik
-        const d = String(date.getDate()).padStart(2, '0');
-        const m = String(date.getMonth() + 1).padStart(2, '0');
-        const y = date.getFullYear() + 551;
-        const s = shios[date.getFullYear() % 12];
-        
-        return { shio: s, lunarYear: `${d}:${m}:${y}` };
+    // Logika sederhana penyesuaian bulan (jika lDay lebih dari 29/30)
+    if (lDay > 29) {
+        lDay = (lDay % 30) || 30;
+        // Jika lewat dari bulan 12, balik ke bulan 1
+        if (diffDays > 18) { 
+            lMonth = 1; 
+            lYear = date.getFullYear() + 551;
+        }
+    } else if (lDay <= 0) {
+        // Logika untuk tanggal sebelum 29 Jan (Bulan 11 Imlek)
+        lDay = 30 + lDay;
+        lMonth = 11;
     }
+
+    // 4. Penentuan Shio (Tahun 2025 = Shio Ular / Indeks 9)
+    // 2025 % 12 = 9 (Ular). 2026 % 12 = 10 (Kuda).
+    const shioIndex = date.getFullYear() % 12;
+
+    // Format dd:mm:yyyy
+    const dd = String(lDay).padStart(2, '0');
+    const mm = String(lMonth).padStart(2, '0');
+    const yy = String(lYear);
+
+    return { 
+        shio: shios[shioIndex], 
+        lunarYear: `${dd}:${mm}:${yy}` 
+    };
 }
+
 
 
 
