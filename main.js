@@ -1,6 +1,6 @@
 /**
  * KALENDER JAWA MODERN - VERSI FINAL FIX 2026
- * Perbaikan: Penambahan Sifat Pasaran & Hari
+ * Perbaikan: Fitur Salin Teks (Menggantikan PDF)
  */
 
 // ==========================================
@@ -11,7 +11,6 @@ const PASARAN = ['Legi', 'Pahing', 'Pon', 'Wage', 'Kliwon'];
 const NEPTU_HARI = { 'Minggu': 5, 'Senin': 4, 'Selasa': 3, 'Rabu': 7, 'Kamis': 8, 'Jumat': 6, 'Sabtu': 9 };
 const NEPTU_PASARAN = { 'Pahing': 9, 'Pon': 7, 'Wage': 4, 'Kliwon': 8, 'Legi': 5 };
 
-// DATA SIFAT TAMBAHAN
 const DATA_SIFAT_PASARAN = {
     'KLIWON': 'Pandai bicara dan bergaul, periang, ambisius, urakan, kurang bisa membalas budi, setia pada janji, ceroboh memilih makanan, banyak selamat dan doanya.',
     'LEGI': 'Bertanggung jawab, murah hati, enak dalam pergaulan, selalu gembira seperti tidak pernah susah, sering kena fitnah, kuat tidak tidur malam hari, berhati-hati namun sering bingung sendiri, bicaranya berisi. Banyak keberuntungan dan kesialannya.',
@@ -166,7 +165,7 @@ function hitungUsiaLengkap(birthDate) {
 }
 
 // ==========================================
-// FUNGSI CARI WETON (FIX)
+// FUNGSI CARI WETON
 // ==========================================
 function searchWeton() {
     const input = document.getElementById('dateInput');
@@ -241,7 +240,6 @@ function updateDetail(date, pasaran) {
     const arahMeditasi = getArahMeditasi(neptu);
     const usia = hitungUsiaLengkap(date);
     
-    // Ambil Sifat Hari & Pasaran
     const sifatHariIni = DATA_SIFAT_HARI[h] || "-";
     const sifatPasaranIni = DATA_SIFAT_PASARAN[pasaran.toUpperCase()] || "-";
 
@@ -250,7 +248,6 @@ function updateDetail(date, pasaran) {
     const tglMasehiLengkap = `${date.getDate()} ${namaBulanMasehi[date.getMonth()]} ${date.getFullYear()}`;
 
     const teksWuku = (typeof DATA_WUKU !== 'undefined') ? (DATA_WUKU[wukuName] || "Detail wuku belum tersedia.") : "Data Wuku tidak ditemukan.";
-    const teksHari = (typeof DATA_HARI !== 'undefined') ? (DATA_HARI[wetonKey] || "Data watak hari belum tersedia.") : "Data Hari tidak ditemukan.";
     const dataSriJati = (typeof TABEL_SRIJATI !== 'undefined') ? (TABEL_SRIJATI[neptu] || []) : [];
 
     const isNaas = infoJawa.bulan.naas.includes(infoJawa.tanggal);
@@ -268,7 +265,7 @@ function updateDetail(date, pasaran) {
     let tabelHtml = `<table style="width:100%; border-collapse: collapse; margin-top:10px; font-size:0.85rem; border:1px solid #ddd;">
         <thead><tr style="background:#f9f9f9;"><th style="border:1px solid #ddd; padding:8px;">Usia</th><th style="border:1px solid #ddd; padding:8px;">Nilai</th><th style="border:1px solid #ddd; padding:8px;">Nasib</th></tr></thead><tbody>`;
 
-    if (dataSriJati && dataSriJati.length > 0) {
+    if (dataSriJati.length > 0) {
         dataSriJati.forEach(item => {
             const skor = item.nilai !== undefined ? item.nilai : (item.v !== undefined ? item.v : 0);
             const rangeUsia = item.usia || item.age || "-";
@@ -286,6 +283,7 @@ function updateDetail(date, pasaran) {
             ${warningNaas}
             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                 <h2 style="color:#D30000; margin:0 0 5px 0; border-bottom:2px solid #D30000; display:inline-block;">${wetonKey}</h2>
+                <button onclick="copyToClipboard()" style="background:#D30000; color:#fff; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">📋 Salin Hasil</button>
             </div>
             <p style="margin:10px 0 0; font-size:1.15rem; font-weight:bold;">📅 ${tglMasehiLengkap}</p>
             <p style="margin:5px 0; color:#d30000; font-weight:500;"><strong>Jawa:</strong> ${infoJawa.tanggal} ${infoJawa.bulan.nama} ${infoJawa.tahun} AJ</p>
@@ -317,34 +315,29 @@ function updateDetail(date, pasaran) {
 }
 
 // ==========================================
-// FITUR DOWNLOAD & SHARE
+// FITUR SALIN & SHARE
 // ==========================================
 
-async function downloadPDF() {
-    const source = document.getElementById("printableArea");
-    if (!source) return alert("Data tidak ditemukan!");
+function copyToClipboard() {
+    const detailArea = document.getElementById('printableArea');
+    if (!detailArea) return alert("Data tidak ditemukan!");
 
-    const originalStyle = source.getAttribute("style");
-    const originalParent = source.parentNode;
-    const placeholder = document.createElement("div");
-    originalParent.insertBefore(placeholder, source);
-    document.body.appendChild(source);
+    // Menghapus elemen tombol dari teks yang akan disalin
+    const clone = detailArea.cloneNode(true);
+    const button = clone.querySelector('button');
+    if (button) button.remove();
 
-    Object.assign(source.style, { display: "block", position: "relative", width: "794px", maxWidth: "794px", background: "#fff", color: "#000" });
+    const textToCopy = "*HASIL CEK WETON JAWA*\n" + 
+                       "━━━━━━━━━━━━━━━━━━━━━━\n\n" + 
+                       clone.innerText.trim() + 
+                       "\n\n━━━━━━━━━━━━━━━━━━━━━━\n" +
+                       "_Kalender Jawa by Tius_";
 
-    const opt = {
-        margin: 20,
-        filename: "Detail-Weton-Lengkap.pdf",
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, backgroundColor: "#ffffff", windowWidth: 794 },
-        jsPDF: { unit: "px", format: "a4", orientation: "portrait" }
-    };
-
-    try { await html2pdf().set(opt).from(source).save(); } catch (e) { alert("Gagal membuat PDF"); }
-
-    placeholder.replaceWith(source);
-    if (originalStyle) source.setAttribute("style", originalStyle);
-    else source.removeAttribute("style");
+    navigator.clipboard.writeText(textToCopy).then(() => {
+        alert("Hasil berhasil disalin ke clipboard!");
+    }).catch(err => {
+        alert("Gagal menyalin teks.");
+    });
 }
 
 function shareWhatsApp() {
@@ -355,32 +348,19 @@ function shareWhatsApp() {
     }
 
     let content = detailArea.innerText
+        .replace(/📋 Salin Hasil/g, "") // Hapus teks tombol jika ikut terbawa
         .replace(/\r\n/g, "\n")
-        // Rapikan Wuku & Pal Jati
         .replace(/Wuku\s*:/gi, "\nWuku : ")
         .replace(/Pal\.?\s*Jati\s*:/gi, "\n\nPal. Jati : ")
-
-        // 🔥 PAKSA SECTION BARU UNTUK SRI JATI
         .replace(/(📈\s*)?Siklus\s+Sri\s+Jati/gi, "\n\n📈 *Siklus Sri Jati (Rejeki)*\n")
-
-        // Rapikan enter berlebih
         .replace(/\n{3,}/g, "\n\n")
         .trim();
 
-    const header =
-        "*HASIL LENGKAP CEK WETON JAWA*\n" +
-        "━━━━━━━━━━━━━━━━━━━━━━\n\n";
-
-    const footer =
-        "\n\n━━━━━━━━━━━━━━━━━━━━━━\n" +
-        "_Kalender Jawa by Tius_";
-
+    const header = "*HASIL LENGKAP CEK WETON JAWA*\n" + "━━━━━━━━━━━━━━━━━━━━━━\n\n";
+    const footer = "\n\n━━━━━━━━━━━━━━━━━━━━━━\n" + "_Kalender Jawa by Tius_";
     const finalText = header + content + footer;
 
-    window.open(
-        "https://wa.me/?text=" + encodeURIComponent(finalText),
-        "_blank"
-    );
+    window.open("https://wa.me/?text=" + encodeURIComponent(finalText), "_blank");
 }
 
 // ==========================================
