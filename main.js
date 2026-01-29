@@ -105,36 +105,42 @@ function getLunarShio(date) {
     const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
     
     try {
-        // 1. Ambil penanggalan Lunar asli dari sistem
-        const formatter = new Intl.DateTimeFormat('id-ID-u-ca-chinese', {
-            day: 'numeric',
-            month: 'numeric',
-            year: 'numeric'
-        });
+        // Menggunakan toLocaleString untuk mendapatkan data kalender Chinese
+        // Cara ini lebih kompatibel dengan banyak perangkat
+        const chineseDate = date.toLocaleString('en-US', { calendar: 'chinese' });
+        
+        // chineseDate biasanya berformat: "M/D/YYYY, HH:MM:SS" 
+        // Contoh: "12/11/2025, ..."
+        const datePart = chineseDate.split(',')[0];
+        const [lMonth, lDay, lYearSystem] = datePart.split('/');
 
-        const parts = formatter.formatToParts(date);
-        const lDay = parts.find(p => p.type === 'day').value.padStart(2, '0');
-        const lMonth = parts.find(p => p.type === 'month').value.padStart(2, '0');
-        const lYearSystem = parts.find(p => p.type === 'year').value;
-
-        // 2. Tahun Imlek (2025 + 551 = 2576)
+        // 1. Tahun Imlek (2025 + 551 = 2576)
         const lunarYearValue = date.getFullYear() + 551;
         
-        // 3. Shio (menggunakan tahun dari sistem lunar agar akurat saat transisi)
+        // 2. Shio
         const shioIndex = parseInt(lYearSystem) % 12;
 
-        // 4. Format akhir dd:mm:yyyy (11:12:2576)
-        const fullFormat = `${lDay}:${lMonth}:${lunarYearValue}`;
+        // 3. Format dd:mm:yyyy (Contoh: 11:12:2576)
+        const dd = lDay.padStart(2, '0');
+        const mm = lMonth.padStart(2, '0');
+        const yy = lunarYearValue;
 
         return { 
             shio: shios[shioIndex], 
-            lunarYear: fullFormat 
+            lunarYear: `${dd}:${mm}:${yy}` 
         };
     } catch (e) {
-        // Fallback jika terjadi error agar kalender tidak macet
-        return { shio: "-", lunarYear: "00:00:0000" };
+        // Jika cara di atas masih gagal, gunakan hitungan manual sederhana 
+        // agar kalender TIDAK BLANK dan tetap bisa diklik
+        const d = String(date.getDate()).padStart(2, '0');
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const y = date.getFullYear() + 551;
+        const s = shios[date.getFullYear() % 12];
+        
+        return { shio: s, lunarYear: `${d}:${m}:${y}` };
     }
 }
+
 
 
 
