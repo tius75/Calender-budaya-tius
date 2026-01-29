@@ -272,7 +272,7 @@ function updateDetail(date, pasaran) {
     
     const wukuName = getWuku(date);
     const infoJawa = getTanggalJawa(date);
-    const siklusBesar = getSiklusBesar(date);
+    const siklusBesar = getSiklusBesar(infoJawa.tahun); // Gunakan tahun Jawa
     const mangsa = getMangsaInfo(date);
     const zodiak = getZodiak(date);
     const lunar = getLunarShio(date);
@@ -281,9 +281,7 @@ function updateDetail(date, pasaran) {
     const arahMeditasi = getArahMeditasi(neptu);
     const usia = hitungUsiaLengkap(date);
     
-
-
-// 2. LOGIKA IMLEK (Dari file eksternal imlek-engine.global.js)
+    // --- 🏮 LOGIKA IMLEK (INTEGRASI ENGINE EKSTERNAL) ---
     let imlekHtml = "";
     if (window.ImlekEngine) {
         const china = window.ImlekEngine.getTanggalChina(date);
@@ -292,17 +290,14 @@ function updateDetail(date, pasaran) {
             const namaBulanChina = ["", "Cia Gwee", "Ji Gwee", "Sa Gwee", "Si Gwee", "Go Gwee", "Lak Gwee", "Tjit Gwee", "Pe Gwee", "Kauw Gwee", "Tjap Gwee", "Tjap It Gwee", "Tjap Ji Gwee"];
             imlekHtml = `
                 <div style="background:#fff1f0; padding:12px; border-radius:8px; margin:15px 0; border:1px solid #ffa39e; border-left:5px solid #cf1322;">
-                    <p style="margin:0; color:#cf1322; font-weight:bold;">🏮 Kalender Imlek / China</p>
+                    <p style="margin:0; color:#cf1322; font-weight:bold; font-size:1rem;">🏮 Kalender Imlek / China</p>
                     <p style="margin:5px 0; font-size:1.1rem; color:#000;">
-                        <strong>${china.tanggal} ${namaBulanChina[china.bulan] || 'Bulan '+china.bulan} ${china.tahun}</strong>
+                        <strong>${china.tanggal} ${namaBulanChina[china.bulan] || 'Bulan '+china.bulan} ${china.tahun} ${china.kabisat ? '(Kabisat)' : ''}</strong>
                     </p>
                     <p style="margin:0; font-size:0.85rem; color:#666;">Tahun: <strong>${se.elemen} ${se.shio}</strong></p>
                 </div>`;
         }
     }
-
-
-
 
     const sifatHariIni = DATA_SIFAT_HARI[h] || "-";
     const sifatPasaranIni = DATA_SIFAT_PASARAN[pasaran.toUpperCase()] || "-";
@@ -351,6 +346,8 @@ function updateDetail(date, pasaran) {
             </div>
             
             <p style="margin:10px 0 0; font-size:1.15rem; font-weight:bold;">📅 ${tglMasehiLengkap}</p>
+
+            ${imlekHtml}
             
             <div style="background:#fff3e0; padding:12px; border-radius:8px; margin:10px 0; border:1px solid #ffe0b2;">
                 <p style="margin:0; color:#e65100; font-weight:bold; font-size:1rem;">✨ Siklus Tahun & Windu</p>
@@ -363,8 +360,6 @@ function updateDetail(date, pasaran) {
                 <p style="margin:0; color:#d30000; font-weight:bold; font-size:1rem;">🌙 Kalender Jawa</p>
                 <p style="margin:5px 0; font-size:0.9rem;"><strong>Tanggal:</strong> ${infoJawa.tanggal} ${infoJawa.bulan.nama} ${infoJawa.tahun} AJ</p>
                 <p style="margin:5px 0; font-size:0.9rem;"><strong>Status Bulan:</strong> <span style="color:${infoJawa.bulan.status === 'Baik' || infoJawa.bulan.status === 'Sangat Baik' ? '#2e7d32' : '#c62828'}">${infoJawa.bulan.status}</span></p>
-                <p style="margin:5px 0; font-size:0.85rem; color:#666;"><strong>Tanggal Naas:</strong> ${infoJawa.bulan.naas.join(', ')}</p>
-                <p style="margin:5px 0; font-size:0.85rem; color:#666;"><strong>Tali Wangke:</strong> ${infoJawa.bulan.taliWangke}</p>
             </div>
 
             <div style="background:#f8f9fa; padding:12px; border-radius:8px; margin:10px 0; border:1px solid #e9ecef;">
@@ -383,25 +378,38 @@ function updateDetail(date, pasaran) {
                 <p style="font-size:0.85rem; margin:5px 0 0 0;"><strong>Sifat ${pasaran}:</strong> ${sifatPasaranIni}</p>
             </div>
 
-            <p style="margin:5px 0; font-size:0.9rem;"><strong>Lunar:</strong> ${lunar.lunarYear} (Shio ${lunar.shio}) | <strong>Zodiak:</strong> ${zodiak}</p>
             <div style="background:#f0f7ff; border:1px solid #cfe2ff; padding:10px; border-radius:8px; margin:10px 0;">
                 <p style="margin:0; font-size:0.9rem;"><strong>⏳ Usia Saat Ini:</strong> ${usia}</p>
                 <p style="margin:5px 0 0; font-size:0.9rem;"><strong>🧘 Arah Meditasi:</strong> ${arahMeditasi}</p>
             </div>
+
             <div style="background:#e8f5e9; border:1px solid #c8e6c9; padding:12px; border-radius:8px; margin:15px 0;">
                 <h4 style="margin:0; color:#2e7d32; font-size:0.95rem;">💎 Nasib Pembagi 5: ${nasib5.nama}</h4>
                 <p style="font-size:0.85rem; margin-top:5px;">${nasib5.arti}</p>
             </div>
-            <p style="margin:10px 0;"><strong>Neptu:</strong> ${neptu} | <strong>Wuku:</strong> ${wukuName}</p>
-            ${watakNeptu ? `<div style="margin:15px 0; padding:12px; border:1px solid #e1bee7; border-radius:8px; background:#f3e5f5;"><h4 style="color:#7b1fa2; margin:0 0 5px 0; border-bottom:1px solid #d1c4e9; font-size:0.95rem;">🌟 Watak Neptu ${neptu}</h4><p style="font-size:0.85rem; line-height:1.5; color:#4a148c;">${watakNeptu.watak}</p></div>` : ""}
-            <div style="margin:15px 0; padding:10px; background:#fffcf0; border-left:4px solid #f1c40f; border-radius:4px;"><h4 style="margin:0; color:#856404; font-size:0.9rem;">🪦 Nasib Kematian (Ahli Waris)</h4><p style="margin:5px 0 0; font-weight:bold;">${nasibKematian.nama}</p><p style="margin:2px 0 0; font-size:0.85rem; font-style:italic;">"${nasibKematian.arti}"</p></div>
+
+            <div style="margin:15px 0; padding:10px; background:#fffcf0; border-left:4px solid #f1c40f; border-radius:4px;">
+                <h4 style="margin:0; color:#856404; font-size:0.9rem;">🪦 Nasib Kematian (Ahli Waris)</h4>
+                <p style="margin:5px 0 0; font-weight:bold;">${nasibKematian.nama}</p>
+                <p style="margin:2px 0 0; font-size:0.85rem; font-style:italic;">"${nasibKematian.arti}"</p>
+            </div>
+
             ${mangsa ? `<div style="margin:15px 0; padding:12px; border:1px solid #cfe2ff; background:#f0f7ff; border-radius:8px;"><h4 style="margin:0; color:#084298; font-size:0.95rem;">🌾 Pranata Mangsa: ${mangsa.nama}</h4><p style="font-size:0.85rem; margin-top:5px; line-height:1.4;">${mangsa.deskripsi}</p></div>` : ""}
-            <div style="margin-top:20px;"><h4 style="color:#D30000; border-bottom:1px solid #eee; padding-bottom:5px;">🛡️ Analisis Wuku ${wukuName}</h4><div style="font-size:0.85rem; line-height:1.5;">${teksWuku}</div></div>
-            <div style="margin-top:20px;"><h4 style="color:#D30000; border-bottom:1px solid #eee; padding-bottom:5px;">📈 Siklus Sri Jati (Rejeki)</h4>${dataSriJati.length > 0 ? tabelHtml : "<p style='color:#999;'>Data tidak tersedia.</p>"}</div>
+
+            <div style="margin-top:20px;">
+                <h4 style="color:#D30000; border-bottom:1px solid #eee; padding-bottom:5px;">🛡️ Analisis Wuku ${wukuName}</h4>
+                <div style="font-size:0.85rem; line-height:1.5;">${teksWuku}</div>
+            </div>
+
+            <div style="margin-top:20px;">
+                <h4 style="color:#D30000; border-bottom:1px solid #eee; padding-bottom:5px;">📈 Siklus Sri Jati (Rejeki)</h4>
+                ${dataSriJati.length > 0 ? tabelHtml : "<p style='color:#999;'>Data tidak tersedia.</p>"}
+            </div>
         </div>
     `;
     detailDiv.scrollIntoView({ behavior: 'smooth' });
 }
+
 
 // ==========================================
 // FITUR SALIN & SHARE
