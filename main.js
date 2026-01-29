@@ -283,30 +283,23 @@ function updateDetail(date, pasaran) {
     
 
 
-// LOGIKA IMLEK (FIXED INTEGRATION)
-let imlekHtml = "";
-if (window.ImlekEngine) {
-    const china = window.ImlekEngine.getTanggalChina(date);
-    if (china) {
-        // Ambil Shio & Elemen dari engine eksternal
-        const se = window.ImlekEngine.getShioElemen(china.tahun);
-        const namaBulanChina = ["", "Cia Gwee", "Ji Gwee", "Sa Gwee", "Si Gwee", "Go Gwee", "Lak Gwee", "Tjit Gwee", "Pe Gwee", "Kauw Gwee", "Tjap Gwee", "Tjap It Gwee", "Tjap Ji Gwee"];
-        
-        imlekHtml = `
-            <div style="background:#fff1f0; padding:12px; border-radius:8px; margin:15px 0; border:1px solid #ffa39e; border-left:5px solid #cf1322;">
-                <p style="margin:0; color:#cf1322; font-weight:bold;">🏮 Kalender Imlek / Kongzili</p>
-                <p style="margin:5px 0; font-size:1.1rem; color:#000;">
-                    <strong>${china.tanggal} ${namaBulanChina[china.bulan]} ${china.tahun} ${china.kabisat ? '(Leap)' : ''}</strong>
-                </p>
-                <p style="margin:0; font-size:0.85rem; color:#666;">
-                    Tahun: <strong>${se.elemen} ${se.shio}</strong>
-                </p>
-            </div>`;
+// 2. LOGIKA IMLEK (Dari file eksternal imlek-engine.global.js)
+    let imlekHtml = "";
+    if (window.ImlekEngine) {
+        const china = window.ImlekEngine.getTanggalChina(date);
+        if (china) {
+            const se = window.ImlekEngine.getShioElemen(china.tahun);
+            const namaBulanChina = ["", "Cia Gwee", "Ji Gwee", "Sa Gwee", "Si Gwee", "Go Gwee", "Lak Gwee", "Tjit Gwee", "Pe Gwee", "Kauw Gwee", "Tjap Gwee", "Tjap It Gwee", "Tjap Ji Gwee"];
+            imlekHtml = `
+                <div style="background:#fff1f0; padding:12px; border-radius:8px; margin:15px 0; border:1px solid #ffa39e; border-left:5px solid #cf1322;">
+                    <p style="margin:0; color:#cf1322; font-weight:bold;">🏮 Kalender Imlek / China</p>
+                    <p style="margin:5px 0; font-size:1.1rem; color:#000;">
+                        <strong>${china.tanggal} ${namaBulanChina[china.bulan] || 'Bulan '+china.bulan} ${china.tahun}</strong>
+                    </p>
+                    <p style="margin:0; font-size:0.85rem; color:#666;">Tahun: <strong>${se.elemen} ${se.shio}</strong></p>
+                </div>`;
+        }
     }
-} else {
-    // Fallback jika file eksternal gagal load
-    imlekHtml = `<div style="color:red; font-size:0.8rem;">Gagal memuat data ImlekEngine.</div>`;
-}
 
 
 
