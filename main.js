@@ -281,39 +281,26 @@ function updateDetail(date, pasaran) {
     const arahMeditasi = getArahMeditasi(neptu);
     const usia = hitungUsiaLengkap(date);
     
-        // --- 🏮 DETEKSI & LOGIKA IMLEK SUPER AMAN ---
-    let imlekHtml = "";
-    
-    // Cek semua kemungkinan nama engine (ImlekEngine atau imlekEngine)
-    const Engine = window.ImlekEngine || window.imlekEngine;
+        // --- 🏮 DETEKSI & LOGIKA IMLEK // Di dalam function updateDetail(date, pasaran)
+let imlekHtml = "";
 
-    if (Engine) {
-        try {
-            const china = Engine.getTanggalChina(date);
-            if (china) {
-                const se = Engine.getShioElemen ? Engine.getShioElemen(china.tahun) : {elemen: "", shio: ""};
-                const namaBulanChina = ["", "Cia Gwee", "Ji Gwee", "Sa Gwee", "Si Gwee", "Go Gwee", "Lak Gwee", "Tjit Gwee", "Pe Gwee", "Kauw Gwee", "Tjap Gwee", "Tjap It Gwee", "Tjap Ji Gwee"];
-                
-                imlekHtml = `
-                    <div style="background:#fff1f0; padding:12px; border-radius:8px; margin:15px 0; border:1px solid #ffa39e; border-left:5px solid #cf1322;">
-                        <p style="margin:0; color:#cf1322; font-weight:bold;">🏮 Kalender Imlek / Kongzili</p>
-                        <p style="margin:5px 0; font-size:1.1rem; color:#000;">
-                            <strong>${china.tanggal} ${namaBulanChina[china.bulan] || 'Bulan '+china.bulan} ${china.tahun}</strong>
-                        </p>
-                        <p style="margin:0; font-size:0.85rem; color:#666;">Tahun: <strong>${se.elemen} ${se.shio}</strong></p>
-                    </div>`;
-            } else {
-                console.warn("Imlek: Tanggal tidak ditemukan di database engine.");
-            }
-        } catch (err) {
-            console.error("Imlek: Terjadi kesalahan saat menjalankan fungsi engine.", err);
-        }
-    } else {
-        // INFO UNTUK DEVELOPER (Muncul di layar jika engine beneran tidak terbaca)
-        imlekHtml = `<div style="background:#f5f5f5; color:#888; padding:8px; border-radius:5px; font-size:0.75rem; border:1px dashed #ccc;">
-            ⚠️ ImlekEngine tidak terdeteksi. Pastikan file imlek-engine.global.js sudah benar.
-        </div>`;
+if (window.ImlekEngine && typeof window.ImlekEngine.getTanggalChina === 'function') {
+    const china = window.ImlekEngine.getTanggalChina(date);
+    if (china) {
+        const se = window.ImlekEngine.getShioElemen(china.tahun);
+        const namaBulanChina = ["", "Cia Gwee", "Ji Gwee", "Sa Gwee", "Si Gwee", "Go Gwee", "Lak Gwee", "Tjit Gwee", "Pe Gwee", "Kauw Gwee", "Tjap Gwee", "Tjap It Gwee", "Tjap Ji Gwee"];
+        
+        imlekHtml = `
+            <div style="background:#fff1f0; padding:12px; border-radius:8px; margin:15px 0; border:1px solid #ffa39e; border-left:5px solid #cf1322;">
+                <p style="margin:0; color:#cf1322; font-weight:bold;">🏮 Kalender Imlek / Kongzili</p>
+                <p style="margin:5px 0; font-size:1.1rem; color:#000;">
+                    <strong>${china.tanggal} ${namaBulanChina[china.bulan] || 'Bulan '+china.bulan} ${china.tahun}</strong>
+                </p>
+                <p style="margin:0; font-size:0.85rem; color:#666;">Tahun: <strong>${se.elemen} ${se.shio}</strong></p>
+            </div>`;
     }
+}
+
 
 
     const sifatHariIni = DATA_SIFAT_HARI[h] || "-";
