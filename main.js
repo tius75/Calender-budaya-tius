@@ -354,10 +354,11 @@ function shareWhatsApp() {
         return;
     }
 
-    // Ambil teks & rapikan baris
     let content = detailArea.innerText
-        .replace(/\r\n/g, "\n")        // samakan line break
-        .replace(/\n{3,}/g, "\n\n")   // maksimal 2 enter
+        .replace(/\r\n/g, "\n")              // normalisasi enter
+        .replace(/Wuku\s*:/gi, "\nWuku : ")  // paksa Wuku baris baru
+        .replace(/Pal\.?\s*Jati\s*:/gi, "\n\nPal. Jati : ") // JEDA JELAS
+        .replace(/\n{3,}/g, "\n\n")          // max 2 enter
         .trim();
 
     const header =
@@ -366,12 +367,14 @@ function shareWhatsApp() {
 
     const footer =
         "\n\n━━━━━━━━━━━━━━━━━━━━━━\n" +
-        "_Kalender Jawa By Tius_";
+        "_Dikirim melalui Aplikasi Kalender Jawa_";
 
     const finalText = header + content + footer;
 
-    const waUrl = "https://wa.me/?text=" + encodeURIComponent(finalText);
-    window.open(waUrl, "_blank");
+    window.open(
+        "https://wa.me/?text=" + encodeURIComponent(finalText),
+        "_blank"
+    );
 }
 
 // ==========================================
