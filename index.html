@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kalender Jawa Modern</title>
     
+    <meta name="theme-color" content="#D30000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Kalender Jawa">
+    <link rel="apple-touch-icon" href="logo192.png">
+    
+    <link rel="manifest" href="manifest.json">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <style>
@@ -23,7 +31,6 @@
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
         .header-day { font-weight: bold; font-size: 12px; padding: 5px 0; color: #666; }
         
-        /* CSS KHUSUS HARI MINGGU MERAH */
         .sunday-red { color: red !important; }
         
         .calendar-day { border: 1px solid #eee; padding: 8px 0; border-radius: 8px; cursor: pointer; font-size: 14px; min-height: 45px; transition: 0.2s; position: relative; }
@@ -33,7 +40,6 @@
 
         #detail { margin-top: 20px; border-top: 2px solid #eee; padding-top: 15px; }
         .action-buttons { display: flex; gap: 10px; margin-top: 15px; justify-content: center; padding-bottom: 20px; }
-        .btn-pdf { background: #333; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
         .btn-wa { background: #25D366; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
 
         @media print {
@@ -64,12 +70,9 @@
 
     <div id="calendar" class="calendar-grid"></div>
 
-  <div id="detail">
-    <div id="printableArea">
-        </div>
-</div>
-
-  
+    <div id="detail">
+        <div id="printableArea"></div>
+    </div>
 
     <div id="actionButtons" class="action-buttons">
         <button class="btn-wa" onclick="shareWhatsApp()">📱 Share WA</button>
@@ -87,9 +90,17 @@
 <script src="data-neptu.js"></script>
 <script src="data-astrologi.js"></script>
 <script src="numerology.js"></script>
-
-
 <script src="main.js"></script>
+
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('PWA: Service Worker terdaftar!', reg.scope))
+                .catch(err => console.log('PWA: Registrasi Service Worker gagal!', err));
+        });
+    }
+</script>
 
 </body>
 </html>
