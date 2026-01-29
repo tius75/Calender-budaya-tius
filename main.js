@@ -104,24 +104,26 @@ function getZodiak(date) {
 function getLunarShio(date) {
     const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
     
-    // Gunakan Intl untuk ambil tanggal & bulan saja
-    const options = { day: 'numeric', month: 'long' };
-    const lunarString = new Intl.DateTimeFormat('id-ID-u-ca-chinese', options).format(date);
+    // 1. Ambil Tanggal dan Bulan Imlek (Contoh: "11 bulan 12")
+    const lunarDateStr = new Intl.DateTimeFormat('id-ID-u-ca-chinese', {
+        day: 'numeric',
+        month: 'long'
+    }).format(date);
     
-    // Ambil tahun masehi untuk perhitungan
+    // 2. Hitung Tahun & Shio
     const year = date.getFullYear();
-    
-    // Penentuan Shio yang lebih akurat (berdasarkan tahun lunar dari sistem)
     const yearLunarSystem = new Intl.DateTimeFormat('id-ID-u-ca-chinese', {year: 'numeric'}).format(date);
     const index = parseInt(yearLunarSystem) % 12;
+    
+    // 3. Gabungkan Tanggal, Bulan, dan Tahun ke dalam satu string
+    const fullLunarYear = `${lunarDateStr} ${year + 551}`;
 
-    // Return format yang mirip dengan kode lama Anda agar tidak merusak UI
     return { 
         shio: shios[index], 
-        lunarYear: year + 551,
-        lunarDate: lunarString // Ini untuk memunculkan Tanggal & Bulan
+        lunarYear: fullLunarYear // Sekarang isinya: "Tgl Bln Tahun"
     };
 }
+
 
 
 
