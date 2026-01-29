@@ -133,29 +133,35 @@ function getTanggalJawa(date) {
     return { tanggal: tglJawa, bulan: DATA_BULAN_JAWA[bulanIdx], tahun: tahunJawa };
 }
 
-function getSiklusBesar(date) {
-    // Patokan: 1-12-2576 adalah Tahun Dal, Windu Sancaya, Konzili 1
-    const refDate = new Date(2576, 11, 1);
-    const diffYears = date.getFullYear() - refDate.getFullYear();
-    
-    // Perbaikan Logika Tahun (Siklus 8 Tahunan)
-    // Menggunakan Math.floor dan modulo yang aman untuk angka negatif
-    let tahunIdx = (4 + (diffYears % 8)) % 8;
+function getSiklusBesar(tahunJawa) {
+    /*
+      PATOKAN ABSOLUT:
+      Tahun Jawa 2576 = Tahun Dal
+      Windu Sancaya
+      Konzili ke-1
+    */
+
+    const REF_TAHUN_JAWA = 2576;
+    const REF_TAHUN_IDX = 4;   // Dal
+    const REF_WINDU_IDX = 2;   // Sancaya
+
+    const diffYears = tahunJawa - REF_TAHUN_JAWA;
+
+    // === Tahun (Siklus 8 Tahun) ===
+    let tahunIdx = (REF_TAHUN_IDX + diffYears) % 8;
     if (tahunIdx < 0) tahunIdx += 8;
 
-    // Perbaikan Logika Windu (8 tahun per windu)
-    let totalWinduShift = Math.floor(diffYears / 8);
-    let winduIdx = (2 + (totalWinduShift % 4)) % 4;
+    // === Windu (8 Tahun per Windu) ===
+    let winduIdx = (REF_WINDU_IDX + Math.floor(diffYears / 8)) % 4;
     if (winduIdx < 0) winduIdx += 4;
 
-    // Perbaikan Logika Konzili (1 Konzili = 32 Tahun)
-    // Agar tidak muncul angka negatif, kita hitung relatif terhadap titik awal siklus
+    // === Konzili (32 Tahun) ===
     let konzili = 1 + Math.floor(diffYears / 32);
 
     return {
         tahun: DATA_SIKLUS_TAHUN[tahunIdx],
         windu: WINDU_LIST[winduIdx],
-        konzili: konzili
+        konzili
     };
 }
 
