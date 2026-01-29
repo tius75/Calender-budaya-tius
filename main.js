@@ -135,13 +135,12 @@ function getTanggalJawa(date) {
 
 function getSiklusBesar(tahunJawa) {
 
-    // SAFETY CHECK (jangan hentikan aplikasi)
+    // Safety (tidak bikin hang)
     if (typeof tahunJawa !== "number" || tahunJawa < 2000 || tahunJawa > 3000) {
-        console.warn("Tahun Jawa tidak valid, fallback ke 2576");
         tahunJawa = 2576;
     }
 
-    // PATOKAN
+    // Patokan
     const REF_TAHUN_JAWA = 2576;
     const REF_TAHUN_IDX = 4; // Dal
     const REF_WINDU_IDX = 2; // Sancaya
@@ -156,13 +155,14 @@ function getSiklusBesar(tahunJawa) {
     let winduIdx = (REF_WINDU_IDX + Math.floor(diffYears / 8)) % 4;
     if (winduIdx < 0) winduIdx += 4;
 
-    // === Konzili (32 tahun) ===
-    let konzili = 1 + Math.floor(diffYears / 32);
+    // === Konzili (32 tahun, TIDAK BOLEH < 1) ===
+    let konzili = Math.floor(diffYears / 32) + 1;
+    if (konzili < 1) konzili = 1;
 
     return {
         tahun: DATA_SIKLUS_TAHUN[tahunIdx],
         windu: WINDU_LIST[winduIdx],
-        konzili
+        konzili: konzili
     };
 }
 
