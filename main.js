@@ -101,33 +101,36 @@ function getZodiak(date) {
     return "Pisces";
 }
 
-function getLunarDetails(date) {
-    const shios = ["Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing", "Monyet", "Ayam", "Anjing", "Babi"];
 
-    // Menggunakan Intl.DateTimeFormat untuk mendapatkan data kalender Lunar
-    const formatter = new Intl.DateTimeFormat('id-u-ca-chinese', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-    });
-
-    const parts = formatter.formatToParts(date);
-    const detail = {};
-    parts.forEach(({ type, value }) => {
-        detail[type] = value;
-    });
-
-    // Menghitung Shio: Tahun Tikus dimulai pada tahun 4 (siklus 60 tahunan)
-    // Rumus: (Tahun_Lunar - 4) % 12
-    const lunarYear = parseInt(detail.year);
-    const shioIndex = (lunarYear - 4) % 12;
-
+/**
+ * Fungsi untuk menghitung detail penanggalan Kongzili lengkap
+ * @param {Date} dateObj - Objek Date JS (Default hari ini)
+ * @returns {Object} - Objek berisi tanggal, bulan, dan tahun 2576
+ */
+function hitungPenanggalanKongzili(dateObj = new Date()) {
+    // 1. Inisialisasi objek Solar dari tanggal masehi
+    const solar = Solar.fromDate(dateObj);
+    
+    // 2. Dapatkan objek Lunar (Imlek) yang terkait
+    const lunar = solar.getLunar();
+    
+    // 3. Rumus Tahun Kongzili: Tahun Lunar + 551
+    // lunar.getYear() mengembalikan tahun lunar (contoh: 2025 untuk Jan 2026)
+    const tahunKongzili = lunar.getYear() + 551;
+    
+    // 4. Ambil angka bulan dan hari lunar
+    const bulanLunar = lunar.getMonth();
+    const hariLunar = lunar.getDay();
+    
+    // 5. Kembalikan dalam format objek dan string
     return {
-        tanggalLengkap: formatter.format(date),
-        tanggal: detail.day,
-        bulan: detail.month,
-        tahunLunar: lunarYear,
-        shio: shios[shioIndex]
+        angka: `${hariLunar} - ${bulanLunar} - ${tahunKongzili}`,
+        teks: `Hari ${lunar.getDayInChinese()}, Bulan ${lunar.getMonthInChinese()}, Tahun ${tahunKongzili}`,
+        data: {
+            hari: hariLunar,
+            bulan: bulanLunar,
+            tahun: tahunKongzili
+        }
     };
 }
 
