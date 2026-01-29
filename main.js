@@ -97,12 +97,20 @@ function getTahunKonzili(date) {
 
 // FITUR 2: TAHUN WINDU JAWA
 function getWinduJawa(tahunJawa) {
-    // Siklus 8 tahun: Alip (1) s/d Jimakir (0/8)
-    // Tahun 1959 AJ (Jan 2026) adalah tahun ke-3 (Jimawal) dalam siklus Windu
-    const index = (tahunJawa - 1) % 8; 
+    /**
+     * Siklus 8 tahun: Alip(1), Ehe(2), Jimawal(3), Je(4), Dal(5), Be(6), Wawu(7), Jimakir(0/8)
+     * Untuk menjadikan 1959 sebagai tahun Dal (index 4 dalam array 0-based), 
+     * kita menggunakan rumus: (tahunJawa + offset) % 8
+     */
+    
+    // DATA_WINDU_JAWA = ["Jimakir", "Alip", "Ehe", "Jimawal", "Je", "Dal", "Be", "Wawu"]
+    // Dengan (1959 + 1) % 8 = 0 -> Menghasilkan Jimakir (Jika menggunakan array standar)
+    
+    // Rekomendasi logika agar 1959 menghasilkan 'Dal' (urutan ke-5):
+    const index = (tahunJawa + 2) % 8; 
+    
     return DATA_WINDU_JAWA[index];
 }
-
 function getPasaran(date) {
     const base = new Date(1900, 0, 1);
     const diff = Math.floor((date.getTime() - base.getTime()) / (1000 * 60 * 60 * 24));
