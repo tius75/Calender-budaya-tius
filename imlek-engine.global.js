@@ -1,10 +1,7 @@
 /* =========================================
-   IMLEK ENGINE - GLOBAL VERSION
-   Aman untuk GitHub Pages & HTML murni
+   IMLEK ENGINE - GLOBAL VERSION (FIXED)
 ========================================= */
-
 (function () {
-
     const DATA_IMLEK = [
         {y:2023,m:1,d:22,leap:2},
         {y:2024,m:2,d:10,leap:0},
@@ -16,15 +13,8 @@
         {y:2030,m:2,d:3, leap:0}
     ];
 
-    const SHIO = [
-        "Tikus","Kerbau","Macan","Kelinci","Naga","Ular",
-        "Kuda","Kambing","Monyet","Ayam","Anjing","Babi"
-    ];
-
-    const ELEMEŃ = [
-        "Kayu","Kayu","Api","Api","Tanah","Tanah",
-        "Logam","Logam","Air","Air"
-    ];
+    const SHIO = ["Tikus","Kerbau","Macan","Kelinci","Naga","Ular","Kuda","Kambing","Monyet","Ayam","Anjing","Babi"];
+    const ELEMEN = ["Kayu","Kayu","Api","Api","Tanah","Tanah","Logam","Logam","Air","Air"];
 
     function getTanggalChina(date) {
         const y = date.getFullYear();
@@ -48,32 +38,19 @@
             if (lunarDay > monthLength(lunarMonth)) {
                 lunarDay = 1;
                 lunarMonth++;
-                if (lunarMonth > 12) {
-                    lunarMonth = 1;
-                    lunarYear++;
-                }
+                if (lunarMonth > 12) { lunarMonth = 1; lunarYear++; }
             }
             diff--;
         }
-
-        return {
-            tanggal: lunarDay,
-            bulan: lunarMonth,
-            tahun: lunarYear,
-            kabisat: lunarMonth === ref.leap
-        };
+        return { tanggal: lunarDay, bulan: lunarMonth, tahun: lunarYear, kabisat: lunarMonth === ref.leap };
     }
 
     function getShioElemen(year) {
         const shio = SHIO[(year - 4) % 12];
-        const elemen = ELEMEŃ[Math.floor(((year - 4) % 10) / 2)];
+        const elemen = ELEMEN[Math.floor(((year - 4) % 10) / 2)];
         return { shio, elemen };
     }
 
-    // 🔓 expose ke global
-    window.ImlekEngine = {
-        getTanggalChina,
-        getShioElemen
-    };
-
+    // Pastikan terdaftar di window
+    window.ImlekEngine = { getTanggalChina, getShioElemen };
 })();
