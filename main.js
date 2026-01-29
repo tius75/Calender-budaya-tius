@@ -345,27 +345,47 @@ function updateDetail(date, pasaran) {
 // FITUR DOWNLOAD & SHARE (FIXED PDF)
 // ==========================================
 
-async function downloadJPG() {
-            const resultDiv = document.getElementById('result');
-            const canvas = await html2canvas(resultDiv, { scale: 2 });
-            const imgData = canvas.toDataURL('image/jpeg', 1.0);
-            const link = document.createElement('a');
-            link.href = imgData;
-            link.download = 'result.jpg';
-            link.click();
-        } 
+async function downloadPDF(event) {
+    const source = document.getElementById("printableArea");
+    if (!source) {
+        alert("Data tidak ditemukan!");
+        return;
+    }
 
-        function downloadPDF() {
-            const resultDiv = document.getElementById('result');
-            const options = {
-                margin: 0.5, // Tambahkan margin untuk menghindari pemotongan
-                filename: 'neptu-result.pdf',
-                image: { type: 'jpg', quality: 1.0 },
-                html2canvas: { scale: 2, scrollY: 0 }, // Pastikan tidak terpotong
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } // Ganti 'legal' ke 'letter' jika perlu
-            };
-            html2pdf().from(resultDiv).set(options).save();
-        }
+    // Tombol loading
+    const btn = event ? event.target : null;
+    const originalBtnText = btn ? btn.innerText : null;
+    if (btn) {
+        btn.innerText = "⏳ Sedang Memproses...";
+        btn.disabled = true;
+    }
+
+    const opt = {
+        margin: [10, 10, 10, 10],
+        filename: "Detail-Weton-Lengkap.pdf",
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { 
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: "#ffffff",
+            logging: false
+        },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+    };
+
+    try {
+        await html2pdf().from(source).set(opt).save();
+    } catch (e) {
+        console.error("PDF Error: ", e);
+        alert("Gagal membuat PDF. Pastikan library html2pdf.js sudah terpasang dengan benar.");
+    } finally {
+        if (btn) {
+            btn.innerText = originalBtnText;
+            btn.disabled = false;
+        }
+    }
+}
 
 function shareWhatsApp() {
     const detailArea = document.getElementById('printableArea');
