@@ -286,7 +286,18 @@ function updateDetail(date, pasaran) {
     const sifatHariIni = DATA_SIFAT_HARI[h] || "-";
     const sifatPasaranIni = DATA_SIFAT_PASARAN[pasaran.toUpperCase()] || "-";
 
+const today = new Date();
 
+const china = ImlekEngine.getTanggalChina(today);
+
+console.log(
+  "Kalender China:",
+  china.tanggal,
+  "Bulan",
+  china.bulan,
+  "Tahun",
+  china.tahun
+);
 
     const watakNeptu = (typeof DATA_WATAK_NEPTU !== 'undefined') ? DATA_WATAK_NEPTU[neptu] : null;
     const namaBulanMasehi = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
