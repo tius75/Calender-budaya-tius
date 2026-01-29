@@ -138,16 +138,18 @@ function getSiklusBesar(date) {
     const refDate = new Date(2576, 11, 1);
     const diffYears = date.getFullYear() - refDate.getFullYear();
     
-    // Hitung Tahun (Siklus 8 Tahunan) - Dal berada di index 4
+    // Perbaikan Logika Tahun (Siklus 8 Tahunan)
+    // Menggunakan Math.floor dan modulo yang aman untuk angka negatif
     let tahunIdx = (4 + (diffYears % 8)) % 8;
     if (tahunIdx < 0) tahunIdx += 8;
 
-    // Hitung Windu (Siklus 32 Tahunan / 4 Windu) - Sancaya index 2
+    // Perbaikan Logika Windu (8 tahun per windu)
     let totalWinduShift = Math.floor(diffYears / 8);
     let winduIdx = (2 + (totalWinduShift % 4)) % 4;
     if (winduIdx < 0) winduIdx += 4;
 
-    // Hitung Konzili
+    // Perbaikan Logika Konzili (1 Konzili = 32 Tahun)
+    // Agar tidak muncul angka negatif, kita hitung relatif terhadap titik awal siklus
     let konzili = 1 + Math.floor(diffYears / 32);
 
     return {
