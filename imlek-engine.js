@@ -1,6 +1,6 @@
 // Simpan sebagai imlek-engine.js
 function getLunarImlek(date) {
-    // Referensi: 29 Jan 2025 = 1-1-2576 (Tahun Ular)
+    // Referensi: 29 Jan 2025 = 11-12-2576 (Tahun Ular)
     const refDate = new Date(2025, 0, 29); 
     const diffTime = date.getTime() - refDate.getTime();
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
