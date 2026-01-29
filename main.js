@@ -101,42 +101,13 @@ function getZodiak(date) {
     return "Pisces";
 }
 
-
-/**
- * Fungsi untuk menghitung detail penanggalan Kongzili lengkap
- * @param {Date} dateObj - Objek Date JS (Default hari ini)
- * @returns {Object} - Objek berisi tanggal, bulan, dan tahun 2576
- */
-function hitungPenanggalanKongzili(dateObj = new Date()) {
-    // 1. Inisialisasi objek Solar dari tanggal masehi
-    const solar = Solar.fromDate(dateObj);
-    
-    // 2. Dapatkan objek Lunar (Imlek) yang terkait
-    const lunar = solar.getLunar();
-    
-    // 3. Rumus Tahun Kongzili: Tahun Lunar + 551
-    // lunar.getYear() mengembalikan tahun lunar (contoh: 2025 untuk Jan 2026)
-    const tahunKongzili = lunar.getYear() + 551;
-    
-    // 4. Ambil angka bulan dan hari lunar
-    const bulanLunar = lunar.getMonth();
-    const hariLunar = lunar.getDay();
-    
-    // 5. Kembalikan dalam format objek dan string
-    return {
-        angka: `${hariLunar} - ${bulanLunar} - ${tahunKongzili}`,
-        teks: `Hari ${lunar.getDayInChinese()}, Bulan ${lunar.getMonthInChinese()}, Tahun ${tahunKongzili}`,
-        data: {
-            hari: hariLunar,
-            bulan: bulanLunar,
-            tahun: tahunKongzili
-        }
-    };
+function getLunarShio(date) {
+    const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
+    const year = date.getFullYear();
+    const isEarly = (date.getMonth() === 0) || (date.getMonth() === 1 && date.getDate() < 10);
+    const index = isEarly ? (year - 1) % 12 : year % 12;
+    return { shio: shios[index], lunarYear: year + 2576 };
 }
-
-// Contoh Penggunaan:
-const hariIni = new Date();
-console.log(getLunarDetails(hariIni));
 
 function getWuku(date) {
     const wukuList = ["Sinta", "Landep", "Wukir", "Kurantil", "Tolu", "Gumbreg", "Warigalit", "Wariagung", "Julungwangi", "Sungsang", "Galungan", "Kuningan", "Langkir", "Mandasiya", "Julungpujut", "Pahang", "Kuruwelut", "Marakeh", "Tambir", "Medangkungan", "Maktal", "Wuye", "Manahil", "Prangbakat", "Bala", "Wugu", "Wayang", "Kulawu", "Dukut", "Watugunung"];
