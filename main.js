@@ -281,6 +281,22 @@ function updateDetail(date, pasaran) {
     const arahMeditasi = getArahMeditasi(neptu);
     const usia = hitungUsiaLengkap(date);
     
+let imlekDisplay = "";
+if (typeof window.ImlekEngine !== 'undefined') {
+    const imlekInfo = window.ImlekEngine.getTanggalChina(date);
+    if (imlekInfo) {
+        const shioElemen = window.ImlekEngine.getShioElemen(imlekInfo.tahun);
+        const tahunSiklus = date.getFullYear() + 550; // 2026 → 2576
+
+        imlekDisplay = `
+            <p style="margin:5px 0; font-size:0.9rem;">
+                <strong>Imlek:</strong> Tanggal ${imlekInfo.tanggal} Bulan ${imlekInfo.bulan} Tahun ${tahunSiklus} 
+                (Shio ${shioElemen?.shio || '-'}, Elemen ${shioElemen?.elemen || '-'})
+                ${imlekInfo.tanggal === 1 && imlekInfo.bulan === 1 ? '🎉 HARI RAYA IMLEK!' : ''}
+            </p>
+        `;
+    }
+}
     const sifatHariIni = DATA_SIFAT_HARI[h] || "-";
     const sifatPasaranIni = DATA_SIFAT_PASARAN[pasaran.toUpperCase()] || "-";
 
