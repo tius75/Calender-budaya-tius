@@ -242,7 +242,9 @@ function generateCalendar() {
     for (let i = 0; i < firstDay; i++) grid.appendChild(document.createElement('div'));
 
     for (let d = 1; d <= daysInMonth; d++) {
-        const dateObj = new Date(y, m, d);
+    const dateObj = new Date(y, m, d);
+    const p = getPasaran(dateObj);
+    const imlek =
         const p = getPasaran(dateObj);
         const cell = document.createElement('div');
         cell.className = 'calendar-day';
@@ -250,7 +252,11 @@ function generateCalendar() {
         if (dateObj.getDay() === 0) cell.classList.add('sunday-red');
         if (dateObj.toDateString() === TODAY.toDateString()) cell.classList.add('today-highlight');
         
-        cell.innerHTML = `<div class="date-num">${d}</div><div class="pasaran-text">${p}</div>`;
+        cell.innerHTML = `<div class="date-num">${d}</div><div class="pasaran-text">${p}</div>
+  <div class="imlek-num" style="position:absolute; bottom:2px; right:4px; font-size:9px; color:#D30000; font-weight:bold;">
+            ${imlek.tanggal}
+        </div>
+    `;
         cell.onclick = () => {
             document.querySelectorAll('.calendar-day').forEach(c => c.classList.remove('selected-day'));
             cell.classList.add('selected-day');
