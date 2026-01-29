@@ -104,35 +104,38 @@ function getZodiak(date) {
 function getLunarShio(date) {
     const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
     
-    // 1. Ambil tanggal, bulan, tahun dari objek 'date' yang diklik
-    const d = date.getDate();
-    const m = date.getMonth() + 1;
-    const y = date.getFullYear();
+    try {
+        // 1. Ambil penanggalan Lunar asli dari sistem
+        const formatter = new Intl.DateTimeFormat('id-ID-u-ca-chinese', {
+            day: 'numeric',
+            month: 'numeric',
+            year: 'numeric'
+        });
 
-    // 2. Logika Sederhana Tahun Baru Imlek (Pendekatan)
-    // Jika Januari atau Februari awal, dianggap tahun lunar sebelumnya
-    const isEarly = (m === 1) || (m === 2 && d < 10);
-    
-    // Perhitungan Tahun Imlek (2025 + 551 = 2576)
-    const lunarYearValue = isEarly ? (y + 551 - 1) : (y + 551);
-    
-    // Perhitungan Shio
-    const shioIndex = isEarly ? (y - 1) % 12 : y % 12;
+        const parts = formatter.formatToParts(date);
+        const lDay = parts.find(p => p.type === 'day').value.padStart(2, '0');
+        const lMonth = parts.find(p => p.type === 'month').value.padStart(2, '0');
+        const lYearSystem = parts.find(p => p.type === 'year').value;
 
-    // 3. Format dd:mm:yy (Menggunakan Tahun Imlek)
-    // PadStart digunakan agar angka 1 menjadi 01
-    const dd = String(d).padStart(2, '0');
-    const mm = String(m).padStart(2, '0');
-    const yy = String(lunarYearValue); 
+        // 2. Tahun Imlek (2025 + 551 = 2576)
+        const lunarYearValue = date.getFullYear() + 551;
+        
+        // 3. Shio (menggunakan tahun dari sistem lunar agar akurat saat transisi)
+        const shioIndex = parseInt(lYearSystem) % 12;
 
-    // Hasil akhir: "29:01:2576"
-    const fullFormat = `${dd}:${mm}:${yy}`;
+        // 4. Format akhir dd:mm:yyyy (11:12:2576)
+        const fullFormat = `${lDay}:${lMonth}:${lunarYearValue}`;
 
-    return { 
-        shio: shios[shioIndex], 
-        lunarYear: fullFormat 
-    };
+        return { 
+            shio: shios[shioIndex], 
+            lunarYear: fullFormat 
+        };
+    } catch (e) {
+        // Fallback jika terjadi error agar kalender tidak macet
+        return { shio: "-", lunarYear: "00:00:0000" };
+    }
 }
+
 
 
 
