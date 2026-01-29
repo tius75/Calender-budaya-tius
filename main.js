@@ -352,7 +352,6 @@ async function downloadPDF(event) {
         return;
     }
 
-    // Tombol loading
     const btn = event ? event.target : null;
     const originalBtnText = btn ? btn.innerText : null;
     if (btn) {
@@ -375,10 +374,12 @@ async function downloadPDF(event) {
     };
 
     try {
+        // beri jeda sebentar agar konten/gambar sempat render
+        await new Promise(r => setTimeout(r, 300));
         await html2pdf().from(source).set(opt).save();
     } catch (e) {
         console.error("PDF Error: ", e);
-        alert("Gagal membuat PDF. Pastikan library html2pdf.js sudah terpasang dengan benar.");
+        alert("Gagal membuat PDF. Cek console untuk detail error.");
     } finally {
         if (btn) {
             btn.innerText = originalBtnText;
