@@ -1,6 +1,6 @@
 /**
- * KALENDER JAWA MODERN - VERSI FINAL FIX 2026
- * Update: Detail Perhitungan Neptu & Info Lengkap Bulan Jawa
+ * KALENDER JAWA MODERN - VERSI UPDATE KONZILI & WINDU
+ * Update: Fitur Tahun Konzili & Tahun Jawa Windu (Siklus 8 Tahun)
  */
 
 // ==========================================
@@ -10,6 +10,18 @@ const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 const PASARAN = ['Legi', 'Pahing', 'Pon', 'Wage', 'Kliwon'];
 const NEPTU_HARI = { 'Minggu': 5, 'Senin': 4, 'Selasa': 3, 'Rabu': 7, 'Kamis': 8, 'Jumat': 6, 'Sabtu': 9 };
 const NEPTU_PASARAN = { 'Pahing': 9, 'Pon': 7, 'Wage': 4, 'Kliwon': 8, 'Legi': 5 };
+
+// DATA FILOSOFIS WINDU (SIKLUS 8 TAHUN)
+const DATA_WINDU_JAWA = [
+    { nama: "Alip", makna: "Ada-ada (Niat)", penjelasan: "Melambangkan permulaan. Waktunya manusia mulai menanam niat, ide, atau tekad untuk melakukan sesuatu yang baik." },
+    { nama: "Ehe", makna: "Tumandang (Bekerja)", penjelasan: "Melambangkan realisasi. Setelah ada niat di tahun Alip, tahun ini adalah waktunya mulai bergerak dan bertindak." },
+    { nama: "Jimawal", makna: "Gawe (Pekerjaan)", penjelasan: "Melambangkan proses. Pekerjaan mulai terlihat bentuknya dan menuntut ketekunan untuk menyelesaikannya." },
+    { nama: "Je", makna: "Lelakon (Peristiwa/Nasib)", penjelasan: "Melambangkan ujian. Dalam proses bekerja, manusia pasti menemui cobaan atau dinamika hidup sebagai ujian mental." },
+    { nama: "Dal", makna: "Urip (Hidup)", penjelasan: "Melambangkan keberadaan. Tahun ini dianggap sakral, sering disebut tahun 'Duda'. Waktunya merenungi hakikat hidup dan hubungan dengan Sang Pencipta." },
+    { nama: "Be", makna: "Bola-bali (Kembali/Konsisten)", penjelasan: "Melambangkan keteguhan. Mengajarkan manusia untuk tetap konsisten pada kebaikan meskipun sudah melalui berbagai ujian." },
+    { nama: "Wawu", makna: "Marang (Arah/Tujuan)", penjelasan: "Melambangkan fokus. Menjelang akhir siklus, manusia diingatkan untuk kembali fokus pada tujuan akhir hidup agar tidak tersesat." },
+    { nama: "Jimakir", makna: "Suwung (Kosong/Selesai)", penjelasan: "Melambangkan akhir dan evaluasi. Fase untuk melepaskan keterikatan duniawi dan mengevaluasi apa yang telah dilakukan selama 8 tahun terakhir." }
+];
 
 const DATA_SIFAT_PASARAN = {
     'KLIWON': 'Pandai bicara dan bergaul, periang, ambisius, urakan, kurang bisa membalas budi, setia pada janji, ceroboh memilih makanan, banyak selamat dan doanya.',
@@ -63,8 +75,33 @@ let current = new Date();
 const TODAY = new Date();
 
 // ==========================================
-// FUNGSI LOGIKA DASAR
+// FUNGSI LOGIKA DASAR (UPDATE BARU)
 // ==========================================
+
+// FITUR 1: TAHUN KONZILI
+function getTahunKonzili(date) {
+    const diffTime = date.getTime() - TODAY.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    // Patokan: Hari ini = 11-12-2576
+    let tgl = 11 + diffDays;
+    let bln = 12;
+    let thn = 2576;
+
+    // Logika sederhana penyesuaian (estimasi 30 hari/bulan)
+    while (tgl > 30) { tgl -= 30; bln++; if (bln > 12) { bln = 1; thn++; } }
+    while (tgl <= 0) { tgl += 30; bln--; if (bln <= 0) { bln = 12; thn--; } }
+
+    return `${tgl}-${bln}-${thn}`;
+}
+
+// FITUR 2: TAHUN WINDU JAWA
+function getWinduJawa(tahunJawa) {
+    // Siklus 8 tahun: Alip (1) s/d Jimakir (0/8)
+    // Tahun 1959 AJ (Jan 2026) adalah tahun ke-3 (Jimawal) dalam siklus Windu
+    const index = (tahunJawa - 1) % 8; 
+    return DATA_WINDU_JAWA[index];
+}
 
 function getPasaran(date) {
     const base = new Date(1900, 0, 1);
@@ -243,6 +280,10 @@ function updateDetail(date, pasaran) {
     const arahMeditasi = getArahMeditasi(neptu);
     const usia = hitungUsiaLengkap(date);
     
+    // DATA BARU: Konzili & Windu
+    const tglKonzili = getTahunKonzili(date);
+    const winduData = getWinduJawa(infoJawa.tahun);
+
     const sifatHariIni = DATA_SIFAT_HARI[h] || "-";
     const sifatPasaranIni = DATA_SIFAT_PASARAN[pasaran.toUpperCase()] || "-";
 
@@ -290,13 +331,14 @@ function updateDetail(date, pasaran) {
             </div>
             
             <p style="margin:10px 0 0; font-size:1.15rem; font-weight:bold;">📅 ${tglMasehiLengkap}</p>
+            <p style="margin:5px 0; font-size:0.9rem; color:#d30000;"><strong>🏛️ Tahun Konzili:</strong> ${tglKonzili}</p>
             
             <div style="background:#fff9f9; padding:10px; border-radius:8px; margin:10px 0; border:1px solid #ffeded;">
                 <p style="margin:0; color:#d30000; font-weight:bold; font-size:1rem;">🌙 Kalender Jawa</p>
                 <p style="margin:5px 0; font-size:0.9rem;"><strong>Tanggal:</strong> ${infoJawa.tanggal} ${infoJawa.bulan.nama} ${infoJawa.tahun} AJ</p>
+                <p style="margin:5px 0; font-size:0.9rem;"><strong>Tahun Windu:</strong> ${winduData.nama} (${winduData.makna})</p>
+                <p style="margin:5px 0; font-size:0.85rem; font-style:italic; color:#555;">"${winduData.penjelasan}"</p>
                 <p style="margin:5px 0; font-size:0.9rem;"><strong>Status Bulan:</strong> <span style="color:${infoJawa.bulan.status === 'Baik' || infoJawa.bulan.status === 'Sangat Baik' ? '#2e7d32' : '#c62828'}">${infoJawa.bulan.status}</span></p>
-                <p style="margin:5px 0; font-size:0.85rem; color:#666;"><strong>Tanggal Naas:</strong> ${infoJawa.bulan.naas.join(', ')}</p>
-                <p style="margin:5px 0; font-size:0.85rem; color:#666;"><strong>Tali Wangke:</strong> ${infoJawa.bulan.taliWangke}</p>
             </div>
 
             <div style="background:#f8f9fa; padding:12px; border-radius:8px; margin:10px 0; border:1px solid #e9ecef;">
