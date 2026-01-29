@@ -1,7 +1,6 @@
 /**
  * KALENDER JAWA MODERN - VERSI FINAL FIX 2026
  * Update: Windu Sancaya, Tahun Jawa (Filosofi), & Konzili
- * + Integrasi Imlek Engine (External)
  */
 
 // ==========================================
@@ -47,7 +46,8 @@ const PEMBAGI_5 = {
 
 const DATA_BULAN_JAWA = [
     { nama: "Sura", status: "Tidak Baik", naas: [6, 11, 13, 14, 17, 18, 27], taliWangke: "Rabu Pahing" },
-    { nama: "Sapar", status: "Tidak Baik", naas: [1, 10, 12, 20, 22], taliWangke: "Kamis Pon" },    { nama: "Mulud", status: "Tidak Baik", naas: [1, 3, 8, 10, 13, 15, 20, 23], taliWangke: "Jumat Wage" },
+    { nama: "Sapar", status: "Tidak Baik", naas: [1, 10, 12, 20, 22], taliWangke: "Kamis Pon" },
+    { nama: "Mulud", status: "Tidak Baik", naas: [1, 3, 8, 10, 13, 15, 20, 23], taliWangke: "Jumat Wage" },
     { nama: "Bakdamulud", status: "Baik", naas: [10, 15, 16, 20, 25, 28], taliWangke: "Sabtu Kliwon" },
     { nama: "Jumadilawal", status: "Tidak Baik", naas: [1, 5, 10, 11, 16, 26, 28], taliWangke: "Senin Kliwon" },
     { nama: "Jumadilakir", status: "Kurang Baik", naas: [4, 10, 11, 14, 18, 21], taliWangke: "Selasa Legi" },
@@ -96,7 +96,8 @@ function getZodiak(date) {
     if ((m == 9 && d >= 23) || (m == 10 && d <= 22)) return "Libra";
     if ((m == 10 && d >= 23) || (m == 11 && d <= 21)) return "Scorpio";
     if ((m == 11 && d >= 22) || (m == 12 && d <= 21)) return "Sagittarius";
-    if ((m == 12 && d >= 22) || (m == 1 && d <= 19)) return "Capricorn";    if ((m == 1 && d >= 20) || (m == 2 && d <= 18)) return "Aquarius";
+    if ((m == 12 && d >= 22) || (m == 1 && d <= 19)) return "Capricorn";
+    if ((m == 1 && d >= 20) || (m == 2 && d <= 18)) return "Aquarius";
     return "Pisces";
 }
 
@@ -146,6 +147,7 @@ function getSiklusBesar(tahunJawa) {
 
     let tahunIdx = (REF_TAHUN_IDX + diffYears) % 8;
     if (tahunIdx < 0) tahunIdx += 8;
+
     let winduIdx = (REF_WINDU_IDX + Math.floor(diffYears / 8)) % 4;
     if (winduIdx < 0) winduIdx += 4;
 
@@ -194,7 +196,8 @@ function hitungUsiaLengkap(birthDate) {
     }
     if (months < 0) {
         years--;
-        months += 12;    }
+        months += 12;
+    }
     return `${years} Tahun, ${months} Bulan, ${days} Hari`;
 }
 
@@ -243,7 +246,8 @@ function generateCalendar() {
         const p = getPasaran(dateObj);
         const cell = document.createElement('div');
         cell.className = 'calendar-day';
-                if (dateObj.getDay() === 0) cell.classList.add('sunday-red');
+        
+        if (dateObj.getDay() === 0) cell.classList.add('sunday-red');
         if (dateObj.toDateString() === TODAY.toDateString()) cell.classList.add('today-highlight');
         
         cell.innerHTML = `<div class="date-num">${d}</div><div class="pasaran-text">${p}</div>`;
@@ -268,7 +272,7 @@ function updateDetail(date, pasaran) {
     
     const wukuName = getWuku(date);
     const infoJawa = getTanggalJawa(date);
-    const siklusBesar = getSiklusBesar(infoJawa.tahun);
+    const siklusBesar = getSiklusBesar(date);
     const mangsa = getMangsaInfo(date);
     const zodiak = getZodiak(date);
     const lunar = getLunarShio(date);
@@ -277,54 +281,6 @@ function updateDetail(date, pasaran) {
     const arahMeditasi = getArahMeditasi(neptu);
     const usia = hitungUsiaLengkap(date);
     
-    // ========== INTEGRASI IMLEK ENGINE ==========
-    let imlekDisplay = "";
-    try {
-        if (typeof window.ImlekEngine !== 'undefined' && typeof window.ImlekEngine.getTanggalChina === 'function') {
-            const imlekInfo = window.ImlekEngine.getTanggalChina(date);
-            if (imlekInfo) {
-                const shioElemen = window.ImlekEngine.getShioElemen(imlekInfo.tahun);
-                // Gunakan offset: 2026 → 2576 ⇒ +550
-                const tahunSiklus = date.getFullYear() + 550;
-
-                // ========== INTEGRASI IMLEK ENGINE — VERIFIED VERSION ==========
-let imlekDisplay = "";
-const ie = window.ImlekEngine;
-
-if (ie && typeof ie.getTanggalChina === 'function' && typeof ie.getShioElemen === 'function') {
-    try {
-        const imlekInfo = ie.getTanggalChina(date);
-        if (imlekInfo) {
-            const shioElemen = ie.getShioElemen(imlekInfo.tahun);
-            const tahunSiklus = date.getFullYear() + 550; // 2026 → 2576
-
-            // ========== INTEGRASI IMLEK ENGINE — SAFE MODE ==========
-let imlekDisplay = "";
-const ie = window?.ImlekEngine;
-if (ie && typeof ie.getTanggalChina === 'function') {
-    try {
-        const imlekInfo = ie.getTanggalChina(date);
-        if (imlekInfo && typeof imlekInfo.tanggal === 'number') {
-            const shioElemen = ie.getShioElemen?.(imlekInfo.tahun) || { shio: '?', elemen: '?' };
-            const tahunSiklus = date.getFullYear() + 550;
-
-            imlekDisplay = `
-                <p style="margin:5px 0; font-size:0.9rem;">
-                    <strong>Imlek:</strong> Tanggal ${imlekInfo.tanggal} Bulan ${imlekInfo.bulan} Tahun ${tahunSiklus} 
-                    (Shio ${shioElemen.shio}, Elemen ${shioElemen.elemen})
-                    ${imlekInfo.tanggal === 1 && imlekInfo.bulan === 1 ? ' 🎉 HARI RAYA IMLEK!' : ''}
-                </p>
-            `;
-        }
-    } catch (e) {
-        // JANGAN LEWATKAN ERROR — tapi jangan hentikan skrip!
-        console.warn("[Imlek] Gagal render:", e.message);
-        imlekDisplay = `<p style="color:#666; font-size:0.85rem;"><em>Imlek: ⚠️ Data tidak tersedia</em></p>`;
-    }
-} else {
-    imlekDisplay = ""; // diam saja, jangan ganggu
-}
-// ===========================================
     const sifatHariIni = DATA_SIFAT_HARI[h] || "-";
     const sifatPasaranIni = DATA_SIFAT_PASARAN[pasaran.toUpperCase()] || "-";
 
@@ -365,7 +321,8 @@ if (ie && typeof ie.getTanggalChina === 'function') {
     detailDiv.style.display = 'block';
     detailDiv.innerHTML = `
         <div id="printableArea" class="card-result" style="background:#fff; padding:20px; border-radius:12px; border:1px solid #eee; box-shadow: 0 4px 6px rgba(0,0,0,0.05); color:#000;">
-            ${warningNaas}            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            ${warningNaas}
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                 <h2 style="color:#D30000; margin:0 0 5px 0; border-bottom:2px solid #D30000; display:inline-block;">${wetonKey}</h2>
                 <button onclick="copyToClipboard()" style="background:#D30000; color:#fff; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">📋 Salin Hasil</button>
             </div>
@@ -404,8 +361,6 @@ if (ie && typeof ie.getTanggalChina === 'function') {
             </div>
 
             <p style="margin:5px 0; font-size:0.9rem;"><strong>Lunar:</strong> ${lunar.lunarYear} (Shio ${lunar.shio}) | <strong>Zodiak:</strong> ${zodiak}</p>
-            ${imlekDisplay}
-
             <div style="background:#f0f7ff; border:1px solid #cfe2ff; padding:10px; border-radius:8px; margin:10px 0;">
                 <p style="margin:0; font-size:0.9rem;"><strong>⏳ Usia Saat Ini:</strong> ${usia}</p>
                 <p style="margin:5px 0 0; font-size:0.9rem;"><strong>🧘 Arah Meditasi:</strong> ${arahMeditasi}</p>
@@ -414,7 +369,8 @@ if (ie && typeof ie.getTanggalChina === 'function') {
                 <h4 style="margin:0; color:#2e7d32; font-size:0.95rem;">💎 Nasib Pembagi 5: ${nasib5.nama}</h4>
                 <p style="font-size:0.85rem; margin-top:5px;">${nasib5.arti}</p>
             </div>
-            <p style="margin:10px 0;"><strong>Neptu:</strong> ${neptu} | <strong>Wuku:</strong> ${wukuName}</p>            ${watakNeptu ? `<div style="margin:15px 0; padding:12px; border:1px solid #e1bee7; border-radius:8px; background:#f3e5f5;"><h4 style="color:#7b1fa2; margin:0 0 5px 0; border-bottom:1px solid #d1c4e9; font-size:0.95rem;">🌟 Watak Neptu ${neptu}</h4><p style="font-size:0.85rem; line-height:1.5; color:#4a148c;">${watakNeptu.watak}</p></div>` : ""}
+            <p style="margin:10px 0;"><strong>Neptu:</strong> ${neptu} | <strong>Wuku:</strong> ${wukuName}</p>
+            ${watakNeptu ? `<div style="margin:15px 0; padding:12px; border:1px solid #e1bee7; border-radius:8px; background:#f3e5f5;"><h4 style="color:#7b1fa2; margin:0 0 5px 0; border-bottom:1px solid #d1c4e9; font-size:0.95rem;">🌟 Watak Neptu ${neptu}</h4><p style="font-size:0.85rem; line-height:1.5; color:#4a148c;">${watakNeptu.watak}</p></div>` : ""}
             <div style="margin:15px 0; padding:10px; background:#fffcf0; border-left:4px solid #f1c40f; border-radius:4px;"><h4 style="margin:0; color:#856404; font-size:0.9rem;">🪦 Nasib Kematian (Ahli Waris)</h4><p style="margin:5px 0 0; font-weight:bold;">${nasibKematian.nama}</p><p style="margin:2px 0 0; font-size:0.85rem; font-style:italic;">"${nasibKematian.arti}"</p></div>
             ${mangsa ? `<div style="margin:15px 0; padding:12px; border:1px solid #cfe2ff; background:#f0f7ff; border-radius:8px;"><h4 style="margin:0; color:#084298; font-size:0.95rem;">🌾 Pranata Mangsa: ${mangsa.nama}</h4><p style="font-size:0.85rem; margin-top:5px; line-height:1.4;">${mangsa.deskripsi}</p></div>` : ""}
             <div style="margin-top:20px;"><h4 style="color:#D30000; border-bottom:1px solid #eee; padding-bottom:5px;">🛡️ Analisis Wuku ${wukuName}</h4><div style="font-size:0.85rem; line-height:1.5;">${teksWuku}</div></div>
@@ -464,6 +420,7 @@ function shareWhatsApp() {
         .replace(/(📈\s*)?Siklus\s+Sri\s+Jati/gi, "\n\n📈 *Siklus Sri Jati (Rejeki)*\n")
         .replace(/\n{3,}/g, "\n\n")
         .trim();
+
     const header = "*HASIL LENGKAP CEK WETON JAWA*\n" + "━━━━━━━━━━━━━━━━━━━━━━\n\n";
     const footer = "\n\n━━━━━━━━━━━━━━━━━━━━━━\n" + "_Kalender Jawa by Tius_";
     const finalText = header + content + footer;
@@ -482,3 +439,4 @@ document.addEventListener("DOMContentLoaded", () => {
     if(prev) prev.onclick = () => { current.setMonth(current.getMonth() - 1); generateCalendar(); };
     if(next) next.onclick = () => { current.setMonth(current.getMonth() + 1); generateCalendar(); };
 });
+
