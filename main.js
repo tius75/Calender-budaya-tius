@@ -270,25 +270,22 @@ function updateDetail(date, pasaran) {
     const nPasaran = NEPTU_PASARAN[pasaran];
     const neptu = nHari + nPasaran;
     
-    const wukuName = getWuku(date);
+    // Pastikan fungsi pendukung ini ada di main.js Anda
     const infoJawa = getTanggalJawa(date);
     const siklusBesar = getSiklusBesar(infoJawa.tahun);
-    const zodiak = getZodiak(date);
-    const usia = hitungUsiaLengkap(date);
-    const arahMeditasi = getArahMeditasi(neptu);
+    const usia = hitungUsiaLengkap(date); // Detail Usia
+    const arahMeditasi = getArahMeditasi(neptu); // Detail Meditasi
 
-    // --- 🏮 LOGIKA IMLEK (INTEGRASI ULANG) ---
+    // --- 🏮 LOGIKA IMLEK ---
     let imlekHtml = "";
-    // Pastikan memanggil "ImlekEngine" dengan huruf kapital sesuai isi file Anda
     if (window.ImlekEngine) {
         const china = window.ImlekEngine.getTanggalChina(date);
         if (china) {
             const se = window.ImlekEngine.getShioElemen(china.tahun);
             const namaBulanChina = ["", "Cia Gwee", "Ji Gwee", "Sa Gwee", "Si Gwee", "Go Gwee", "Lak Gwee", "Tjit Gwee", "Pe Gwee", "Kauw Gwee", "Tjap Gwee", "Tjap It Gwee", "Tjap Ji Gwee"];
-            
             imlekHtml = `
                 <div style="background:#fff1f0; padding:12px; border-radius:8px; margin:15px 0; border:1px solid #ffa39e; border-left:5px solid #cf1322;">
-                    <p style="margin:0; color:#cf1322; font-weight:bold; font-size:1rem;">🏮 Kalender Imlek / Kongzili</p>
+                    <p style="margin:0; color:#cf1322; font-weight:bold;">🏮 Kalender Imlek / China</p>
                     <p style="margin:5px 0; font-size:1.1rem; color:#000;">
                         <strong>${china.tanggal} ${namaBulanChina[china.bulan] || 'Bulan '+china.bulan} ${china.tahun}</strong>
                     </p>
@@ -296,15 +293,13 @@ function updateDetail(date, pasaran) {
                 </div>`;
         }
     } else {
-        // Jika file imlek-engine.global.js belum benar, munculkan pesan ini (seperti gambar 1)
+        // Pesan peringatan jika engine gagal dimuat (seperti di foto Anda)
         imlekHtml = `<div style="background:#fffbe6; border:1px dashed #ffe58f; padding:10px; border-radius:8px; margin:15px 0; font-size:0.8rem; color:#856404;">
             ⚠️ ImlekEngine tidak terdeteksi. Pastikan file imlek-engine.global.js sudah benar.
         </div>`;
     }
 
-    const tglMasehiLengkap = `${date.getDate()} ${["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"][date.getMonth()]} ${date.getFullYear()}`;
-
-    // RENDER KE HTML (Sesuai Urutan Gambar Anda)
+    // --- RENDER TAMPILAN ---
     detailDiv.style.display = 'block';
     detailDiv.innerHTML = `
         <div id="printableArea" class="card-result" style="background:#fff; padding:20px; border-radius:12px; border:1px solid #eee; color:#000;">
@@ -313,7 +308,7 @@ function updateDetail(date, pasaran) {
                 <button onclick="copyToClipboard()" style="background:#D30000; color:#fff; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">📋 Salin Hasil</button>
             </div>
             
-            <p style="margin:15px 0; font-size:1.15rem; font-weight:bold;">📅 ${tglMasehiLengkap}</p>
+            <p style="margin:15px 0; font-size:1.15rem; font-weight:bold;">📅 ${date.getDate()} ${["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"][date.getMonth()]} ${date.getFullYear()}</p>
 
             ${imlekHtml}
 
@@ -321,27 +316,11 @@ function updateDetail(date, pasaran) {
                 <p style="margin:0; color:#e65100; font-weight:bold;">✨ Siklus Tahun & Windu</p>
                 <p style="margin:5px 0;"><strong>Tahun:</strong> ${siklusBesar.tahun.nama} (${siklusBesar.tahun.makna})</p>
                 <p style="margin:5px 0;"><strong>Windu:</strong> ${siklusBesar.windu}</p>
-                <p style="margin:10px 0 0; font-size:0.85rem; font-style:italic; color:#6d4c41; line-height:1.4;">"${siklusBesar.tahun.deskripsi}"</p>
-            </div>
-
-            <div style="background:#fff9f9; padding:12px; border-radius:8px; margin-bottom:15px; border:1px solid #ffeded;">
-                <p style="margin:0; color:#d30000; font-weight:bold;">🌙 Kalender Jawa</p>
-                <p style="margin:5px 0;"><strong>Tanggal:</strong> ${infoJawa.tanggal} ${infoJawa.bulan.nama} ${infoJawa.tahun} AJ</p>
-                <p style="margin:5px 0;"><strong>Status Bulan:</strong> <span style="color:#2e7d32;">${infoJawa.bulan.status}</span></p>
             </div>
 
             <div style="background:#f8f9fa; padding:12px; border-radius:8px; margin-bottom:15px; border:1px solid #e9ecef;">
-                <p style="margin:0; font-weight:bold; color:#333;">🔢 Perhitungan Neptu</p>
-                <p style="margin:5px 0; font-family:monospace;">Hari ${h} = ${nHari}</p>
-                <p style="margin:0; font-family:monospace;">Pasaran ${pasaran} = ${nPasaran}</p>
-                <p style="margin:0; font-family:monospace;">---------------------- +</p>
-                <p style="margin:5px 0; font-weight:bold;">Total Neptu = ${neptu}</p>
-            </div>
-
-            <div style="background:#fff8e1; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #ffe0b2;">
-                <p style="margin:0; color:#e65100; font-weight:bold;">🎭 Karakter Hari & Pasaran</p>
-                <p style="margin:8px 0 0; font-size:0.9rem;"><strong>Sifat ${h}:</strong> ${DATA_SIFAT_HARI[h]}</p>
-                <p style="margin:8px 0 0; font-size:0.9rem;"><strong>Sifat ${pasaran}:</strong> ${DATA_SIFAT_PASARAN[pasaran.toUpperCase()]}</p>
+                <p style="margin:0; font-weight:bold;">🔢 Perhitungan Neptu</p>
+                <p style="margin:5px 0; font-family:monospace;">Hari ${h} = ${nHari}<br>Pasaran ${pasaran} = ${nPasaran}<br>--- Total Neptu = ${neptu}</p>
             </div>
 
             <div style="background:#f0f7ff; padding:12px; border-radius:8px; border:1px solid #cfe2ff;">
@@ -350,8 +329,8 @@ function updateDetail(date, pasaran) {
             </div>
         </div>
     `;
-    detailDiv.scrollIntoView({ behavior: 'smooth' });
 }
+
 
 
 
