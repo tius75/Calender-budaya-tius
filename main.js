@@ -133,17 +133,22 @@ function getTanggalJawa(date) {
     return { tanggal: tglJawa, bulan: DATA_BULAN_JAWA[bulanIdx], tahun: tahunJawa };
 }
 
-function getSiklusBesar(tahunJawa) {
+function getHasilKalender(dateObj) {
 
-    if (typeof tahunJawa !== "number" || tahunJawa < 2000 || tahunJawa > 3000) {
-        tahunJawa = 2576;
-    }
+    // === 1. HITUNG TANGGAL CHINESE ===
+    const solar = Solar.fromDate(dateObj);
+    const lunar = solar.getLunar();
 
+    const hari = lunar.getDay();
+    const bulan = lunar.getMonth();
+    const tahunChinese = lunar.getYear() + 551;
+
+    // === 2. HITUNG TAHUN JAWA & WINDU ===
     const REF_TAHUN_JAWA = 2576;
     const REF_TAHUN_IDX = 4; // Dal
     const REF_WINDU_IDX = 2; // Sancaya
 
-    const diffYears = tahunJawa - REF_TAHUN_JAWA;
+    const diffYears = tahunChinese - REF_TAHUN_JAWA;
 
     let tahunIdx = (REF_TAHUN_IDX + diffYears) % 8;
     if (tahunIdx < 0) tahunIdx += 8;
@@ -152,8 +157,9 @@ function getSiklusBesar(tahunJawa) {
     if (winduIdx < 0) winduIdx += 4;
 
     return {
-        tahun: DATA_SIKLUS_TAHUN[tahunIdx],
-        windu: WINDU_LIST[winduIdx]
+        tahunJawa: DATA_SIKLUS_TAHUN[tahunIdx],
+        windu: WINDU_LIST[winduIdx],
+        chinese: `${hari} / ${bulan} / ${tahunChinese}`
     };
 }
 
