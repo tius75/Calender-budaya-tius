@@ -366,7 +366,7 @@ function shareWhatsApp() {
 
     const footer =
         "\n\n━━━━━━━━━━━━━━━━━━━━━━\n" +
-        "_Dikirim melalui Aplikasi Kalender Jawa By Tius_";
+        "_Kalender Jawa By Tius_";
 
     const finalText = header + content + footer;
 
