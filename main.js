@@ -287,20 +287,36 @@ function updateDetail(date, pasaran) {
                 // Gunakan offset: 2026 → 2576 ⇒ +550
                 const tahunSiklus = date.getFullYear() + 550;
 
-                imlekDisplay = `
-                    <p style="margin:5px 0; font-size:0.9rem;">
-                        <strong>Imlek:</strong> Tanggal ${imlekInfo.tanggal} Bulan ${imlekInfo.bulan} Tahun ${tahunSiklus} 
-                        (Shio ${shioElemen?.shio || '-'}, Elemen ${shioElemen?.elemen || '-'})
-                        ${(imlekInfo.tanggal === 1 && imlekInfo.bulan === 1) ? '🎉 <em>HARI RAYA IMLEK!</em>' : ''}
-                    </p>                `;
-            }
+                // ========== INTEGRASI IMLEK ENGINE — VERIFIED VERSION ==========
+let imlekDisplay = "";
+const ie = window.ImlekEngine;
+
+if (ie && typeof ie.getTanggalChina === 'function' && typeof ie.getShioElemen === 'function') {
+    try {
+        const imlekInfo = ie.getTanggalChina(date);
+        if (imlekInfo) {
+            const shioElemen = ie.getShioElemen(imlekInfo.tahun);
+            const tahunSiklus = date.getFullYear() + 550; // 2026 → 2576
+
+            imlekDisplay = `
+                <p style="margin:5px 0; font-size:0.9rem;">
+                    <strong>Imlek:</strong> Tanggal ${imlekInfo.tanggal} Bulan ${imlekInfo.bulan} Tahun ${tahunSiklus} 
+                    (Shio ${shioElemen?.shio || '?'}, Elemen ${shioElemen?.elemen || '?'})
+                    ${(imlekInfo.tanggal === 1 && imlekInfo.bulan === 1) ? ' 🎉 HARI RAYA IMLEK!' : ''}
+                </p>
+            `;
+        } else {
+            imlekDisplay = `<p style="color:#999; font-size:0.85rem;"><em>⚠️ ImlekEngine: Data lunar tidak ditemukan untuk tanggal ini.</em></p>`;
         }
     } catch (e) {
-        console.warn("ImlekEngine error:", e);
-        imlekDisplay = ""; // silent fail
+        imlekDisplay = `<p style="color:#d32f2f; font-size:0.85rem;">❌ ImlekEngine error: ${e.message}</p>`;
+        console.error("ImlekEngine error:", e);
     }
-    // ===========================================
-
+} else {
+    imlekDisplay = `<p style="color:#999; font-size:0.85rem;"><em>🔍 ImlekEngine belum siap — pastikan imlek-engine.js dimuat & bebas error.</em></p>`;
+    console.warn("ImlekEngine not found. Check: window.ImlekEngine =", ie);
+}
+// ===========================================
     const sifatHariIni = DATA_SIFAT_HARI[h] || "-";
     const sifatPasaranIni = DATA_SIFAT_PASARAN[pasaran.toUpperCase()] || "-";
 
