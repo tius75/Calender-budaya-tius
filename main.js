@@ -106,7 +106,7 @@ function getLunarShio(date) {
     const year = date.getFullYear();
     const isEarly = (date.getMonth() === 0) || (date.getMonth() === 1 && date.getDate() < 10);
     const index = isEarly ? (year - 1) % 12 : year % 12;
-    return { shio: shios[index], lunarYear: year + 3502 };
+    return { shio: shios[index], lunarYear: year + 551 };
 }
 
 function getWuku(date) {
