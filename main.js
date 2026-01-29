@@ -373,7 +373,7 @@ function shareWhatsApp() {
 
     const footer =
         "\n\n━━━━━━━━━━━━━━━━━━━━━━\n" +
-        "_Kalender Jawa Tius_";
+        "_Kalender Jawa by Tius_";
 
     const finalText = header + content + footer;
 
