@@ -561,14 +561,467 @@ function fallbackCopyTextToClipboard(text) {
 // FITUR SHARE (TETAP ADA)
 // ==========================================
 
+/**
+ * FUNGSI SHARE WHATSAPP DENGAN SRI JATI FULL & FORMAT RAPI
+ */
+
 function shareWhatsApp() {
     const detailArea = document.getElementById('printableArea');
+    if (!detailArea) {
+        alert("Data tidak ditemukan!");
+        return;
+    }
+
+    // Tampilkan loading di tombol
+    const btn = event?.target;
+    const originalText = btn?.innerText || "📱 Share WA";
+    if (btn) {
+        btn.innerHTML = "⏳ Memproses...";
+        btn.disabled = true;
+    }
+
+    try {
+        // Format teks untuk WhatsApp
+        const formattedText = formatWhatsAppContent(detailArea);
+        
+        // Tambahkan header dan footer
+        const header = "🌟 *HASIL LENGKAP CEK WETON JAWA* 🌟\n" +
+                       "═══════════════════════════════════\n\n";
+        
+        const footer = "\n═══════════════════════════════════\n" +
+                       "_Dikirim melalui Aplikasi Kalender Jawa_ 📱";
+        
+        const finalText = header + formattedText + footer;
+        
+        // Encode untuk URL WhatsApp
+        const encodedText = encodeURIComponent(finalText);
+        window.open(`https://wa.me/?text=${encodedText}`, '_blank');
+        
+    } catch (error) {
+        console.error("Error sharing to WhatsApp:", error);
+        alert("Terjadi kesalahan saat memproses data untuk WhatsApp.");
+    } finally {
+        // Kembalikan tombol ke keadaan semula
+        if (btn) {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+}
+
+function formatWhatsAppContent(element) {
+    let result = "";
+    
+    // Clone elemen untuk manipulasi
+    const tempDiv = element.cloneNode(true);
+    
+    // Hapus tombol dari konten
+    const buttons = tempDiv.querySelectorAll('button');
+    buttons.forEach(btn => btn.remove());
+    
+    // Ambil semua teks
+    const allText = tempDiv.textContent || tempDiv.innerText;
+    
+    // Bersihkan dan format teks
+    const cleanedText = cleanWhatsAppText(allText);
+    
+    // Pisahkan menjadi sections
+    const sections = cleanedText.split(/\n{2,}/).filter(s => s.trim() !== '');
+    
+    // Proses setiap section
+    sections.forEach(section => {
+        const lines = section.split('\n').map(l => l.trim()).filter(l => l !== '');
+        
+        if (lines.length === 0) return;
+        
+        const firstLine = lines[0];
+        
+        // Format berdasarkan jenis konten
+        if (firstLine.includes('PERINGATAN')) {
+            result += formatWarningSection(lines);
+        } 
+        else if (isWetonLine(firstLine)) {
+            result += formatWetonSection(lines);
+        }
+        else if (firstLine.includes('Status Bulan')) {
+            result += formatBulanJawaSection(lines);
+        }
+        else if (firstLine.includes('Sifat')) {
+            result += formatKarakterSection(lines);
+        }
+        else if (firstLine.includes('Lunar') || firstLine.includes('Zodiak')) {
+            result += formatAstrologiSection(lines);
+        }
+        else if (firstLine.includes('Usia') || firstLine.includes('Arah')) {
+            result += formatPersonalInfoSection(lines);
+        }
+        else if (firstLine.includes('Neptu')) {
+            result += formatNeptuSection(lines);
+        }
+        else if (firstLine.includes('Nasib Pembagi')) {
+            result += formatNasibSection(lines);
+        }
+        else if (firstLine.includes('Wuku')) {
+            result += formatWukuSection(lines);
+        }
+        else if (firstLine.includes('Watak Neptu')) {
+            result += formatWatakNeptuSection(lines);
+        }
+        else if (firstLine.includes('Nasib Kematian')) {
+            result += formatKematianSection(lines);
+        }
+        else if (firstLine.includes('Pranata Mangsa')) {
+            result += formatMangsaSection(lines);
+        }
+        else if (firstLine.includes('Analisis Wuku')) {
+            result += formatAnalisisWukuSection(lines);
+        }
+        else if (section.includes('Siklus Sri Jati') || 
+                 (lines.length >= 2 && lines.some(l => l.includes('Thn') && l.includes('Nasib')))) {
+            result += formatSriJatiSection(section, tempDiv);
+        }
+        else {
+            result += formatGenericSection(lines);
+        }
+        
+        result += "\n";
+    });
+    
+    // Jika Sri Jati belum diproses, coba ekstrak dari HTML
+    if (!result.includes('SRI JATI')) {
+        const sriJatiData = extractSriJatiFromHTML(tempDiv);
+        if (sriJatiData && sriJatiData.length > 0) {
+            result += formatSriJatiTable(sriJatiData);
+        }
+    }
+    
+    return result.trim();
+}
+
+// ==========================================
+// FUNGSI PEMBANTU FORMATTING
+// ==========================================
+
+function cleanWhatsAppText(text) {
+    return text
+        .replace(/\s+/g, ' ')
+        .replace(/\n\s*\n/g, '\n\n')
+        .replace(/([.,!?;:])\s{2,}/g, '$1 ')
+        .replace(/\s+\./g, '.')
+        .trim();
+}
+
+function isWetonLine(line) {
+    const wetonDays = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+    return wetonDays.some(day => line.includes(day));
+}
+
+function formatWarningSection(lines) {
+    let result = "⚠️ *PERINGATAN HARI KRITIS:*\n";
+    lines.forEach((line, i) => {
+        if (i === 0) return;
+        if (line.includes('Tanggal') || line.includes('Tali Wangke')) {
+            result += `   • ${line}\n`;
+        }
+    });
+    return result + "\n";
+}
+
+function formatWetonSection(lines) {
+    let result = "📅 *INFORMASI UTAMA:*\n";
+    lines.slice(0, 3).forEach(line => {
+        result += `   ${line}\n`;
+    });
+    return result;
+}
+
+function formatBulanJawaSection(lines) {
+    let result = "🌙 *STATUS BULAN JAWA:*\n";
+    lines.forEach(line => {
+        if (line.includes('Status') || line.includes('Tali') || line.includes('Daftar')) {
+            result += `   • ${line}\n`;
+        }
+    });
+    return result;
+}
+
+function formatKarakterSection(lines) {
+    let result = "🎭 *KARAKTER HARI & PASARAN:*\n";
+    lines.forEach(line => {
+        if (line.length > 5) {
+            result += `   • ${line.substring(0, 60)}\n`;
+        }
+    });
+    return result;
+}
+
+function formatAstrologiSection(lines) {
+    let result = "✨ *ASTROLOGI:*\n";
+    lines.forEach(line => {
+        result += `   • ${line}\n`;
+    });
+    return result;
+}
+
+function formatPersonalInfoSection(lines) {
+    let result = "👤 *INFORMASI PRIBADI:*\n";
+    lines.forEach(line => {
+        result += `   • ${line}\n`;
+    });
+    return result;
+}
+
+function formatNeptuSection(lines) {
+    let result = "🧮 *PERHITUNGAN NEPTU:*\n";
+    
+    // Cari total neptu
+    let totalNeptu = "";
+    lines.forEach(line => {
+        if (line.includes('Total Neptu')) {
+            totalNeptu = line;
+        } else if (line.includes('Neptu')) {
+            result += `   • ${line}\n`;
+        }
+    });
+    
+    if (totalNeptu) {
+        result += `   • ${totalNeptu}\n`;
+    }
+    
+    return result;
+}
+
+function formatNasibSection(lines) {
+    let result = "💎 *NASIB PEMBAGI 5:*\n";
+    lines.forEach(line => {
+        result += `   • ${line}\n`;
+    });
+    return result;
+}
+
+function formatWukuSection(lines) {
+    let result = "📜 *WUKU:*\n";
+    lines.forEach(line => {
+        if (line.length > 5 && !line.includes('Analisis')) {
+            result += `   • ${line.substring(0, 50)}\n`;
+        }
+    });
+    return result;
+}
+
+function formatWatakNeptuSection(lines) {
+    let result = "🌟 *WATAK NEPTU:*\n";
+    lines.slice(1).forEach((line, i) => {
+        if (i < 2) { // Ambil 2 baris pertama saja
+            result += `   • ${line.substring(0, 60)}\n`;
+        }
+    });
+    return result;
+}
+
+function formatKematianSection(lines) {
+    let result = "🪦 *NASIB KEMATIAN:*\n";
+    lines.forEach(line => {
+        result += `   • ${line}\n`;
+    });
+    return result;
+}
+
+function formatMangsaSection(lines) {
+    let result = "🌾 *PRANATA MANGSA:*\n";
+    lines.slice(0, 2).forEach(line => {
+        result += `   • ${line.substring(0, 60)}\n`;
+    });
+    return result;
+}
+
+function formatAnalisisWukuSection(lines) {
+    let result = "🛡️ *ANALISIS WUKU:*\n";
+    lines.slice(1, 3).forEach(line => {
+        result += `   • ${line.substring(0, 60)}\n`;
+    });
+    return result;
+}
+
+function formatSriJatiSection(section, htmlElement) {
+    // Coba ekstrak data dari HTML terlebih dahulu
+    const sriJatiData = extractSriJatiFromHTML(htmlElement);
+    
+    if (sriJatiData && sriJatiData.length > 0) {
+        return formatSriJatiTable(sriJatiData);
+    }
+    
+    // Fallback: format dari teks biasa
+    let result = "📊 *SIKLUS SRI JATI (REJEKI):*\n";
+    const lines = section.split('\n');
+    
+    // Coba format sebagai tabel sederhana
+    lines.forEach(line => {
+        if (line.includes('Thn') && line.trim()) {
+            const parts = line.split(/\s{2,}/);
+            if (parts.length >= 3) {
+                const usia = parts[0].padEnd(10);
+                const nilai = parts[1].padEnd(8);
+                const nasib = parts.slice(2).join(' ').substring(0, 30);
+                result += `   ${usia} | ${nilai} | ${nasib}\n`;
+            }
+        }
+    });
+    
+    return result;
+}
+
+function formatGenericSection(lines) {
+    if (lines.length < 2) return "";
+    
+    let result = "";
+    lines.slice(0, 3).forEach(line => {
+        result += `   • ${line.substring(0, 50)}\n`;
+    });
+    
+    if (lines.length > 3) {
+        result += "   • ...\n";
+    }
+    
+    return result;
+}
+
+// ==========================================
+// FUNGSI EKSTRAK SRI JATI DARI HTML
+// ==========================================
+
+function extractSriJatiFromHTML(element) {
+    try {
+        // Cari semua tabel
+        const tables = element.getElementsByTagName('table');
+        
+        for (let table of tables) {
+            // Cek apakah ini tabel Sri Jati
+            const tableText = table.textContent || table.innerText;
+            
+            if (tableText.includes('Usia') && tableText.includes('Nilai') && tableText.includes('Nasib')) {
+                const rows = table.getElementsByTagName('tr');
+                const data = [];
+                
+                for (let row of rows) {
+                    const cells = row.getElementsByTagName('td');
+                    if (cells.length >= 3) {
+                        const usia = cells[0].textContent.trim();
+                        const nilai = cells[1].textContent.trim();
+                        const nasib = cells[2].textContent.trim();
+                        
+                        // Pastikan ini baris data, bukan header
+                        if (usia && nilai && nasib && 
+                            !usia.includes('Usia') && 
+                            !nilai.includes('Nilai') && 
+                            !nasib.includes('Nasib')) {
+                            data.push({
+                                usia: usia,
+                                nilai: nilai,
+                                nasib: nasib.substring(0, 40) // Batasi panjang
+                            });
+                        }
+                    }
+                }
+                
+                if (data.length > 0) {
+                    return data;
+                }
+            }
+        }
+    } catch (error) {
+        console.error("Error extracting Sri Jati:", error);
+    }
+    
+    return null;
+}
+
+// ==========================================
+// FUNGSI FORMAT TABEL SRI JATI
+// ==========================================
+
+function formatSriJatiTable(data) {
+    if (!data || data.length === 0) {
+        return "📊 *SIKLUS SRI JATI:*\n   Data tidak tersedia\n\n";
+    }
+    
+    // Hitung lebar kolom maksimum
+    let maxUsia = 8; // Minimum width
+    let maxNilai = 6;
+    let maxNasib = 30;
+    
+    data.forEach(item => {
+        maxUsia = Math.max(maxUsia, item.usia.length);
+        maxNilai = Math.max(maxNilai, item.nilai.length);
+        maxNasib = Math.max(maxNasib, Math.min(item.nasib.length, 40));
+    });
+    
+    // Buat tabel
+    let tableText = "\n📊 *TABEL SRI JATI LENGKAP:*\n";
+    
+    // Header
+    tableText += "┌" + "─".repeat(maxUsia + 2) + "┬" + 
+                 "─".repeat(maxNilai + 2) + "┬" + 
+                 "─".repeat(maxNasib + 2) + "┐\n";
+    
+    tableText += "│ " + "USIA".padEnd(maxUsia) + " │ " + 
+                 "NILAI".padEnd(maxNilai) + " │ " + 
+                 "NASIB (REJEKI)".padEnd(maxNasib) + " │\n";
+    
+    tableText += "├" + "─".repeat(maxUsia + 2) + "┼" + 
+                 "─".repeat(maxNilai + 2) + "┼" + 
+                 "─".repeat(maxNasib + 2) + "┤\n";
+    
+    // Data rows
+    data.forEach(item => {
+        const usia = item.usia.padEnd(maxUsia);
+        const nilai = item.nilai.padEnd(maxNilai);
+        const nasib = item.nasib.padEnd(maxNasib);
+        
+        tableText += `│ ${usia} │ ${nilai} │ ${nasib} │\n`;
+    });
+    
+    // Footer
+    tableText += "└" + "─".repeat(maxUsia + 2) + "┴" + 
+                 "─".repeat(maxNilai + 2) + "┴" + 
+                 "─".repeat(maxNasib + 2) + "┘\n";
+    
+    return tableText;
+}
+
+// ==========================================
+// FUNGSI SHARE VERSI SIMPLE (BACKUP)
+// ==========================================
+
+function shareWhatsAppSimple() {
+    const detailArea = document.getElementById('printableArea');
     if (!detailArea) return alert("Data tidak ditemukan!");
-    // Pembersihan teks agar rapi di WA
-    const fullText = detailArea.innerText.replace(/\n\s*\n/g, '\n');
-    const header = "*HASIL LENGKAP CEK WETON JAWA*\n" + "=".repeat(20) + "\n\n";
-    const footer = "\n\n" + "=".repeat(20) + "\n_Dikirim melalui Aplikasi Kalender Jawa_";
-    window.open(`https://wa.me/?text=${encodeURIComponent(header + fullText + footer)}`, '_blank');
+    
+    // Clone dan hapus tombol
+    const tempDiv = detailArea.cloneNode(true);
+    const buttons = tempDiv.querySelectorAll('button');
+    buttons.forEach(btn => btn.remove());
+    
+    // Ambil teks dan format sederhana
+    let text = tempDiv.textContent || tempDiv.innerText;
+    
+    text = text
+        .replace(/\s+/g, ' ')
+        .replace(/\n\s*\n/g, '\n\n')
+        .replace(/([.!?])\s+/g, '$1\n')
+        .replace(/•\s*/g, '\n• ')
+        .trim();
+    
+    // Tambahkan header dan footer
+    const header = "📅 *HASIL CEK WETON JAWA*\n" +
+                   "═══════════════════════\n\n";
+    
+    const footer = "\n═══════════════════════\n" +
+                   "via Kalender Jawa App";
+    
+    const finalText = header + text.substring(0, 1500) + footer;
+    
+    window.open(`https://wa.me/?text=${encodeURIComponent(finalText)}`, '_blank');
 }
 
 // ==========================================
