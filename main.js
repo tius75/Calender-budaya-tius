@@ -135,9 +135,10 @@ function getTanggalJawa(date) {
 
 function getSiklusBesar(tahunJawa) {
 
-    // KUNCI INPUT (anti salah kirim Date / timestamp)
+    // SAFETY CHECK (jangan hentikan aplikasi)
     if (typeof tahunJawa !== "number" || tahunJawa < 2000 || tahunJawa > 3000) {
-        throw new Error("Input harus TAHUN JAWA (contoh: 2576)");
+        console.warn("Tahun Jawa tidak valid, fallback ke 2576");
+        tahunJawa = 2576;
     }
 
     // PATOKAN
