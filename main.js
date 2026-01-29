@@ -1,18 +1,17 @@
 /**
- * KALENDER JAWA & NUMEROLOGI - FIX VERSION 2026
- * Mengatasi masalah klik dan detail tidak muncul
+ * KALENDER JAWA & NUMEROLOGI - STABLE VERSION 2026
+ * Perbaikan: Tombol ganda dihapus, Zodiak & Shio ditambahkan, PDF Anti-Blank
  */
 
 let current = new Date();
 const TODAY = new Date();
 
-// DATA DASAR INTERNAL (Agar tetap jalan meskipun file data eksternal error)
+// DATA REFERENSI
 const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 const PASARAN = ['Legi', 'Pahing', 'Pon', 'Wage', 'Kliwon'];
 const NEPTU_HARI = { 'Minggu': 5, 'Senin': 4, 'Selasa': 3, 'Rabu': 7, 'Kamis': 8, 'Jumat': 6, 'Sabtu': 9 };
 const NEPTU_PASARAN = { 'Pahing': 9, 'Pon': 7, 'Wage': 4, 'Kliwon': 8, 'Legi': 5 };
 
-// DATA BULAN JAWA (WAJIB ADA agar tidak error)
 const DATA_BULAN_JAWA = [
     { nama: "Sura", status: "Tidak Baik", naas: [6, 11, 13, 14, 17, 18, 27], taliWangke: "Rabu Pahing" },
     { nama: "Sapar", status: "Tidak Baik", naas: [1, 10, 12, 20, 22], taliWangke: "Kamis Pon" },
@@ -28,9 +27,17 @@ const DATA_BULAN_JAWA = [
     { nama: "Besar", status: "Sangat Baik", naas: [1, 6, 10, 13, 20, 23, 25], taliWangke: "Selasa Wage" }
 ];
 
-// ==========================================
-// LOGIKA KALENDER
-// ==========================================
+// FUNGSI PEMBANTU (Zodiak & Shio)
+function getZodiak(d, m) {
+    const zodiacs = ["Capricorn", "Aquarius", "Pisces", "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius"];
+    const last_day = [19, 18, 20, 19, 20, 20, 22, 22, 22, 22, 21, 21];
+    return (d > last_day[m]) ? zodiacs[(m + 1) % 12] : zodiacs[m];
+}
+
+function getShio(year) {
+    const list = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
+    return list[year % 12];
+}
 
 function getPasaran(date) {
     const base = new Date(1900, 0, 1);
@@ -39,16 +46,16 @@ function getPasaran(date) {
 }
 
 function getTanggalJawa(date) {
-    const refDate = new Date(2026, 0, 28); // 9 Ruwah 1959
+    const refDate = new Date(2026, 0, 28); 
     const diffDays = Math.floor((date.getTime() - refDate.getTime()) / (1000 * 60 * 60 * 24));
-    let totalHariJawa = 9 + diffDays;
+    let tglJawa = 9 + diffDays;
     let bulanIdx = 7; 
-    let tglJawa = totalHariJawa;
     while (tglJawa > 30) { tglJawa -= 30; bulanIdx = (bulanIdx + 1) % 12; }
     while (tglJawa <= 0) { tglJawa += 30; bulanIdx = (bulanIdx - 1 + 12) % 12; }
     return { tanggal: tglJawa, bulan: DATA_BULAN_JAWA[bulanIdx], tahun: 1959 };
 }
 
+// RENDER KALENDER
 function generateCalendar() {
     const grid = document.getElementById('calendar');
     const mNav = document.getElementById('monthYearNav');
@@ -59,7 +66,6 @@ function generateCalendar() {
     const m = current.getMonth();
     mNav.innerText = new Intl.DateTimeFormat('id-ID', { month: 'long', year: 'numeric' }).format(current);
 
-    // Render Header Hari
     HARI.forEach((h, i) => {
         const el = document.createElement('div');
         el.innerText = h.substring(0, 3);
@@ -77,27 +83,16 @@ function generateCalendar() {
         const p = getPasaran(dateObj);
         const cell = document.createElement('div');
         cell.className = 'calendar-day';
-        cell.style.cursor = 'pointer';
-        cell.style.padding = '10px 2px';
-        cell.style.border = '1px solid #eee';
-        
         if (dateObj.getDay() === 0) cell.style.color = 'red';
-        if (dateObj.toDateString() === TODAY.toDateString()) cell.style.background = '#fff9c4';
+        if (dateObj.toDateString() === TODAY.toDateString()) cell.style.border = '2px solid orange';
         
-        cell.innerHTML = `<b>${d}</b><br><small style="font-size:0.7rem">${p}</small>`;
-        
-        // EVENT KLIK YANG DIPERBAIKI
-        cell.onclick = () => {
-            updateDetail(dateObj, p);
-        };
+        cell.innerHTML = `<b>${d}</b><br><small>${p}</small>`;
+        cell.onclick = () => updateDetail(dateObj, p);
         grid.appendChild(cell);
     }
 }
 
-// ==========================================
-// TAMPILAN DETAIL
-// ==========================================
-
+// UPDATE DETAIL
 function updateDetail(date, pasaran) {
     const detailDiv = document.getElementById('detail');
     if (!detailDiv) return;
@@ -106,71 +101,63 @@ function updateDetail(date, pasaran) {
     const nH = NEPTU_HARI[h];
     const nP = NEPTU_PASARAN[pasaran];
     const nTotal = nH + nP;
-    
     const infoJawa = getTanggalJawa(date);
+    const zodiak = getZodiak(date.getDate(), date.getMonth());
+    const shio = getShio(date.getFullYear());
     
-    // Integrasi Numerologi (Cek apakah file numerology.js sudah dimuat)
-    let lp = { angka: '?', arti: 'Data Numerologi tidak ditemukan.' };
+    // Ambil Numerologi dari file terpisah (numerology.js)
+    let lp = { angka: '?', arti: 'Numerologi tidak dimuat.' };
     if (typeof NUMEROLOGI_ENGINE !== 'undefined') {
         lp = NUMEROLOGI_ENGINE.calculateLifePath(date);
     }
 
-    const isNaas = infoJawa.bulan.naas.includes(infoJawa.tanggal);
-    const colorStatus = infoJawa.bulan.status.includes("Tidak") ? "#d32f2f" : "#2e7d32";
-
+    // Tampilkan Detail & Tombol secara dinamis (Tombol di HTML harus dihapus)
     detailDiv.innerHTML = `
-        <div id="printableArea" style="background:#fff; padding:20px; border:2px solid #D30000; border-radius:15px; margin-top:20px; color:#000;">
-            <h2 style="color:#D30000; border-bottom:2px solid #D30000; margin-bottom:10px;">${h} ${pasaran}</h2>
-            <p>📅 <b>Masehi:</b> ${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}</p>
-            <p>🌙 <b>Jawa:</b> ${infoJawa.tanggal} ${infoJawa.bulan.nama} ${infoJawa.tahun}</p>
+        <div id="printableArea" style="background:#fff; padding:20px; border:2px solid #D30000; border-radius:15px; color:#000;">
+            <h2 style="color:#D30000; border-bottom:2px solid #D30000; margin-bottom:15px; padding-bottom:5px;">${h} ${pasaran}</h2>
             
-            <div style="background:#f5f5f5; padding:10px; border-radius:8px; margin:10px 0;">
-                <p style="margin:0;"><strong>Status Bulan:</strong> <span style="color:${colorStatus}">${infoJawa.bulan.status}</span></p>
+            <p>📅 <b>Masehi:</b> ${date.getDate()} ${new Intl.DateTimeFormat('id-ID', {month:'long'}).format(date)} ${date.getFullYear()}</p>
+            <p>🌙 <b>Jawa:</b> ${infoJawa.tanggal} ${infoJawa.bulan.nama} 1959</p>
+            <p>🐉 <b>Shio:</b> ${shio} | ♒ <b>Zodiak:</b> ${zodiak}</p>
+            
+            <div style="background:#f9f9f9; padding:10px; border-radius:8px; margin:10px 0; border:1px solid #ddd;">
+                <p style="margin:0;"><b>Status Bulan:</b> <span style="color:${infoJawa.bulan.status.includes('Tidak') ? 'red' : 'green'}">${infoJawa.bulan.status}</span></p>
                 <p style="margin:5px 0 0 0; font-size:0.85rem;">Tali Wangke: ${infoJawa.bulan.taliWangke}</p>
             </div>
 
-            <div style="background:#fff5f5; border:1px solid #ffcdd2; padding:10px; border-radius:8px; text-align:center;">
-                <small>Kalkulasi Neptu</small><br>
-                <strong>${h}(${nH}) + ${pasaran}(${nP}) = <span style="color:#D30000; font-size:1.2rem;">${nTotal}</span></strong>
+            <div style="background:#fff5f5; border:1px solid #ffcdd2; padding:10px; border-radius:8px; text-align:center; margin:15px 0;">
+                <strong>Kalkulasi Neptu: ${h}(${nH}) + ${pasaran}(${nP}) = <span style="color:#D30000; font-size:1.2rem;">${nTotal}</span></strong>
             </div>
 
-            ${isNaas ? `<div style="margin-top:10px; background:#ffebee; color:#c62828; padding:8px; border-radius:5px; border-left:4px solid #d32f2f;">⚠️ <b>Hari Naas:</b> Tidak disarankan untuk hajat besar.</div>` : ''}
-
-            <div style="margin-top:20px; padding:15px; border:1px solid #084298; border-radius:10px; background:#f0f7ff;">
+            <div style="padding:15px; border:1px solid #084298; border-radius:10px; background:#f0f7ff;">
                 <h4 style="color:#084298; margin:0 0 5px 0;">🔮 Numerologi Life Path</h4>
                 <p style="font-size:1.1rem; font-weight:bold; margin:0;">Angka: ${lp.angka}</p>
-                <p style="font-size:0.85rem; color:#444; margin:5px 0 0 0;">${lp.arti}</p>
+                <p style="font-size:0.85rem; color:#444; line-height:1.4;">${lp.arti}</p>
             </div>
         </div>
 
-        <div style="margin-top:15px; display:flex; gap:10px;">
-            <button onclick="downloadPDF()" style="flex:1; padding:12px; background:#333; color:white; border:none; border-radius:8px; cursor:pointer;">Cetak PDF</button>
-            <button onclick="shareWA('${h} ${pasaran}', ${nTotal})" style="flex:1; padding:12px; background:#25D366; color:white; border:none; border-radius:8px; cursor:pointer;">WhatsApp</button>
+        <div style="margin-top:20px; display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <button onclick="downloadPDF()" style="padding:15px; background:#333; color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">Simpan PDF</button>
+            <button onclick="shareWA('${h} ${pasaran}', ${nTotal})" style="padding:15px; background:#25D366; color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">Share WA</button>
         </div>
     `;
     detailDiv.scrollIntoView({ behavior: 'smooth' });
 }
 
-// ==========================================
-// FITUR DOWNLOAD (ANTI-BLANK)
-// ==========================================
-
+// FIX PDF BLANK
 async function downloadPDF() {
     const area = document.getElementById("printableArea");
-    if (!area) return alert("Pilih tanggal terlebih dahulu!");
-
-    const btn = event.target;
-    btn.innerText = "⏳ Sedang Memproses...";
-    btn.disabled = true;
+    if (!area) return;
 
     const opt = {
         margin: 10,
-        filename: 'Hasil_Ramalan_Weton.pdf',
+        filename: 'Ramalan-Lengkap.pdf',
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { 
             scale: 2, 
             useCORS: true, 
-            backgroundColor: "#ffffff" 
+            backgroundColor: "#ffffff",
+            scrollY: -window.scrollY // Fix posisi potret
         },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
@@ -178,19 +165,16 @@ async function downloadPDF() {
     try {
         await html2pdf().set(opt).from(area).save();
     } catch (e) {
-        alert("Gagal mengunduh PDF. Pastikan library html2pdf.js sudah terpasang.");
-    } finally {
-        btn.innerText = "Cetak PDF";
-        btn.disabled = false;
+        alert("Gagal mengunduh PDF");
     }
 }
 
 function shareWA(weton, neptu) {
-    const text = `Hasil Cek Weton: ${weton}\nNeptu: ${neptu}\nCek lengkap di aplikasi kami.`;
+    const text = `Hasil Ramalan Weton: ${weton}\nNeptu: ${neptu}\nCek selengkapnya di website kami!`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
 }
 
-// JALANKAN SAAT START
+// INITIALIZE
 window.onload = () => {
     generateCalendar();
     document.getElementById('prevMonth').onclick = () => { current.setMonth(current.getMonth() - 1); generateCalendar(); };
