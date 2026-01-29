@@ -1,6 +1,6 @@
 /**
  * KALENDER JAWA MODERN - VERSI FINAL FIX 2026
- * Update: Detail Perhitungan Neptu & Info Lengkap Bulan Jawa
+ * Update: Windu Sancaya, Tahun Jawa (Filosofi), & Konzili
  */
 
 // ==========================================
@@ -58,6 +58,19 @@ const DATA_BULAN_JAWA = [
     { nama: "Dulkaidah", status: "Cukup Baik", naas: [2, 6, 11, 12, 13, 21, 22, 24, 28], taliWangke: "Senin Kliwon" },
     { nama: "Besar", status: "Sangat Baik", naas: [1, 6, 10, 13, 20, 23, 25], taliWangke: "Selasa Wage" }
 ];
+
+const DATA_SIKLUS_TAHUN = [
+    { nama: "Alip", makna: "Ada-ada (Niat)", deskripsi: "Melambangkan permulaan. Waktunya manusia mulai menanam niat, ide, atau tekad untuk melakukan sesuatu yang baik." },
+    { nama: "Ehe", makna: "Tumandang (Bekerja)", deskripsi: "Melambangkan realisasi. Setelah ada niat di tahun Alip, tahun ini adalah waktunya mulai bergerak dan bertindak." },
+    { nama: "Jimawal", makna: "Gawe (Pekerjaan)", deskripsi: "Melambangkan proses. Pekerjaan mulai terlihat bentuknya dan menuntut ketekunan untuk menyelesaikannya." },
+    { nama: "Je", makna: "Lelakon (Peristiwa/Nasib)", deskripsi: "Melambangkan ujian. Dalam proses bekerja, manusia pasti menemui cobaan atau dinamika hidup sebagai ujian mental." },
+    { nama: "Dal", makna: "Urip (Hidup)", deskripsi: "Melambangkan keberadaan. Tahun ini dianggap sakral (Tahun Duda). Waktunya merenungi hakikat hidup dan hubungan dengan Sang Pencipta." },
+    { nama: "Be", makna: "Bola-bali (Kembali/Konsisten)", deskripsi: "Melambangkan keteguhan. Mengajarkan manusia untuk tetap konsisten pada kebaikan meskipun sudah melalui berbagai ujian." },
+    { nama: "Wawu", makna: "Marang (Arah/Tujuan)", deskripsi: "Melambangkan fokus. Menjelang akhir siklus, manusia diingatkan untuk kembali fokus pada tujuan akhir hidup agar tidak tersesat." },
+    { nama: "Jimakir", makna: "Suwung (Kosong/Selesai)", deskripsi: "Melambangkan akhir dan evaluasi. Fase untuk melepaskan keterikatan duniawi dan mengevaluasi apa yang telah dilakukan." }
+];
+
+const WINDU_LIST = ["Kuntara", "Sangara", "Sancaya", "Adi"];
 
 let current = new Date();
 const TODAY = new Date();
@@ -118,6 +131,30 @@ function getTanggalJawa(date) {
     while (tglJawa > 30) { tglJawa -= 30; bulanIdx = (bulanIdx + 1) % 12; if (bulanIdx === 0) tahunJawa++; }
     while (tglJawa <= 0) { tglJawa += 30; bulanIdx = (bulanIdx - 1 + 12) % 12; if (bulanIdx === 11) tahunJawa--; }
     return { tanggal: tglJawa, bulan: DATA_BULAN_JAWA[bulanIdx], tahun: tahunJawa };
+}
+
+function getSiklusBesar(date) {
+    // Patokan: 1-12-2576 adalah Tahun Dal, Windu Sancaya, Konzili 1
+    const refDate = new Date(2576, 11, 1);
+    const diffYears = date.getFullYear() - refDate.getFullYear();
+    
+    // Hitung Tahun (Siklus 8 Tahunan) - Dal berada di index 4
+    let tahunIdx = (4 + (diffYears % 8)) % 8;
+    if (tahunIdx < 0) tahunIdx += 8;
+
+    // Hitung Windu (Siklus 32 Tahunan / 4 Windu) - Sancaya index 2
+    let totalWinduShift = Math.floor(diffYears / 8);
+    let winduIdx = (2 + (totalWinduShift % 4)) % 4;
+    if (winduIdx < 0) winduIdx += 4;
+
+    // Hitung Konzili
+    let konzili = 1 + Math.floor(diffYears / 32);
+
+    return {
+        tahun: DATA_SIKLUS_TAHUN[tahunIdx],
+        windu: WINDU_LIST[winduIdx],
+        konzili: konzili
+    };
 }
 
 function getMangsaInfo(date) {
@@ -235,6 +272,7 @@ function updateDetail(date, pasaran) {
     
     const wukuName = getWuku(date);
     const infoJawa = getTanggalJawa(date);
+    const siklusBesar = getSiklusBesar(date);
     const mangsa = getMangsaInfo(date);
     const zodiak = getZodiak(date);
     const lunar = getLunarShio(date);
@@ -291,6 +329,13 @@ function updateDetail(date, pasaran) {
             
             <p style="margin:10px 0 0; font-size:1.15rem; font-weight:bold;">📅 ${tglMasehiLengkap}</p>
             
+            <div style="background:#fff3e0; padding:12px; border-radius:8px; margin:10px 0; border:1px solid #ffe0b2;">
+                <p style="margin:0; color:#e65100; font-weight:bold; font-size:1rem;">✨ Siklus Tahun & Windu</p>
+                <p style="margin:5px 0; font-size:0.9rem;"><strong>Tahun:</strong> ${siklusBesar.tahun.nama} (${siklusBesar.tahun.makna})</p>
+                <p style="margin:5px 0; font-size:0.9rem;"><strong>Windu:</strong> ${siklusBesar.windu} | <strong>Konzili:</strong> ${siklusBesar.konzili}</p>
+                <p style="margin:8px 0 0; font-size:0.8rem; font-style:italic; color:#6d4c41; line-height:1.4;">"${siklusBesar.tahun.deskripsi}"</p>
+            </div>
+
             <div style="background:#fff9f9; padding:10px; border-radius:8px; margin:10px 0; border:1px solid #ffeded;">
                 <p style="margin:0; color:#d30000; font-weight:bold; font-size:1rem;">🌙 Kalender Jawa</p>
                 <p style="margin:5px 0; font-size:0.9rem;"><strong>Tanggal:</strong> ${infoJawa.tanggal} ${infoJawa.bulan.nama} ${infoJawa.tahun} AJ</p>
