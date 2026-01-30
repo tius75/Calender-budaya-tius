@@ -108,36 +108,38 @@ function getLunarShio(date) {
     const y = date.getFullYear();
     const m = date.getMonth() + 1;
     const d = date.getDate();
-
-    // 1. Logika Shio Abadi (Siklus 12 Tahun)
-    // 1975 adalah tahun Kelinci, 2026 adalah tahun Kuda (setelah Imlek)
-    const daftarShio = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
     
-    // Tentukan Shio berdasarkan tahun Masehi (pendekatan sederhana)
-    let indexShio = y % 12;
-    let shioNama = daftarShio[indexShio];
-
-    // 2. Logika Tanggal Lunar (Sederhana agar tidak negatif)
-    // Untuk hasil akurat di semua tahun, idealnya menggunakan library lunar, 
-    // namun agar tidak error/negatif, kita gunakan sisa bagi 30 hari.
-    const refDate = new Date(y, 0, 1); // Acuan awal tahun masing-masing
-    const diffDays = Math.floor((date.getTime() - refDate.getTime()) / (1000 * 60 * 60 * 24));
-    let lunarDay = (diffDays % 30) + 1;
-    let lunarMonth = Math.floor(diffDays / 30) + 1;
-
-    // Khusus Tahun 2026: Reset Shio Kuda tepat 17 Februari
-    if (y === 2026) {
-        const isImlek = (m > 2) || (m === 2 && d >= 17);
-        shioNama = isImlek ? "Kuda" : "Ular";
-        if (isImlek && m === 2 && d === 17) lunarDay = 1; // Reset 1 Imlek
+    // 1. Tentukan Tanggal Imlek tahun tersebut (Estimasi jika DB tidak ada)
+    let imlekM, imlekD, shioTahunIni;
+    
+    if (DB_IMLEK[y]) {
+        imlekM = DB_IMLEK[y].m;
+        imlekD = DB_IMLEK[y].d;
+        shioTahunIni = DB_IMLEK[y].shio;
+    } else {
+        // Algoritma Cadangan jika data tahun tsb tidak diketik di DB
+        const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
+        shioTahunIni = shios[y % 12];
+        imlekM = 2; imlekD = 5; // Estimasi rata-rata
     }
 
+    const tglImlek = new Date(y, imlekM - 1, imlekD);
+    const isSudahImlek = date >= tglImlek;
+
+    // 2. Hitung Lunar Day (Agar tidak muncul angka negatif/undefined)
+    const diffTime = Math.abs(date - tglImlek);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    let lunarDay = isSudahImlek ? (diffDays % 30) + 1 : 30 - (diffDays % 30);
+    let shioFinal = isSudahImlek ? shioTahunIni : (DB_IMLEK[y-1] ? DB_IMLEK[y-1].shio : "Transisi");
+
     return {
-        full: `${lunarDay} - ${lunarMonth > 12 ? 12 : lunarMonth} - ${y + 551}`,
-        shio: shioNama,
-        ramalan: "Tetaplah optimis dalam melangkah."
+        full: `${lunarDay} - ${isSudahImlek ? Math.floor(diffDays/30)+1 : 12} - ${y + 551}`,
+        shio: shioFinal,
+        ramalan: "Gunakan energi hari ini dengan bijaksana."
     };
 }
+
 
 
 
