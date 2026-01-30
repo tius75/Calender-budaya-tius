@@ -106,50 +106,51 @@ function getZodiak(date) {
 
 function getLunarShio(date) {
     const d = date.getDate();
-    const m = date.getMonth() + 1; // Januari = 1
+    const m = date.getMonth() + 1;
     const y = date.getFullYear();
 
-    // Referensi: 30 Jan 2026 adalah 12 - 12 - 2576
-    const refDate = new Date(2026, 0, 30); 
-    const diffDays = Math.floor((date.getTime() - refDate.getTime()) / (1000 * 60 * 60 * 24));
-    
-    let lunarDay = 12 + diffDays;
-    let lunarMonth = 12;
-    let huangdiYear = 2576;
+    let lunarDay, lunarMonth, huangdiYear, shioNama;
 
-    // Perbaikan Logika Shio: Mulai 17 Februari 2026 menjadi Shio Kuda
-    let shioNama;
-    if (y === 2026) {
-        // Jika bulan > 2 ATAU (bulan adalah Februari DAN tanggal >= 17)
-        const isKuda = (m > 2) || (m === 2 && d >= 17); 
-        shioNama = isKuda ? "Kuda" : "Ular";
-        if (isKuda) huangdiYear = 2577;
+    // Tentukan apakah sudah masuk Imlek 2026 (17 Februari)
+    const isImlekKeatas = (y === 2026 && (m > 2 || (m === 2 && d >= 17)));
+
+    if (!isImlekKeatas) {
+        // PERIODE SEBELUM IMLEK (Acuan: 30 Jan 2026 = 12 - 12 - 2576)
+        const refDate = new Date(2026, 0, 30);
+        const diffDays = Math.floor((date.getTime() - refDate.getTime()) / (1000 * 60 * 60 * 24));
+        lunarDay = 12 + diffDays;
+        lunarMonth = 12;
+        huangdiYear = 2576;
+        shioNama = "Ular";
+        
+        // Jika hasil hitungan melebihi 29/30 (akhir bulan 12)
+        if (lunarDay > 29 && d < 17) {
+            lunarDay = lunarDay; // Tetap di bulan 12 sampai tgl 16 Feb
+        }
     } else {
-        const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
-        shioNama = shios[y % 12];
-    }
+        // PERIODE SETELAH IMLEK (Acuan: 17 Feb 2026 = 1 - 1 - 2577)
+        const refImlek = new Date(2026, 1, 17); // 17 Feb 2026
+        const diffDays = Math.floor((date.getTime() - refImlek.getTime()) / (1000 * 60 * 60 * 24));
+        
+        lunarDay = 1 + diffDays; // Reset ke tanggal 1
+        lunarMonth = 1;
+        huangdiYear = 2577;
+        shioNama = "Kuda"; // Shio berubah jadi Kuda
 
-    // Logika Tanggal Lunar
-    if (lunarDay > 30) { 
-        lunarDay -= 30; 
-        lunarMonth = (m === 2 && d >= 17) ? 1 : 1; 
-    } else if (lunarDay <= 0) { 
-        lunarDay += 30; 
-        lunarMonth = 11; 
+        // Logika sederhana untuk ganti bulan lunar (asumsi 30 hari/bulan)
+        if (lunarDay > 30) {
+            lunarDay -= 30;
+            lunarMonth = 2;
+        }
     }
-
-    const dataRamalan = {
-        "Ular": "Intuisi tajam dalam membaca peluang.",
-        "Kuda": "Kecepatan membawa rezeki harian.",
-        "Naga": "Kekuatan besar dalam karier menanti."
-    };
 
     return {
-        full: `${lunarDay} - ${lunarMonth} - ${huangdiYear}`, // Format Strip
+        full: `${lunarDay} - ${lunarMonth} - ${huangdiYear}`,
         shio: shioNama,
-        ramalan: dataRamalan[shioNama] || "Tetaplah optimis hari ini."
+        ramalan: shioNama === "Kuda" ? "Kecepatan membawa rezeki harian." : "Intuisi tajam dalam membaca peluang."
     };
 }
+
 
 
 
