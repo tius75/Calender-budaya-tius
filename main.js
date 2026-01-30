@@ -365,7 +365,12 @@ function updateDetail(date, pasaran) {
                 <h2 style="color:#D30000; margin:0 0 5px 0; border-bottom:2px solid #D30000; display:inline-block;">${wetonKey}</h2>
                 <button onclick="copyToClipboard()" style="background:#D30000; color:#fff; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">📋 Salin Hasil</button>
             </div>
-            
+        
+ <div style="background:#f1f8e9; padding:10px; border-radius:8px; margin:10px 0;">
+                <p><b>🏮 Lunar:</b> ${lunar.full} | <b>Shio:</b> ${lunar.shio}</p>
+                <p style="font-size:12px;"><i>Ramalan: ${lunar.ramalan}</i></p>
+            </div>
+    
             <p style="margin:10px 0 0; font-size:1.15rem; font-weight:bold;">📅 ${tglMasehiLengkap}</p>
             
             <div style="background:#fff3e0; padding:12px; border-radius:8px; margin:10px 0; border:1px solid #ffe0b2;">
@@ -375,10 +380,7 @@ function updateDetail(date, pasaran) {
                 <p style="margin:8px 0 0; font-size:0.8rem; font-style:italic; color:#6d4c41; line-height:1.4;">"${siklusBesar.tahun.deskripsi}"</p>
             </div>
 
-      <div style="background:#f1f8e9; padding:10px; border-radius:8px; margin:10px 0;">
-                <p><b>🏮 Lunar:</b> ${lunar.full} | <b>Shio:</b> ${lunar.shio}</p>
-                <p style="font-size:12px;"><i>Ramalan: ${lunar.ramalan}</i></p>
-            </div>
+     
     
             <div style="background:#fff9f9; padding:10px; border-radius:8px; margin:10px 0; border:1px solid #ffeded;">
                 <p style="margin:0; color:#d30000; font-weight:bold; font-size:1rem;">🌙 Kalender Jawa</p>
