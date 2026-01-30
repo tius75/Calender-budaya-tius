@@ -148,11 +148,9 @@ function getLunarShio(date) {
 
     return {
     full: `${lunarDay} - ${lunarMonth} - ${huangdiYear}`, // Ubah dari : menjadi -
-        shio: shioNama,
-        ramalan: dataRamalan[shioNama] || "Tetaplah optimis dalam melangkah hari ini."
-    };
-}
-
+    shio: shioNama,
+    ramalan: dataRamalan[shioNama] || "Tetaplah optimis dalam melangkah hari ini."
+};
 
 
 
