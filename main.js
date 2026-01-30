@@ -309,6 +309,9 @@ function updateDetail(date, pasaran) {
     
     const wukuName = getWuku(date);
     const infoJawa = getTanggalJawa(date);
+// Gunakan infoJawa.tahun agar Siklus Windu berubah otomatis sesuai tahun Jawa
+const siklusBesar = getSiklusBesar(infoJawa.tahun); 
+
     const siklusBesar = getSiklusBesar(date);
     const mangsa = getMangsaInfo(date);
     const zodiak = getZodiak(date);
