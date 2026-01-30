@@ -105,33 +105,54 @@ function getZodiak(date) {
 }
 
 function getLunarShio(date) {
-    // Shio tetap Ular untuk Januari 2026
-    const shioNama = "Ular"; 
-    const huangdiYear = 2576;
+    const day = date.getDate();
+    const month = date.getMonth() + 1; // Januari = 1
+    const year = date.getFullYear();
 
-    // Menghitung selisih hari dari 30 Januari 2026
-    // Agar pada tanggal 30 Jan muncul tanggal 12
+    // 1. Logika Tanggal Lunar (Acuan: 30 Jan 2026 = 12-12-2576)
     const refDate = new Date(2026, 0, 30); 
     const diffDays = Math.floor((date.getTime() - refDate.getTime()) / (1000 * 60 * 60 * 24));
     
     let lunarDay = 12 + diffDays;
     let lunarMonth = 12;
+    let huangdiYear = 2576;
 
-    // Logika sederhana untuk menjaga rotasi tanggal lunar (1-30)
+    // Putaran Tanggal dan Bulan Lunar
     if (lunarDay > 30) {
         lunarDay -= 30;
-        lunarMonth = 1; // Masuk ke bulan 1 Imlek (Tahun Baru)
+        lunarMonth = 1; 
     } else if (lunarDay <= 0) {
         lunarDay += 30;
         lunarMonth = 11;
     }
 
+    // 2. Logika Shio Otomatis (Dinamis)
+    // Di tahun 2026, Shio Ular berubah menjadi Kuda pada Imlek (17 Feb 2026)
+    let shioNama;
+    if (year === 2026) {
+        const isAfterImlek = (month > 2) || (month === 2 && day >= 17);
+        shioNama = isAfterImlek ? "Kuda" : "Ular";
+        if (isAfterImlek && lunarMonth === 1) huangdiYear = 2577; // Tahun Baru Huangdi
+    } else {
+        // Logika umum shio untuk tahun lainnya
+        const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
+        shioNama = shios[year % 12];
+    }
+
+    // 3. Data Ramalan Otomatis Berdasarkan Shio
+    const dataRamalan = {
+        "Ular": "Intuisi tajam dalam membaca peluang dan sangat bijaksana.",
+        "Kuda": "Kecepatan membawa rezeki, namun tetap waspada dalam bertindak.",
+        "Naga": "Kekuatan besar dan keberuntungan dalam karier."
+    };
+
     return {
         full: `${lunarDay}:${lunarMonth}:${huangdiYear}`,
         shio: shioNama,
-        ramalan: "Intuisi tajam dalam membaca peluang. Tahun ini membawa kebijaksanaan dalam keuangan."
+        ramalan: dataRamalan[shioNama] || "Tetaplah optimis dalam melangkah hari ini."
     };
 }
+
 
 
 
