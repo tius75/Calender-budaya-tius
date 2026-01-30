@@ -137,9 +137,9 @@ function getLunarShio(date) {
     full: `${lunarDay} - ${lunarMonth} - ${y + 541}`, // Menggunakan 541 agar jadi 2567
     shio: shioFinal,
     ramalan: "Gunakan energi hari ini dengan bijaksana."
-};
-
 }
+
+
 
 
 
