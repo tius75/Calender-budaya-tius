@@ -286,6 +286,7 @@ function updateDetail(date, pasaran) {
     const siklusBesar = getSiklusBesar(date);
     const mangsa = getMangsaInfo(date);
     const zodiak = getZodiak(date);
+const lunar = getLunarShio(date); 
     const lunar = getLunarShio(date);
     const nasibKematian = NASIB_AHLI_WARIS[neptu % 4];
     const nasib5 = PEMBAGI_5[neptu % 5];
