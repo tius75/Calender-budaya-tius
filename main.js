@@ -106,10 +106,8 @@ function getZodiak(date) {
 
 function getLunarShio(date) {
     const y = date.getFullYear();
-    const m = date.getMonth() + 1;
-    const d = date.getDate();
     
-    // Ambil data dari DB_IMLEK atau fallback
+    // Ambil data dari DB_IMLEK
     let imlekM = DB_IMLEK[y] ? DB_IMLEK[y].m : 2;
     let imlekD = DB_IMLEK[y] ? DB_IMLEK[y].d : 5;
     let shioTahunIni = DB_IMLEK[y] ? DB_IMLEK[y].shio : "Transisi";
@@ -117,7 +115,7 @@ function getLunarShio(date) {
     const tglImlek = new Date(y, imlekM - 1, imlekD);
     const isSudahImlek = date >= tglImlek;
 
-    // Hitung selisih hari (Gunakan Math.floor agar tidak melompat 1 hari)
+    // Hitung selisih hari dengan Math.floor agar tidak melompat
     const diffTime = date.getTime() - tglImlek.getTime();
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     
@@ -127,11 +125,13 @@ function getLunarShio(date) {
     if (isSudahImlek) {
         lunarDay = (diffDays % 30) + 1;
         lunarMonth = Math.floor(diffDays / 30) + 1;
-        huangdiYear = y + 550; // Contoh: 2026 + 550 = 2576
+        // Gunakan + 550 agar tahun 2026 menjadi 2576 setelah Imlek
+        huangdiYear = y + 550; 
     } else {
-        lunarDay = 30 + diffDays; // diffDays bernilai negatif sebelum Imlek
+        lunarDay = 30 + diffDays; 
         lunarMonth = 12;
-        huangdiYear = y + 549; // Masih tahun sebelumnya sebelum Imlek
+        // Sebelum Imlek 2026, masih tahun 2575
+        huangdiYear = y + 549; 
     }
 
     return {
@@ -140,6 +140,7 @@ function getLunarShio(date) {
         ramalan: "Gunakan energi hari ini dengan bijaksana."
     };
 }
+
 
 
 
