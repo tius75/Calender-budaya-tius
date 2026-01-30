@@ -106,10 +106,10 @@ function getZodiak(date) {
 
 function getLunarShio(date) {
     const day = date.getDate();
-    const month = date.getMonth() + 1; // Januari = 1
+    const month = date.getMonth() + 1;
     const year = date.getFullYear();
 
-    // 1. Logika Tanggal Lunar (Acuan: 30 Jan 2026 = 12-12-2576)
+    // Referensi: 30 Jan 2026 = 12-12-2576
     const refDate = new Date(2026, 0, 30); 
     const diffDays = Math.floor((date.getTime() - refDate.getTime()) / (1000 * 60 * 60 * 24));
     
@@ -117,40 +117,33 @@ function getLunarShio(date) {
     let lunarMonth = 12;
     let huangdiYear = 2576;
 
-    // Putaran Tanggal dan Bulan Lunar
-    if (lunarDay > 30) {
-        lunarDay -= 30;
-        lunarMonth = 1; 
-    } else if (lunarDay <= 0) {
-        lunarDay += 30;
-        lunarMonth = 11;
-    }
+    if (lunarDay > 30) { lunarDay -= 30; lunarMonth = 1; }
+    else if (lunarDay <= 0) { lunarDay += 30; lunarMonth = 11; }
 
-    // 2. Logika Shio Otomatis (Dinamis)
-    // Di tahun 2026, Shio Ular berubah menjadi Kuda pada Imlek (17 Feb 2026)
     let shioNama;
     if (year === 2026) {
+        // Shio berubah dari Ular ke Kuda pada 17 Feb 2026
         const isAfterImlek = (month > 2) || (month === 2 && day >= 17);
         shioNama = isAfterImlek ? "Kuda" : "Ular";
-        if (isAfterImlek && lunarMonth === 1) huangdiYear = 2577; // Tahun Baru Huangdi
+        if (isAfterImlek) huangdiYear = 2577;
     } else {
-        // Logika umum shio untuk tahun lainnya
         const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
         shioNama = shios[year % 12];
     }
 
-    // 3. Data Ramalan Otomatis Berdasarkan Shio
     const dataRamalan = {
-        "Ular": "Intuisi tajam dalam membaca peluang dan sangat bijaksana.",
-        "Kuda": "Kecepatan membawa rezeki, namun tetap waspada dalam bertindak.",
-        "Naga": "Kekuatan besar dan keberuntungan dalam karier."
+        "Ular": "Intuisi tajam dalam membaca peluang.",
+        "Kuda": "Kecepatan membawa rezeki, tetap waspada.",
+        "Naga": "Keberuntungan besar dalam karier."
     };
 
     return {
-    full: `${lunarDay} - ${lunarMonth} - ${huangdiYear}`, // Ubah dari : menjadi -
-    shio: shioNama,
-    ramalan: dataRamalan[shioNama] || "Tetaplah optimis dalam melangkah hari ini."
+        full: `${lunarDay} - ${lunarMonth} - ${huangdiYear}`, // Format Strip
+        shio: shioNama,
+        ramalan: dataRamalan[shioNama] || "Tetaplah optimis hari ini."
+    };
 }
+
 
 
 
