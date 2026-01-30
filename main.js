@@ -105,11 +105,11 @@ function getZodiak(date) {
 }
 
 function getLunarShio(date) {
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
+    const d = date.getDate();
+    const m = date.getMonth() + 1; // Januari = 1
+    const y = date.getFullYear();
 
-    // Referensi: 30 Jan 2026 = 12-12-2576
+    // Referensi: 30 Jan 2026 adalah 12 - 12 - 2576
     const refDate = new Date(2026, 0, 30); 
     const diffDays = Math.floor((date.getTime() - refDate.getTime()) / (1000 * 60 * 60 * 24));
     
@@ -117,18 +117,25 @@ function getLunarShio(date) {
     let lunarMonth = 12;
     let huangdiYear = 2576;
 
-    if (lunarDay > 30) { lunarDay -= 30; lunarMonth = 1; }
-    else if (lunarDay <= 0) { lunarDay += 30; lunarMonth = 11; }
-
+    // Perbaikan Logika Shio: Mulai 17 Februari 2026 menjadi Shio Kuda
     let shioNama;
-    if (year === 2026) {
-        // Transisi Ular ke Kuda pada 17 Feb 2026
-        const isAfterImlek = (month > 2) || (month === 2 && day >= 17);
-        shioNama = isAfterImlek ? "Kuda" : "Ular";
-        if (isAfterImlek) huangdiYear = 2577;
+    if (y === 2026) {
+        // Jika bulan > 2 ATAU (bulan adalah Februari DAN tanggal >= 17)
+        const isKuda = (m > 2) || (m === 2 && d >= 17); 
+        shioNama = isKuda ? "Kuda" : "Ular";
+        if (isKuda) huangdiYear = 2577;
     } else {
         const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
-        shioNama = shios[year % 12];
+        shioNama = shios[y % 12];
+    }
+
+    // Logika Tanggal Lunar
+    if (lunarDay > 30) { 
+        lunarDay -= 30; 
+        lunarMonth = (m === 2 && d >= 17) ? 1 : 1; 
+    } else if (lunarDay <= 0) { 
+        lunarDay += 30; 
+        lunarMonth = 11; 
     }
 
     const dataRamalan = {
@@ -143,6 +150,7 @@ function getLunarShio(date) {
         ramalan: dataRamalan[shioNama] || "Tetaplah optimis hari ini."
     };
 }
+
 
 
 
