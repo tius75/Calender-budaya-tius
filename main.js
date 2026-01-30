@@ -85,15 +85,7 @@ function getPasaran(date) {
     return PASARAN[(((diff + 1) % 5) + 5) % 5];
 }
 
-function getLunarShio(date) {
-    // Properti ini harus ada agar tidak muncul 'undefined'
-    return {
-        full: "12:12:2576", 
-        shio: "Ular",
-        unsur: "Api",
-        ramalan: "Intuisi tajam dalam membaca peluang. Tahun ini membawa kebijaksanaan dalam keuangan."
-    };
-}
+
 
 
 function getZodiak(date) {
