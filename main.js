@@ -410,7 +410,7 @@ function updateDetail(date, pasaran) {
                 <p style="font-size:0.85rem; margin:5px 0 0 0;"><strong>Sifat ${pasaran}:</strong> ${sifatPasaranIni}</p>
             </div>
 
-            <p style="margin:5px 0; font-size:0.9rem;"><strong>Lunar:</strong> ${lunar.lunarYear} (Shio ${lunar.shio}) | <strong>Zodiak:</strong> ${zodiak}</p>
+            <p style="margin:5px 0; font-size:0.9rem;"><strong>Lunar:</strong> $(Shio ${lunar.shio}) | <strong>Zodiak:</strong> ${zodiak}</p>
             <div style="background:#f0f7ff; border:1px solid #cfe2ff; padding:10px; border-radius:8px; margin:10px 0;">
                 <p style="margin:0; font-size:0.9rem;"><strong>⏳ Usia Saat Ini:</strong> ${usia}</p>
                 <p style="margin:5px 0 0; font-size:0.9rem;"><strong>🧘 Arah Meditasi:</strong> ${arahMeditasi}</p>
