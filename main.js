@@ -186,62 +186,35 @@ function getSiklusBesar(tahunJawa) {
         tahunJawa = 2576;
     }
 
-    // Data siklus tahun dan windu (sesuaikan dengan data yang sudah ada)
-    const DATA_SIKLUS_TAHUN = [
-        "Alip", "Ehe", "Jimawal", "Je", 
-        "Dal", "Be", "Wawu", "Jimakir"
-    ];
-    
-    const WINDU_LIST = [
-        "Adi", "Kuntara", "Sancaya", "Sancala"
-    ];
+    const REF_TAHUN_JAWA = 2576;
+    const REF_TAHUN_IDX = 4; // Dal
+    const REF_WINDU_IDX = 2; // Sancaya
 
-    // PERBAIKAN RUMUS: Hitung berdasarkan tahun 1 Jawa
-    // Tahun Jawa dimulai dari 1, bukan 0
-    const tahunIdx = (tahunJawa - 1) % 8;
-    const winduIdx = Math.floor((tahunJawa - 1) / 8) % 4;
+    const diffYears = tahunJawa - REF_TAHUN_JAWA;
+    
+    // Hitung indeks tahun (0-7)
+    let tahunIdx = (REF_TAHUN_IDX + diffYears) % 8;
+    if (tahunIdx < 0) tahunIdx += 8;
+    if (tahunIdx >= 8) tahunIdx %= 8;
+    
+    // PERBAIKAN UTAMA: Hitung windu dengan benar
+    // Total tahun sejak awal siklus (termasuk posisi tahun referensi)
+    const totalTahunDariAwal = REF_TAHUN_IDX + diffYears;
+    
+    // Hitung berapa windu yang telah berlalu
+    // Windu berubah setiap 8 tahun
+    const winduTerlewat = Math.floor(totalTahunDariAwal / 8);
+    
+    // Hitung indeks windu (0-3)
+    let winduIdx = (REF_WINDU_IDX + winduTerlewat) % 4;
+    if (winduIdx < 0) winduIdx += 4;
+    if (winduIdx >= 4) winduIdx %= 4;
 
     return {
         tahun: DATA_SIKLUS_TAHUN[tahunIdx],
-        windu: WINDU_LIST[winduIdx],
-        tahunJawa: tahunJawa,
-        indeksTahun: tahunIdx,
-        indeksWindu: winduIdx
+        windu: WINDU_LIST[winduIdx]
     };
 }
-
-// ============================================
-// TEST FUNGSI - TANPA MENGUBAH KALENDER LAIN
-// ============================================
-
-console.log("=== TEST FUNGSI getSiklusBesar YANG DIPERBAIKI ===");
-
-// Test perubahan windu
-console.log("1. Windu Sancaya (2576-2583):");
-for (let i = 2576; i <= 2583; i++) {
-    const hasil = getSiklusBesar(i);
-    console.log(`   ${i}: ${hasil.tahun} - ${hasil.windu}`);
-}
-
-console.log("\n2. PERUBAHAN WINDU ke Sancala (dimulai 2584):");
-for (let i = 2584; i <= 2591; i++) {
-    const hasil = getSiklusBesar(i);
-    console.log(`   ${i}: ${hasil.tahun} - ${hasil.windu} ${i === 2584 ? "← WINDU BERUBAH!" : ""}`);
-}
-
-console.log("\n3. PERUBAHAN WINDU ke Adi (dimulai 2592):");
-for (let i = 2592; i <= 2599; i++) {
-    const hasil = getSiklusBesar(i);
-    console.log(`   ${i}: ${hasil.tahun} - ${hasil.windu} ${i === 2592 ? "← WINDU BERUBAH!" : ""}`);
-}
-
-// Test tahun spesifik
-console.log("\n=== HASIL TAHUN SPESIFIK ===");
-const testTahun = [2575, 2576, 2577, 2583, 2584, 2591, 2592, 2600];
-testTahun.forEach(tahun => {
-    const hasil = getSiklusBesar(tahun);
-    console.log(`Tahun ${tahun}: ${hasil.tahun} - Windu ${hasil.windu}`);
-});
 
 // Untuk integrasi dengan kalender yang sudah ada
 // Fungsi ini bisa langsung menggantikan fungsi lama Anda
