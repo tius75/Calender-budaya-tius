@@ -307,38 +307,29 @@ function updateDetail(date, pasaran) {
 
     const h = HARI[date.getDay()];
     const wetonKey = `${h} ${pasaran}`;
-    const neptu = NEPTU_HARI[h] + NEPTU_PASARAN[pasaran];
-    
     const infoJawa = getTanggalJawa(date);
-    const siklus = getSiklusBesar(infoJawa.tahun); // Perbaikan variabel agar tidak bentrok
     const lunar = getLunarShio(date);
     const tglMasehiLengkap = `${date.getDate()} ${["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"][date.getMonth()]} ${date.getFullYear()}`;
 
-    // Menampilkan data ke UI
     detailDiv.style.display = 'block';
     detailDiv.innerHTML = `
-        <div id="printableArea" class="card-result" style="background:#fff; padding:20px; border-radius:12px; border:1px solid #eee; color:#000;">
-            <h2 style="color:#D30000; border-bottom:2px solid #D30000; display:inline-block;">${wetonKey}</h2>
+        <div class="card-result" style="background:#fff; padding:15px; border-radius:12px; border:1px solid #eee;">
+            <h2 style="color:#D30000; margin:0; border-bottom:2px solid #D30000; display:inline-block;">${wetonKey}</h2>
             <p style="margin:10px 0; font-weight:bold;">📅 ${tglMasehiLengkap}</p>
             
-            <div style="background:#fff3e0; padding:12px; border-radius:8px; margin:10px 0; border:1px solid #ffe0b2;">
-                <p style="margin:0; color:#e65100; font-weight:bold;">✨ Siklus Tahun & Windu</p>
-                <p><strong>Tahun:</strong> ${siklus.tahun.nama} | <strong>Windu:</strong> ${siklus.windu}</p>
-                <p style="font-size:0.8rem; font-style:italic;">"${siklus.tahun.deskripsi}"</p>
-            </div>
-
             <div style="background:#f1f8e9; padding:10px; border-radius:8px; margin:10px 0; border:1px solid #c5e1a5;">
                 <p style="margin:0; color:#2e7d32; font-weight:bold;">🏮 Kalender Lunar & Shio</p>
-                <p><b>Lunar:</b> ${lunar.full} | <b>Shio:</b> ${lunar.shio}</p>
-                <p style="font-size:12px; color:#1b5e20;"><i>Ramalan: ${lunar.ramalan}</i></p>
+                <p style="margin:5px 0;"><b>Lunar:</b> ${lunar.full} | <b>Shio:</b> ${lunar.shio}</p>
+                <p style="margin:5px 0; font-size:12px; color:#1b5e20;"><i>Ramalan: ${lunar.ramalan}</i></p>
             </div>
 
-            <div style="background:#e3f2fd; padding:10px; border-radius:8px; margin:10px 0; border:1px solid #bbdefb;">
-                <p><b>Status Bulan:</b> ${infoJawa.bulan.status}</p>
-                <p><b>Tali Wangke:</b> ${infoJawa.bulan.taliWangke}</p>
+            <div style="background:#fff3e0; padding:10px; border-radius:8px; border:1px solid #ffe0b2;">
+                <p style="margin:0; color:#e65100; font-weight:bold;">🌙 Penanggalan Jawa</p>
+                <p style="margin:5px 0;">Tanggal: ${infoJawa.tanggal} ${infoJawa.bulan.nama} ${infoJawa.tahun} AJ</p>
             </div>
         </div>`;
 }
+
 
 
     let tabelHtml = `<table style="width:100%; border-collapse: collapse; margin-top:10px; font-size:0.85rem; border:1px solid #ddd;">
