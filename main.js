@@ -307,28 +307,42 @@ function updateDetail(date, pasaran) {
 
     const h = HARI[date.getDay()];
     const wetonKey = `${h} ${pasaran}`;
+    const nHari = NEPTU_HARI[h];
+    const nPasaran = NEPTU_PASARAN[pasaran];
+    const neptu = nHari + nPasaran;
+    
+    const wukuName = getWuku(date);
     const infoJawa = getTanggalJawa(date);
+    const siklusBesar = getSiklusBesar(date);
+    const mangsa = getMangsaInfo(date);
+    const zodiak = getZodiak(date);
     const lunar = getLunarShio(date);
-    const tglMasehiLengkap = `${date.getDate()} ${["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"][date.getMonth()]} ${date.getFullYear()}`;
+    const nasibKematian = NASIB_AHLI_WARIS[neptu % 4];
+    const nasib5 = PEMBAGI_5[neptu % 5];
+    const arahMeditasi = getArahMeditasi(neptu);
+    const usia = hitungUsiaLengkap(date);
+    
+    const sifatHariIni = DATA_SIFAT_HARI[h] || "-";
+    const sifatPasaranIni = DATA_SIFAT_PASARAN[pasaran.toUpperCase()] || "-";
 
-    detailDiv.style.display = 'block';
-    detailDiv.innerHTML = `
-        <div class="card-result" style="background:#fff; padding:15px; border-radius:12px; border:1px solid #eee;">
-            <h2 style="color:#D30000; margin:0; border-bottom:2px solid #D30000; display:inline-block;">${wetonKey}</h2>
-            <p style="margin:10px 0; font-weight:bold;">📅 ${tglMasehiLengkap}</p>
-            
-            <div style="background:#f1f8e9; padding:10px; border-radius:8px; margin:10px 0; border:1px solid #c5e1a5;">
-                <p style="margin:0; color:#2e7d32; font-weight:bold;">🏮 Kalender Lunar & Shio</p>
-                <p style="margin:5px 0;"><b>Lunar:</b> ${lunar.full} | <b>Shio:</b> ${lunar.shio}</p>
-                <p style="margin:5px 0; font-size:12px; color:#1b5e20;"><i>Ramalan: ${lunar.ramalan}</i></p>
-            </div>
+    const watakNeptu = (typeof DATA_WATAK_NEPTU !== 'undefined') ? DATA_WATAK_NEPTU[neptu] : null;
+    const namaBulanMasehi = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    const tglMasehiLengkap = `${date.getDate()} ${namaBulanMasehi[date.getMonth()]} ${date.getFullYear()}`;
 
-            <div style="background:#fff3e0; padding:10px; border-radius:8px; border:1px solid #ffe0b2;">
-                <p style="margin:0; color:#e65100; font-weight:bold;">🌙 Penanggalan Jawa</p>
-                <p style="margin:5px 0;">Tanggal: ${infoJawa.tanggal} ${infoJawa.bulan.nama} ${infoJawa.tahun} AJ</p>
-            </div>
+    const teksWuku = (typeof DATA_WUKU !== 'undefined') ? (DATA_WUKU[wukuName] || "Detail wuku belum tersedia.") : "Data Wuku tidak ditemukan.";
+    const dataSriJati = (typeof TABEL_SRIJATI !== 'undefined') ? (TABEL_SRIJATI[neptu] || []) : [];
+
+    const isNaas = infoJawa.bulan.naas.includes(infoJawa.tanggal);
+    const isTaliWangke = (wetonKey === infoJawa.bulan.taliWangke);
+
+    let warningNaas = "";
+    if (isNaas || isTaliWangke) {
+        warningNaas = `<div style="background:#ffebee; color:#c62828; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #d32f2f; font-size:0.85rem;">
+            <strong>⚠️ PERINGATAN HARI NAAS</strong><br>
+            ${isNaas ? `• Tanggal ${infoJawa.tanggal} ${infoJawa.bulan.nama} dilarang untuk hajat.<br>` : ""}
+            ${isTaliWangke ? `• Hari ini Tali Wangke (${infoJawa.bulan.taliWangke}).` : ""}
         </div>`;
-}
+    }
 
 
 
