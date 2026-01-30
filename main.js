@@ -174,16 +174,14 @@ function getTanggalJawa(date) {
 }
 
 function getSiklusBesar(tahunJawa) {
+    // Pastikan tahunJawa ada nilainya, jika tidak pakai tahun saat ini
+    let thn = parseInt(tahunJawa) || 1959;
+    
+    const REF_TAHUN_JAWA = 1959;
+    const REF_TAHUN_IDX = 5; // Tahun Be
+    const REF_WINDU_IDX = 2; // Windu Sancaya
 
-    if (typeof tahunJawa !== "number" || tahunJawa < 2000 || tahunJawa > 3000) {
-        tahunJawa = 2576;
-    }
-
-    const REF_TAHUN_JAWA = 2576;
-    const REF_TAHUN_IDX = 4; // Dal
-    const REF_WINDU_IDX = 2; // Sancaya
-
-    const diffYears = tahunJawa - REF_TAHUN_JAWA;
+    const diffYears = thn - REF_TAHUN_JAWA;
 
     let tahunIdx = (REF_TAHUN_IDX + diffYears) % 8;
     if (tahunIdx < 0) tahunIdx += 8;
@@ -192,10 +190,11 @@ function getSiklusBesar(tahunJawa) {
     if (winduIdx < 0) winduIdx += 4;
 
     return {
-        tahun: DATA_SIKLUS_TAHUN[tahunIdx],
-        windu: WINDU_LIST[winduIdx]
+        tahun: DATA_SIKLUS_TAHUN[tahunIdx] || "Dal",
+        windu: WINDU_LIST[winduIdx] || "Sancaya"
     };
 }
+
 
 
 
