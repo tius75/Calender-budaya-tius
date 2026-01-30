@@ -134,7 +134,7 @@ function getLunarShio(date) {
     let shioFinal = isSudahImlek ? shioTahunIni : (DB_IMLEK[y-1] ? DB_IMLEK[y-1].shio : "Transisi");
 
     return {
-        full: `${lunarDay} - ${lunarMonth} - ${y + 541}`, // Hasil: 2567
+        full: `${lunarDay} - ${lunarMonth} - ${y + 550}`, // Hasil: 2576
         shio: shioFinal,
         ramalan: "Gunakan energi hari ini dengan bijaksana."
     }; // Pastikan ada tutup kurung kurawal ini
@@ -174,26 +174,34 @@ function getTanggalJawa(date) {
 }
 
 function getSiklusBesar(tahunJawa) {
-    // Pastikan tahunJawa ada nilainya, jika tidak pakai tahun saat ini
-    let thn = parseInt(tahunJawa) || 1959;
+    // Konversi ke angka untuk memastikan perhitungan matematika berjalan
+    const thn = parseInt(tahunJawa);
     
+    // Referensi: Tahun 1959 AJ adalah tahun Be, Windu Sancaya
     const REF_TAHUN_JAWA = 1959;
-    const REF_TAHUN_IDX = 5; // Tahun Be
-    const REF_WINDU_IDX = 2; // Windu Sancaya
+    const REF_TAHUN_IDX = 5; // Be
+    const REF_WINDU_IDX = 2; // Sancaya
 
     const diffYears = thn - REF_TAHUN_JAWA;
 
+    // Hitung Tahun (Siklus 8)
     let tahunIdx = (REF_TAHUN_IDX + diffYears) % 8;
     if (tahunIdx < 0) tahunIdx += 8;
 
+    // Hitung Windu (Siklus 32 tahun / 4 Windu)
+    // Gunakan Math.floor untuk melihat perpindahan setiap 8 tahun
     let winduIdx = (REF_WINDU_IDX + Math.floor(diffYears / 8)) % 4;
     if (winduIdx < 0) winduIdx += 4;
 
+    const WINDU_NAMA = ["Adi", "Kuntara", "Sangara", "Sancaya"];
+    const TAHUN_NAMA = ["Alip", "Ehe", "Jimawal", "Je", "Dal", "Be", "Wawu", "Jimakir"];
+
     return {
-        tahun: DATA_SIKLUS_TAHUN[tahunIdx] || "Dal",
-        windu: WINDU_LIST[winduIdx] || "Sancaya"
+        tahun: TAHUN_NAMA[tahunIdx],
+        windu: WINDU_NAMA[winduIdx]
     };
 }
+
 
 
 
