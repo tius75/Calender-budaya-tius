@@ -104,59 +104,30 @@ function getZodiak(date) {
     return "Pisces";
 }
 
-function getLunarFix(date) {
+function getLunarShio(date) {
     const y = date.getFullYear();
 
-    if (!DB_IMLEK[y] || !DB_IMLEK[y - 1]) {
+    if (!DB_IMLEK[y]) {
         return {
             full: "Data lunar tidak tersedia",
-            day: "-",
-            month: "-",
-            year: "-",
-            shio: "-"
+            shio: "-",
+            ramalan: "-"
         };
     }
 
-    const today = normalizeDate(date);
+    const { m, d, shio, lunarYear } = DB_IMLEK[y];
 
-    const imlekThisYear = new Date(
-        y,
-        DB_IMLEK[y].m - 1,
-        DB_IMLEK[y].d
-    );
+    const tglImlek = new Date(y, m - 1, d);
+    const selisihHari = Math.floor((date - tglImlek) / 86400000);
 
-    const imlekPrevYear = new Date(
-        y - 1,
-        DB_IMLEK[y - 1].m - 1,
-        DB_IMLEK[y - 1].d
-    );
-
-    const diffThis = Math.round((today - imlekThisYear) / 86400000);
-    const diffPrev = Math.round((today - imlekPrevYear) / 86400000);
-
-    let lunarDay, lunarMonth, lunarYear, shio;
-
-    // === SETELAH / SAAT IMLEK ===
-    if (diffThis >= 0) {
-        lunarDay = diffThis + 1;
-        lunarMonth = 1;
-        lunarYear = DB_IMLEK[y].lunarYear;
-        shio = DB_IMLEK[y].shio;
-    }
-    // === SEBELUM IMLEK ===
-    else {
-        lunarDay = DB_IMLEK[y - 1].lastMonthDays + diffThis + 1;
-        lunarMonth = DB_IMLEK[y - 1].lastMonth;
-        lunarYear = DB_IMLEK[y - 1].lunarYear;
-        shio = DB_IMLEK[y - 1].shio;
-    }
+    // Hari lunar (aman, tidak +1 palsu)
+    const lunarDay = selisihHari >= 0 ? selisihHari + 1 : null;
 
     return {
-        day: lunarDay,
-        month: lunarMonth,
-        year: lunarYear,
-        shio,
-        full: `${lunarDay} - ${lunarMonth} - ${lunarYear}`,
+        full: lunarDay
+            ? `${lunarDay}-${DB_IMLEK[y].bulanLunar}-${lunarYear}`
+            : `Akhir-${DB_IMLEK[y - 1]?.lunarYear}`,
+        shio: selisihHari >= 0 ? shio : DB_IMLEK[y - 1]?.shio,
         ramalan: "Gunakan energi hari ini dengan bijaksana."
     };
 }
