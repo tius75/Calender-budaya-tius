@@ -109,36 +109,38 @@ function getLunarShio(date) {
     const m = date.getMonth() + 1;
     const d = date.getDate();
     
-    // 1. Tentukan Tanggal Imlek tahun tersebut (Estimasi jika DB tidak ada)
-    let imlekM, imlekD, shioTahunIni;
+    // Ambil data dari DB_IMLEK atau fallback
+    let imlekM = DB_IMLEK[y] ? DB_IMLEK[y].m : 2;
+    let imlekD = DB_IMLEK[y] ? DB_IMLEK[y].d : 5;
+    let shioTahunIni = DB_IMLEK[y] ? DB_IMLEK[y].shio : "Transisi";
     
-    if (DB_IMLEK[y]) {
-        imlekM = DB_IMLEK[y].m;
-        imlekD = DB_IMLEK[y].d;
-        shioTahunIni = DB_IMLEK[y].shio;
-    } else {
-        // Algoritma Cadangan jika data tahun tsb tidak diketik di DB
-        const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
-        shioTahunIni = shios[y % 12];
-        imlekM = 2; imlekD = 5; // Estimasi rata-rata
-    }
-
     const tglImlek = new Date(y, imlekM - 1, imlekD);
     const isSudahImlek = date >= tglImlek;
 
-    // 2. Hitung Lunar Day (Agar tidak muncul angka negatif/undefined)
-    const diffTime = Math.abs(date - tglImlek);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    // Hitung selisih hari (Gunakan Math.floor agar tidak melompat 1 hari)
+    const diffTime = date.getTime() - tglImlek.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     
-    let lunarDay = isSudahImlek ? (diffDays % 30) + 1 : 30 - (diffDays % 30);
+    let lunarDay, lunarMonth, huangdiYear;
     let shioFinal = isSudahImlek ? shioTahunIni : (DB_IMLEK[y-1] ? DB_IMLEK[y-1].shio : "Transisi");
 
+    if (isSudahImlek) {
+        lunarDay = (diffDays % 30) + 1;
+        lunarMonth = Math.floor(diffDays / 30) + 1;
+        huangdiYear = y + 550; // Contoh: 2026 + 550 = 2576
+    } else {
+        lunarDay = 30 + diffDays; // diffDays bernilai negatif sebelum Imlek
+        lunarMonth = 12;
+        huangdiYear = y + 549; // Masih tahun sebelumnya sebelum Imlek
+    }
+
     return {
-        full: `${lunarDay} - ${isSudahImlek ? Math.floor(diffDays/30)+1 : 12} - ${y + 551}`,
+        full: `${lunarDay} - ${lunarMonth} - ${huangdiYear}`,
         shio: shioFinal,
         ramalan: "Gunakan energi hari ini dengan bijaksana."
     };
 }
+
 
 
 
