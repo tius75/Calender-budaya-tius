@@ -106,38 +106,30 @@ function getZodiak(date) {
 
 function getLunarShio(date) {
     const y = date.getFullYear();
-    const m = date.getMonth() + 1;
-    const d = date.getDate();
-    
-    let imlekM, imlekD, shioTahunIni;
-    
-    if (DB_IMLEK[y]) {
-        imlekM = DB_IMLEK[y].m;
-        imlekD = DB_IMLEK[y].d;
-        shioTahunIni = DB_IMLEK[y].shio;
-    } else {
-        const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
-        shioTahunIni = shios[y % 12];
-        imlekM = 2; imlekD = 5;
+
+    if (!DB_IMLEK[y]) {
+        return {
+            full: "Data lunar tidak tersedia",
+            shio: "-",
+            ramalan: "-"
+        };
     }
 
-    const tglImlek = new Date(y, imlekM - 1, imlekD);
-    const isSudahImlek = date >= tglImlek;
+    const { m, d, shio, lunarYear } = DB_IMLEK[y];
 
-    const diffTime = Math.abs(date - tglImlek);
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    
-    // PERBAIKAN: Mendefinisikan lunarDay dan lunarMonth agar tidak undefined
-    let lunarDay = isSudahImlek ? (diffDays % 30) + 1 : 30 - (diffDays % 30);
-    let lunarMonth = isSudahImlek ? Math.floor(diffDays / 30) + 1 : 12;
-    
-    let shioFinal = isSudahImlek ? shioTahunIni : (DB_IMLEK[y-1] ? DB_IMLEK[y-1].shio : "Transisi");
+    const tglImlek = new Date(y, m - 1, d);
+    const selisihHari = Math.floor((date - tglImlek) / 86400000);
+
+    // Hari lunar (aman, tidak +1 palsu)
+    const lunarDay = selisihHari >= 0 ? selisihHari + 1 : null;
 
     return {
-        full: `${lunarDay} - ${lunarMonth} - ${y + 550}`, // Hasil: 2576
-        shio: shioFinal,
+        full: lunarDay
+            ? `${lunarDay}-${DB_IMLEK[y].bulanLunar}-${lunarYear}`
+            : `Akhir-${DB_IMLEK[y - 1]?.lunarYear}`,
+        shio: selisihHari >= 0 ? shio : DB_IMLEK[y - 1]?.shio,
         ramalan: "Gunakan energi hari ini dengan bijaksana."
-    }; // Pastikan ada tutup kurung kurawal ini
+    };
 }
 
 
