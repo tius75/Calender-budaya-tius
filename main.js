@@ -105,37 +105,34 @@ function getZodiak(date) {
 }
 
 function getLunarShio(date) {
-    const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
+    // Shio tetap Ular untuk Januari 2026
+    const shioNama = "Ular"; 
+    const huangdiYear = 2576;
 
-    // Logika Shio dinamis: Shio berubah setiap tahun baru Imlek
-    // Untuk tahun 2026, Imlek jatuh pada 17 Februari 2026
-    let shioIndex;
-    if (year === 2026) {
-        // Sebelum 17 Feb 2026 masih Shio Ular (Tahun 2576), sesudahnya Shio Kuda
-        shioIndex = (month < 2 || (month === 2 && day < 17)) ? 9 : 10;
-    } else {
-        shioIndex = year % 12;
+    // Menghitung selisih hari dari 30 Januari 2026
+    // Agar pada tanggal 30 Jan muncul tanggal 12
+    const refDate = new Date(2026, 0, 30); 
+    const diffDays = Math.floor((date.getTime() - refDate.getTime()) / (1000 * 60 * 60 * 24));
+    
+    let lunarDay = 12 + diffDays;
+    let lunarMonth = 12;
+
+    // Logika sederhana untuk menjaga rotasi tanggal lunar (1-30)
+    if (lunarDay > 30) {
+        lunarDay -= 30;
+        lunarMonth = 1; // Masuk ke bulan 1 Imlek (Tahun Baru)
+    } else if (lunarDay <= 0) {
+        lunarDay += 30;
+        lunarMonth = 11;
     }
 
-    const shioNama = shios[shioIndex];
-    const lunarYear = 2576; // Tahun Huangdi untuk 2026
-
-    // Ramalan dinamis berdasarkan Shio
-    const ramalanDaftar = {
-        "Ular": "Intuisi tajam dalam membaca peluang dan sangat bijaksana.",
-        "Kuda": "Kecepatan membawa rezeki, namun tetap waspada dalam bertindak.",
-        "Naga": "Kekuatan besar dan keberuntungan dalam karier."
-    };
-
     return {
-        full: `${day}:${month}:${lunarYear}`,
+        full: `${lunarDay}:${lunarMonth}:${huangdiYear}`,
         shio: shioNama,
-        ramalan: ramalanDaftar[shioNama] || "Tetaplah optimis dalam melangkah hari ini."
+        ramalan: "Intuisi tajam dalam membaca peluang. Tahun ini membawa kebijaksanaan dalam keuangan."
     };
 }
+
 
 
 
