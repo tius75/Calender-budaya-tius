@@ -195,27 +195,26 @@ function getTanggalJawa(date) {
 }
 
 function getSiklusBesar(tahunJawa) {
-    const thn = Number(tahunJawa);
-    if (isNaN(thn)) {
-        return { tahun: "-", windu: "-" };
+
+    if (typeof tahunJawa !== "number" || tahunJawa < 2000 || tahunJawa > 3000) {
+        tahunJawa = 2576;
     }
 
-    const TAHUN = [
-        "Alip", "Ehe", "Jimawal", "Je",
-        "Dal", "Be", "Wawu", "Jimakir"
-    ];
+    const REF_TAHUN_JAWA = 2576;
+    const REF_TAHUN_IDX = 4; // Dal
+    const REF_WINDU_IDX = 2; // Sancaya
 
-    const WINDU = ["Adi", "Kuntara", "Sangara", "Sancaya"];
+    const diffYears = tahunJawa - REF_TAHUN_JAWA;
 
-    const REF_TAHUN = 1555;
-    const selisih = thn - REF_TAHUN;
+    let tahunIdx = (REF_TAHUN_IDX + diffYears) % 8;
+    if (tahunIdx < 0) tahunIdx += 8;
 
-    let tahunIdx = ((selisih % 8) + 8) % 8;
-    let winduIdx = (Math.floor(selisih / 8) % 4 + 4) % 4;
+    let winduIdx = (REF_WINDU_IDX + Math.floor(diffYears / 8)) % 4;
+    if (winduIdx < 0) winduIdx += 4;
 
     return {
-        tahun: TAHUN[tahunIdx],
-        windu: WINDU[winduIdx]
+        tahun: DATA_SIKLUS_TAHUN[tahunIdx],
+        windu: WINDU_LIST[winduIdx]
     };
 }
 
