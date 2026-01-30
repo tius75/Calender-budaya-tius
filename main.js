@@ -107,31 +107,36 @@ function getZodiak(date) {
 function getLunarShio(date) {
     const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
     const year = date.getFullYear();
-    
-    // Logika Shio: Berganti setiap Imlek (estimasi akhir Januari/Awal Februari)
-    const isEarly = (date.getMonth() === 0 && date.getDate() < 29); // Imlek 2026 jatuh pada 17 Feb, tapi simulasi ke Jan
-    const index = isEarly ? (year - 1) % 12 : year % 12;
-    const shioNama = shios[index];
-
-    // Simulasi Tanggal Lunar Huangdi Era (Tahun 2026 Masehi = 2576 Huangdi)
-    const huangdiYear = 2576;
-    const day = date.getDate();
     const month = date.getMonth() + 1;
+    const day = date.getDate();
 
-    // Data Ramalan dinamis berdasarkan Shio
-    const ramalanShio = {
-        "Ular": "Intuisi tajam dalam membaca peluang. Tahun ini membawa kebijaksanaan keuangan.",
+    // Logika Shio dinamis: Shio berubah setiap tahun baru Imlek
+    // Untuk tahun 2026, Imlek jatuh pada 17 Februari 2026
+    let shioIndex;
+    if (year === 2026) {
+        // Sebelum 17 Feb 2026 masih Shio Ular (Tahun 2576), sesudahnya Shio Kuda
+        shioIndex = (month < 2 || (month === 2 && day < 17)) ? 9 : 10;
+    } else {
+        shioIndex = year % 12;
+    }
+
+    const shioNama = shios[shioIndex];
+    const lunarYear = 2576; // Tahun Huangdi untuk 2026
+
+    // Ramalan dinamis berdasarkan Shio
+    const ramalanDaftar = {
+        "Ular": "Intuisi tajam dalam membaca peluang dan sangat bijaksana.",
         "Kuda": "Kecepatan membawa rezeki, namun tetap waspada dalam bertindak.",
-        "Kambing": "Kesabaran akan membuahkan hasil yang manis tahun ini."
+        "Naga": "Kekuatan besar dan keberuntungan dalam karier."
     };
 
     return {
-        full: `${day}:${month}:${huangdiYear}`,
+        full: `${day}:${month}:${lunarYear}`,
         shio: shioNama,
-        unsur: (year % 2 === 0) ? "Api" : "Tanah",
-        ramalan: ramalanShio[shioNama] || "Tetaplah optimis dalam melangkah."
+        ramalan: ramalanDaftar[shioNama] || "Tetaplah optimis dalam melangkah hari ini."
     };
 }
+
 
 
 function getWuku(date) {
