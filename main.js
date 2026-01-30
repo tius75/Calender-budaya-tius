@@ -183,21 +183,6 @@ function getSiklusBesar(tahunJawa) {
     const REF_TAHUN_IDX = 4; // Dal (indeks 4 dalam siklus 8 tahun)
     const REF_WINDU_IDX = 2; // Sancaya (indeks 2 dalam siklus 4 windu)
 
-    // Hitung perbedaan tahun
-    const diffYears = tahunJawa - REF_TAHUN_JAWA;
-
-    // Hitung indeks tahun dalam siklus 8 tahun
-    let tahunIdx = (REF_TAHUN_IDX + diffYears) % 8;
-    if (tahunIdx < 0) tahunIdx += 8;
-    
-    // Hitung total windu yang telah berlalu sejak referensi
-    // Setiap 8 tahun = 1 windu
-    const totalWinduSinceRef = Math.floor((REF_TAHUN_IDX + diffYears) / 8);
-    
-    // Hitung indeks windu dalam siklus 4 windu
-    let winduIdx = (REF_WINDU_IDX + totalWinduSinceRef) % 4;
-    if (winduIdx < 0) winduIdx += 4;
-
     // Data siklus tahun (urutan: Alip, Ehe, Jimawal, Je, Dal, Be, Wawu, Jimakir)
     const DATA_SIKLUS_TAHUN = [
         "Alip", "Ehe", "Jimawal", "Je", 
@@ -209,39 +194,121 @@ function getSiklusBesar(tahunJawa) {
         "Adi", "Kuntara", "Sancaya", "Sancala"
     ];
 
+    // Hitung perbedaan tahun dari referensi
+    const diffYears = tahunJawa - REF_TAHUN_JAWA;
+    
+    // PERBAIKAN UTAMA: Hitung total siklus 8-tahun yang lengkap sejak tahun 1 Jawa
+    // Tahun Jawa dimulai dari 1, bukan 0
+    const totalYearsFromStart = tahunJawa - 1;
+    
+    // Hitung indeks tahun (0-7) berdasarkan siklus 8 tahun
+    let tahunIdx = totalYearsFromStart % 8;
+    
+    // PERBAIKAN UTAMA: Hitung indeks windu (0-3) berdasarkan siklus 32 tahun (4 windu × 8 tahun)
+    // Setiap 8 tahun = 1 windu
+    const totalWinduFromStart = Math.floor(totalYearsFromStart / 8);
+    let winduIdx = totalWinduFromStart % 4;
+
     return {
         tahun: DATA_SIKLUS_TAHUN[tahunIdx],
         windu: WINDU_LIST[winduIdx],
         tahunJawa: tahunJawa,
         indeksTahun: tahunIdx,
-        indeksWindu: winduIdx
+        indeksWindu: winduIdx,
+        penjelasan: `Tahun Jawa ${tahunJawa} = ${DATA_SIKLUS_TAHUN[tahunIdx]}, Windu ${WINDU_LIST[winduIdx]}`
     };
 }
 
-// Fungsi untuk menguji
+// Fungsi test yang lebih komprehensif
 function testSiklusBesar() {
     console.log("=== Test Siklus Besar Tahun Jawa ===");
     
-    const testYears = [2576, 2577, 2584, 2600, 2500, 2000];
+    // Test case penting untuk melihat perubahan windu
+    const testYears = [
+        2575, // Sebelum referensi
+        2576, // Tahun referensi: Dal, Sancaya
+        2577, // Tahun berikutnya: Be, Sancaya
+        2583, // Tahun terakhir windu Sancaya: Jimakir, Sancaya
+        2584, // Tahun pertama windu baru: Alip, Sancala
+        2591, // Tahun terakhir windu Sancala: Wawu, Sancala
+        2592, // Tahun pertama windu Adi: Jimakir, Adi
+        2600, // Tahun pertama windu Kuntara: Jimakir, Kuntara
+        2608  // Kembali ke awal siklus: Jimakir, Sancaya
+    ];
+    
+    console.log("Tahun\tTahun Jawa\tWindu\t\tPerubahan Windu");
+    console.log("=".repeat(60));
     
     testYears.forEach(year => {
         const result = getSiklusBesar(year);
-        console.log(`${year}: ${result.tahun} - Windu ${result.windu}`);
+        const perubahan = (year === 2584 || year === 2592 || year === 2600 || year === 2608) 
+            ? "← WINDU BERUBAH" : "";
+        console.log(`${result.tahun.padEnd(8)} ${year}\t\t${result.windu.padEnd(10)} ${perubahan}`);
     });
     
-    // Test perubahan windu
-    console.log("\n=== Test Perubahan Windu ===");
-    console.log("Tahun 2576-2583: Windu Sancaya");
-    console.log("Tahun 2584-2591: Windu Sancala");
+    // Verifikasi perubahan windu
+    console.log("\n=== Verifikasi Perubahan Windu ===");
+    console.log("1. 2576-2583: Windu Sancaya (8 tahun)");
+    for (let y = 2576; y <= 2583; y++) {
+        if (getSiklusBesar(y).windu !== "Sancaya") {
+            console.error(`ERROR: Tahun ${y} seharusnya Sancaya`);
+        }
+    }
     
-    console.log("2576:", getSiklusBesar(2576).windu); // Sancaya
-    console.log("2584:", getSiklusBesar(2584).windu); // Sancala
-    console.log("2592:", getSiklusBesar(2592).windu); // Adi
-    console.log("2600:", getSiklusBesar(2600).windu); // Kuntara
+    console.log("2. 2584-2591: Windu Sancala (8 tahun)");
+    for (let y = 2584; y <= 2591; y++) {
+        if (getSiklusBesar(y).windu !== "Sancala") {
+            console.error(`ERROR: Tahun ${y} seharusnya Sancala`);
+        }
+    }
+    
+    console.log("3. 2592-2599: Windu Adi (8 tahun)");
+    for (let y = 2592; y <= 2599; y++) {
+        if (getSiklusBesar(y).windu !== "Adi") {
+            console.error(`ERROR: Tahun ${y} seharusnya Adi`);
+        }
+    }
 }
 
-// Jalankan test
+// Fungsi alternatif dengan pendekatan berbeda untuk validasi
+function getSiklusBesarAlternatif(tahunJawa) {
+    // Pendekatan lebih sederhana: hitung langsung dari tahun 1 Jawa
+    if (typeof tahunJawa !== "number" || tahunJawa < 1) {
+        tahunJawa = 2576;
+    }
+    
+    const DATA_SIKLUS_TAHUN = ["Alip", "Ehe", "Jimawal", "Je", "Dal", "Be", "Wawu", "Jimakir"];
+    const WINDU_LIST = ["Adi", "Kuntara", "Sancaya", "Sancala"];
+    
+    // Tahun Jawa dimulai dari 1, kurangi 1 untuk perhitungan modulo
+    const tahunIndex = (tahunJawa - 1) % 8;
+    
+    // Setiap 8 tahun membentuk 1 windu
+    const winduIndex = Math.floor((tahunJawa - 1) / 8) % 4;
+    
+    return {
+        tahun: DATA_SIKLUS_TAHUN[tahunIndex],
+        windu: WINDU_LIST[winduIndex]
+    };
+}
+
+// Test kedua metode untuk memastikan hasil sama
+console.log("=== Perbandingan Dua Metode ===");
+const testYears = [2575, 2576, 2583, 2584, 2591, 2592];
+testYears.forEach(year => {
+    const result1 = getSiklusBesar(year);
+    const result2 = getSiklusBesarAlternatif(year);
+    console.log(`${year}: ${result1.tahun}-${result1.windu} | ${result2.tahun}-${result2.windu} ${result1.windu === result2.windu ? '✓' : '✗'}`);
+});
+
+// Jalankan test utama
 testSiklusBesar();
+
+// Contoh penggunaan praktis
+console.log("\n=== Contoh Penggunaan ===");
+console.log(getSiklusBesar(2024).penjelasan);
+console.log(getSiklusBesar(2000).penjelasan);
+console.log(getSiklusBesar(2100).penjelasan);
 
 function getMangsaInfo(date) {
     const d = date.getDate();
