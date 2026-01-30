@@ -174,27 +174,41 @@ function getTanggalJawa(date) {
 }
 
 function getSiklusBesar(tahunJawa) {
-    // Konversi ke angka untuk memastikan perhitungan matematika berjalan
-    const thn = parseInt(tahunJawa);
-    
-    // Referensi: Tahun 1959 AJ adalah tahun Be, Windu Sancaya
-    const REF_TAHUN_JAWA = 1959;
-    const REF_TAHUN_IDX = 5; // Be
-    const REF_WINDU_IDX = 2; // Sancaya
+    const thn = Number(tahunJawa);
 
-    const diffYears = thn - REF_TAHUN_JAWA;
+    if (isNaN(thn)) {
+        return { tahun: "-", windu: "-" };
+    }
 
-    // Hitung Tahun (Siklus 8)
-    let tahunIdx = (REF_TAHUN_IDX + diffYears) % 8;
+    // Urutan resmi Tahun Jawa
+    const TAHUN_NAMA = [
+        "Alip", "Ehe", "Jimawal", "Je",
+        "Dal", "Be", "Wawu", "Jimakir"
+    ];
+
+    // Urutan Windu
+    const WINDU_NAMA = [
+        "Adi", "Kuntara", "Sangara", "Sancaya"
+    ];
+
+    /*
+      Referensi kuat:
+      Tahun Jawa 1555 AJ = Alip, Windu Adi
+      (dipakai luas & stabil untuk hitung siklus)
+    */
+    const REF_TAHUN = 1555;
+    const REF_TAHUN_IDX = 0; // Alip
+    const REF_WINDU_IDX = 0; // Adi
+
+    const selisih = thn - REF_TAHUN;
+
+    // Hitung indeks tahun (mod 8)
+    let tahunIdx = (REF_TAHUN_IDX + selisih) % 8;
     if (tahunIdx < 0) tahunIdx += 8;
 
-    // Hitung Windu (Siklus 32 tahun / 4 Windu)
-    // Gunakan Math.floor untuk melihat perpindahan setiap 8 tahun
-    let winduIdx = (REF_WINDU_IDX + Math.floor(diffYears / 8)) % 4;
+    // Hitung indeks windu (tiap 8 tahun pindah)
+    let winduIdx = (REF_WINDU_IDX + Math.floor(selisih / 8)) % 4;
     if (winduIdx < 0) winduIdx += 4;
-
-    const WINDU_NAMA = ["Adi", "Kuntara", "Sangara", "Sancaya"];
-    const TAHUN_NAMA = ["Alip", "Ehe", "Jimawal", "Je", "Dal", "Be", "Wawu", "Jimakir"];
 
     return {
         tahun: TAHUN_NAMA[tahunIdx],
