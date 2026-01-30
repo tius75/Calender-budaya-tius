@@ -104,30 +104,59 @@ function getZodiak(date) {
     return "Pisces";
 }
 
-function getLunarShio(date) {
+function getLunarFix(date) {
     const y = date.getFullYear();
 
-    if (!DB_IMLEK[y]) {
+    if (!DB_IMLEK[y] || !DB_IMLEK[y - 1]) {
         return {
             full: "Data lunar tidak tersedia",
-            shio: "-",
-            ramalan: "-"
+            day: "-",
+            month: "-",
+            year: "-",
+            shio: "-"
         };
     }
 
-    const { m, d, shio, lunarYear } = DB_IMLEK[y];
+    const today = normalizeDate(date);
 
-    const tglImlek = new Date(y, m - 1, d);
-    const selisihHari = Math.floor((date - tglImlek) / 86400000);
+    const imlekThisYear = new Date(
+        y,
+        DB_IMLEK[y].m - 1,
+        DB_IMLEK[y].d
+    );
 
-    // Hari lunar (aman, tidak +1 palsu)
-    const lunarDay = selisihHari >= 0 ? selisihHari + 1 : null;
+    const imlekPrevYear = new Date(
+        y - 1,
+        DB_IMLEK[y - 1].m - 1,
+        DB_IMLEK[y - 1].d
+    );
+
+    const diffThis = Math.round((today - imlekThisYear) / 86400000);
+    const diffPrev = Math.round((today - imlekPrevYear) / 86400000);
+
+    let lunarDay, lunarMonth, lunarYear, shio;
+
+    // === SETELAH / SAAT IMLEK ===
+    if (diffThis >= 0) {
+        lunarDay = diffThis + 1;
+        lunarMonth = 1;
+        lunarYear = DB_IMLEK[y].lunarYear;
+        shio = DB_IMLEK[y].shio;
+    }
+    // === SEBELUM IMLEK ===
+    else {
+        lunarDay = DB_IMLEK[y - 1].lastMonthDays + diffThis + 1;
+        lunarMonth = DB_IMLEK[y - 1].lastMonth;
+        lunarYear = DB_IMLEK[y - 1].lunarYear;
+        shio = DB_IMLEK[y - 1].shio;
+    }
 
     return {
-        full: lunarDay
-            ? `${lunarDay}-${DB_IMLEK[y].bulanLunar}-${lunarYear}`
-            : `Akhir-${DB_IMLEK[y - 1]?.lunarYear}`,
-        shio: selisihHari >= 0 ? shio : DB_IMLEK[y - 1]?.shio,
+        day: lunarDay,
+        month: lunarMonth,
+        year: lunarYear,
+        shio,
+        full: `${lunarDay} - ${lunarMonth} - ${lunarYear}`,
         ramalan: "Gunakan energi hari ini dengan bijaksana."
     };
 }
@@ -167,44 +196,26 @@ function getTanggalJawa(date) {
 
 function getSiklusBesar(tahunJawa) {
     const thn = Number(tahunJawa);
-
     if (isNaN(thn)) {
         return { tahun: "-", windu: "-" };
     }
 
-    // Urutan resmi Tahun Jawa
-    const TAHUN_NAMA = [
+    const TAHUN = [
         "Alip", "Ehe", "Jimawal", "Je",
         "Dal", "Be", "Wawu", "Jimakir"
     ];
 
-    // Urutan Windu
-    const WINDU_NAMA = [
-        "Adi", "Kuntara", "Sangara", "Sancaya"
-    ];
+    const WINDU = ["Adi", "Kuntara", "Sangara", "Sancaya"];
 
-    /*
-      Referensi kuat:
-      Tahun Jawa 1555 AJ = Alip, Windu Adi
-      (dipakai luas & stabil untuk hitung siklus)
-    */
     const REF_TAHUN = 1555;
-    const REF_TAHUN_IDX = 0; // Alip
-    const REF_WINDU_IDX = 0; // Adi
-
     const selisih = thn - REF_TAHUN;
 
-    // Hitung indeks tahun (mod 8)
-    let tahunIdx = (REF_TAHUN_IDX + selisih) % 8;
-    if (tahunIdx < 0) tahunIdx += 8;
-
-    // Hitung indeks windu (tiap 8 tahun pindah)
-    let winduIdx = (REF_WINDU_IDX + Math.floor(selisih / 8)) % 4;
-    if (winduIdx < 0) winduIdx += 4;
+    let tahunIdx = ((selisih % 8) + 8) % 8;
+    let winduIdx = (Math.floor(selisih / 8) % 4 + 4) % 4;
 
     return {
-        tahun: TAHUN_NAMA[tahunIdx],
-        windu: WINDU_NAMA[winduIdx]
+        tahun: TAHUN[tahunIdx],
+        windu: WINDU[winduIdx]
     };
 }
 
