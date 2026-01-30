@@ -305,42 +305,39 @@ function updateDetail(date, pasaran) {
 
     const h = HARI[date.getDay()];
     const wetonKey = `${h} ${pasaran}`;
-    const nHari = NEPTU_HARI[h];
-    const nPasaran = NEPTU_PASARAN[pasaran];
-    const neptu = nHari + nPasaran;
+    const neptu = NEPTU_HARI[h] + NEPTU_PASARAN[pasaran];
     
-    const wukuName = getWuku(date);
     const infoJawa = getTanggalJawa(date);
-    const siklusBesar = getSiklusBesar(date);
-    const mangsa = getMangsaInfo(date);
-    const zodiak = getZodiak(date);
+    const siklus = getSiklusBesar(infoJawa.tahun); // Perbaikan variabel agar tidak bentrok
     const lunar = getLunarShio(date);
-    const nasibKematian = NASIB_AHLI_WARIS[neptu % 4];
-    const nasib5 = PEMBAGI_5[neptu % 5];
-    const arahMeditasi = getArahMeditasi(neptu);
-    const usia = hitungUsiaLengkap(date);
-    
-    const sifatHariIni = DATA_SIFAT_HARI[h] || "-";
-    const sifatPasaranIni = DATA_SIFAT_PASARAN[pasaran.toUpperCase()] || "-";
+    const tglMasehiLengkap = `${date.getDate()} ${["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"][date.getMonth()]} ${date.getFullYear()}`;
 
-    const watakNeptu = (typeof DATA_WATAK_NEPTU !== 'undefined') ? DATA_WATAK_NEPTU[neptu] : null;
-    const namaBulanMasehi = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    const tglMasehiLengkap = `${date.getDate()} ${namaBulanMasehi[date.getMonth()]} ${date.getFullYear()}`;
+    // Menampilkan data ke UI
+    detailDiv.style.display = 'block';
+    detailDiv.innerHTML = `
+        <div id="printableArea" class="card-result" style="background:#fff; padding:20px; border-radius:12px; border:1px solid #eee; color:#000;">
+            <h2 style="color:#D30000; border-bottom:2px solid #D30000; display:inline-block;">${wetonKey}</h2>
+            <p style="margin:10px 0; font-weight:bold;">📅 ${tglMasehiLengkap}</p>
+            
+            <div style="background:#fff3e0; padding:12px; border-radius:8px; margin:10px 0; border:1px solid #ffe0b2;">
+                <p style="margin:0; color:#e65100; font-weight:bold;">✨ Siklus Tahun & Windu</p>
+                <p><strong>Tahun:</strong> ${siklus.tahun.nama} | <strong>Windu:</strong> ${siklus.windu}</p>
+                <p style="font-size:0.8rem; font-style:italic;">"${siklus.tahun.deskripsi}"</p>
+            </div>
 
-    const teksWuku = (typeof DATA_WUKU !== 'undefined') ? (DATA_WUKU[wukuName] || "Detail wuku belum tersedia.") : "Data Wuku tidak ditemukan.";
-    const dataSriJati = (typeof TABEL_SRIJATI !== 'undefined') ? (TABEL_SRIJATI[neptu] || []) : [];
+            <div style="background:#f1f8e9; padding:10px; border-radius:8px; margin:10px 0; border:1px solid #c5e1a5;">
+                <p style="margin:0; color:#2e7d32; font-weight:bold;">🏮 Kalender Lunar & Shio</p>
+                <p><b>Lunar:</b> ${lunar.full} | <b>Shio:</b> ${lunar.shio}</p>
+                <p style="font-size:12px; color:#1b5e20;"><i>Ramalan: ${lunar.ramalan}</i></p>
+            </div>
 
-    const isNaas = infoJawa.bulan.naas.includes(infoJawa.tanggal);
-    const isTaliWangke = (wetonKey === infoJawa.bulan.taliWangke);
-
-    let warningNaas = "";
-    if (isNaas || isTaliWangke) {
-        warningNaas = `<div style="background:#ffebee; color:#c62828; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #d32f2f; font-size:0.85rem;">
-            <strong>⚠️ PERINGATAN HARI NAAS</strong><br>
-            ${isNaas ? `• Tanggal ${infoJawa.tanggal} ${infoJawa.bulan.nama} dilarang untuk hajat.<br>` : ""}
-            ${isTaliWangke ? `• Hari ini Tali Wangke (${infoJawa.bulan.taliWangke}).` : ""}
+            <div style="background:#e3f2fd; padding:10px; border-radius:8px; margin:10px 0; border:1px solid #bbdefb;">
+                <p><b>Status Bulan:</b> ${infoJawa.bulan.status}</p>
+                <p><b>Tali Wangke:</b> ${infoJawa.bulan.taliWangke}</p>
+            </div>
         </div>`;
-    }
+}
+
 
     let tabelHtml = `<table style="width:100%; border-collapse: collapse; margin-top:10px; font-size:0.85rem; border:1px solid #ddd;">
         <thead><tr style="background:#f9f9f9;"><th style="border:1px solid #ddd; padding:8px;">Usia</th><th style="border:1px solid #ddd; padding:8px;">Nilai</th><th style="border:1px solid #ddd; padding:8px;">Nasib</th></tr></thead><tbody>`;
