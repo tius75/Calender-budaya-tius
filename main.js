@@ -247,7 +247,6 @@ function hitungUsiaLengkap(birthDate) {
     return `${years} Tahun, ${months} Bulan, ${days} Hari`;
 }
 
-
 // ==========================================
 // FUNGSI CARI WETON
 // ==========================================
@@ -306,30 +305,6 @@ function generateCalendar() {
         grid.appendChild(cell);
     }
 }
-
-function cekPancatan(date) {
-    const getNeptuVal = (d) => {
-        const h = HARI[d.getDay()];
-        const p = getPasaran(d);
-        return (NEPTU_HARI[h] || 0) + (NEPTU_PASARAN[p] || 0);
-    };
-
-    const d0 = new Date(date);
-    const d1 = new Date(date); d1.setDate(d0.getDate() - 1);
-    const d2 = new Date(date); d2.setDate(d0.getDate() - 2);
-
-    const totalNeptu3Hari = getNeptuVal(d0) + getNeptuVal(d1) + getNeptuVal(d2);
-
-    if (totalNeptu3Hari === 40) {
-        return {
-            isPancatan: true,
-            total: totalNeptu3Hari,
-            info: `⚠️ <strong>Hari Pancatan:</strong> Akumulasi neptu 3 hari berjumlah 40 (${getNeptuVal(d2)}+${getNeptuVal(d1)}+${getNeptuVal(d0)}). Hari ini baik untuk memulai langkah besar.`
-        };
-    }
-    return { isPancatan: false, total: totalNeptu3Hari };
-}
-
 
 function updateDetail(date, pasaran) {
     const detailDiv = document.getElementById('detail');
@@ -519,51 +494,4 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-function updateDetail(date, pasaran) {
-    const detailDiv = document.getElementById('detail');
-    if (!detailDiv) return;
-
-    const h = HARI[date.getDay()];
-    const wetonKey = `${h} ${pasaran}`;
-    const nHari = NEPTU_HARI[h];
-    const nPasaran = NEPTU_PASARAN[pasaran];
-    const neptu = nHari + nPasaran;
-    
-    const infoJawa = getTanggalJawa(date);
-    const lunar = getLunarShio(date);
-    const pancatan = cekPancatan(date);
-    const zodiak = getZodiak(date);
-
-    detailDiv.style.display = 'block';
-    detailDiv.innerHTML = `
-        <div class="card-result" style="background:#fff; padding:20px; border-radius:12px; border:1px solid #eee; color:#000; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-            ${pancatan.html}
-            <h2 style="color:#D30000; border-bottom:2px solid #D30000; display:inline-block; margin:0;">${wetonKey}</h2>
-            <p style="margin:10px 0; font-weight:bold;">📅 ${date.getDate()} ${["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"][date.getMonth()]} ${date.getFullYear()}</p>
-            
-            <div style="background:#f1f8e9; padding:10px; border-radius:8px; margin:10px 0; border:1px solid #c5e1a5;">
-                <p style="margin:0;">🏮 <b>Lunar:</b> ${lunar.full} | <b>Shio:</b> ${lunar.shio} | <b>Zodiak:</b> ${zodiak}</p>
-                <p style="margin:5px 0; font-size:12px; color:#1b5e20;"><i>Ramalan: ${lunar.ramalan}</i></p>
-            </div>
-
-            <div style="background:#f5f5f5; padding:10px; border-radius:8px; margin:10px 0; border:1px solid #ddd;">
-                <p style="margin:0; font-weight:bold;">🔢 Perhitungan Neptu:</p>
-                <p style="margin:5px 0;">Hari ${h} (${nHari}) + Pasaran ${pasaran} (${nPasaran}) = <b>Total Neptu ${neptu}</b></p>
-            </div>
-
-            <div style="background:#fff9f9; padding:10px; border-radius:8px; margin:10px 0; border:1px solid #ffeded;">
-                <p style="margin:0;">🌙 <b>Kalender Jawa:</b> ${infoJawa.tanggal} ${infoJawa.bulan.nama} ${infoJawa.tahun} AJ</p>
-                <p style="margin:5px 0; font-size:0.85rem;">Status: <b>${infoJawa.bulan.status}</b></p>
-            </div>
-            
-            <div style="background:#fff3e0; padding:10px; border-radius:8px; margin-top:10px; border:1px solid #ffe0b2;">
-                <p style="margin:0; font-size:0.85rem;"><b>🎭 Karakter Hari & Pasaran:</b></p>
-                <p style="margin:5px 0; font-size:0.8rem;"><b>${h}:</b> ${DATA_SIFAT_HARI[h] || "-"}</p>
-                <p style="margin:5px 0; font-size:0.8rem;"><b>${pasaran}:</b> ${DATA_SIFAT_PASARAN[pasaran.toUpperCase()] || "-"}</p>
-            </div>
-        </div>`;
-}
-
-// Tambahkan ini di paling bawah script agar kalender grid muncul
-generateCalendar();
 
