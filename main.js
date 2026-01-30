@@ -109,7 +109,7 @@ function getLunarShio(date) {
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
 
-    // Acuan: 30 Jan 2026 = 12 - 12 - 2576
+    // Referensi: 30 Jan 2026 = 12-12-2576
     const refDate = new Date(2026, 0, 30); 
     const diffDays = Math.floor((date.getTime() - refDate.getTime()) / (1000 * 60 * 60 * 24));
     
@@ -117,14 +117,12 @@ function getLunarShio(date) {
     let lunarMonth = 12;
     let huangdiYear = 2576;
 
-    // Logika rotasi tanggal lunar
     if (lunarDay > 30) { lunarDay -= 30; lunarMonth = 1; }
     else if (lunarDay <= 0) { lunarDay += 30; lunarMonth = 11; }
 
-    // Logika Shio Otomatis untuk 2026
     let shioNama;
     if (year === 2026) {
-        // Imlek jatuh pada 17 Februari 2026
+        // Transisi Ular ke Kuda pada 17 Feb 2026
         const isAfterImlek = (month > 2) || (month === 2 && day >= 17);
         shioNama = isAfterImlek ? "Kuda" : "Ular";
         if (isAfterImlek) huangdiYear = 2577;
@@ -145,8 +143,6 @@ function getLunarShio(date) {
         ramalan: dataRamalan[shioNama] || "Tetaplah optimis hari ini."
     };
 }
-
-
 
 
 
