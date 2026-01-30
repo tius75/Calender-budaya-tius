@@ -134,7 +134,7 @@ function getLunarShio(date) {
     let shioFinal = isSudahImlek ? shioTahunIni : (DB_IMLEK[y-1] ? DB_IMLEK[y-1].shio : "Transisi");
 
     return {
-        full: `${lunarDay} - ${isSudahImlek ? Math.floor(diffDays/30)+0 : 12} - ${y + 551}`,
+        full: `${lunarDay} - ${isSudahImlek ? Math.floor(diffDays/30)+1 : 12} - ${y + 550}`,
         shio: shioFinal,
         ramalan: "Gunakan energi hari ini dengan bijaksana."
     };
