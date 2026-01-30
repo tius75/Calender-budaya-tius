@@ -134,10 +134,11 @@ function getLunarShio(date) {
     let shioFinal = isSudahImlek ? shioTahunIni : (DB_IMLEK[y-1] ? DB_IMLEK[y-1].shio : "Transisi");
 
     return {
-        full: `${lunarDay} - ${isSudahImlek ? Math.floor(diffDays/30)+1 : 12} - ${y + 551}`,
-        shio: shioFinal,
-        ramalan: "Gunakan energi hari ini dengan bijaksana."
-    };
+    full: `${lunarDay} - ${lunarMonth} - ${y + 541}`, // Menggunakan 541 agar jadi 2567
+    shio: shioFinal,
+    ramalan: "Gunakan energi hari ini dengan bijaksana."
+};
+
 }
 
 
@@ -171,28 +172,32 @@ function getTanggalJawa(date) {
 }
 
 function getSiklusBesar(tahunJawa) {
-
-    if (typeof tahunJawa !== "number" || tahunJawa < 2000 || tahunJawa > 3000) {
-        tahunJawa = 2576;
+    // Hapus batasan 2000 karena tahun Jawa saat ini adalah 1959 AJ
+    if (typeof tahunJawa !== "number" || tahunJawa < 1000) {
+        tahunJawa = 1959; 
     }
 
-    const REF_TAHUN_JAWA = 2576;
-    const REF_TAHUN_IDX = 4; // Dal
+    // Referensi: 1959 AJ adalah tahun Be, Windu Sancaya
+    const REF_TAHUN_JAWA = 1959;
+    const REF_TAHUN_IDX = 5; // Indeks untuk tahun 'Be'
     const REF_WINDU_IDX = 2; // Sancaya
 
     const diffYears = tahunJawa - REF_TAHUN_JAWA;
 
+    // Hitung Siklus 8 Tahun (Windu)
     let tahunIdx = (REF_TAHUN_IDX + diffYears) % 8;
     if (tahunIdx < 0) tahunIdx += 8;
 
+    // Hitung Perpindahan Windu (4 Windu: Adi, Kuntara, Sangara, Sancaya)
     let winduIdx = (REF_WINDU_IDX + Math.floor(diffYears / 8)) % 4;
     if (winduIdx < 0) winduIdx += 4;
 
     return {
-        tahun: DATA_SIKLUS_TAHUN[tahunIdx],
+        tahun: DATA_SIKLUS_TAHUN[tahunIdx], // Mengambil nama Dal, Be, dsb.
         windu: WINDU_LIST[winduIdx]
     };
 }
+
 
 function getMangsaInfo(date) {
     const d = date.getDate();
