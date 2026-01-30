@@ -519,7 +519,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ==========================================
-// FUNGSI DETEKSI HARI PANCATAN
+// 1. FUNGSI CEK PANCATAN (FIXED)
 // ==========================================
 function cekPancatan(date) {
     const getNeptuVal = (d) => {
@@ -528,9 +528,9 @@ function cekPancatan(date) {
         return (NEPTU_HARI[h] || 0) + (NEPTU_PASARAN[p] || 0);
     };
 
-    const d0 = new Date(date); // Hari ini
-    const d1 = new Date(date); d1.setDate(d0.getDate() - 1); // Kemarin
-    const d2 = new Date(date); d2.setDate(d0.getDate() - 2); // 2 hari lalu
+    const d0 = new Date(date); // Hari yang dipilih
+    const d1 = new Date(date); d1.setDate(d0.getDate() - 1); // 1 hari sebelumnya
+    const d2 = new Date(date); d2.setDate(d0.getDate() - 2); // 2 hari sebelumnya
 
     const n0 = getNeptuVal(d0);
     const n1 = getNeptuVal(d1);
@@ -540,14 +540,16 @@ function cekPancatan(date) {
     if (total === 40) {
         return {
             isPancatan: true,
-            info: `⚠️ <strong>Hari Pancatan:</strong> Akumulasi neptu 3 hari berturut-turut berjumlah 40 (${n2} + ${n1} + ${n0}).`
+            html: `<div style="background:#e8f5e9; color:#2e7d32; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #4caf50; font-size:0.85rem;">
+                ⚠️ <strong>Hari Pancatan:</strong> Akumulasi neptu 3 hari berturut-turut berjumlah 40 (${n2} + ${n1} + ${n0}). Hari ini dipercaya sebagai waktu untuk memulai langkah besar.
+            </div>`
         };
     }
-    return { isPancatan: false };
+    return { isPancatan: false, html: "" };
 }
 
 // ==========================================
-// FUNGSI UPDATE DETAIL (VERSI PERBAIKAN TOTAL)
+// 2. FUNGSI UPDATE DETAIL (VERSI LENGKAP & TUTUP)
 // ==========================================
 function updateDetail(date, pasaran) {
     const detailDiv = document.getElementById('detail');
@@ -558,26 +560,20 @@ function updateDetail(date, pasaran) {
     const nHari = NEPTU_HARI[h];
     const nPasaran = NEPTU_PASARAN[pasaran];
     const neptu = nHari + nPasaran;
-    
     const infoJawa = getTanggalJawa(date);
-    const lunar = getLunarShio(date); // Menggunakan fungsi reset tgl 1 di 17 Feb
+    const lunar = getLunarShio(date);
     const pancatan = cekPancatan(date);
-    const tglMasehi = `${date.getDate()} ${["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"][date.getMonth()]} ${date.getFullYear()}`;
-
-    let pancatanHtml = "";
-    if (pancatan.isPancatan) {
-        pancatanHtml = `<div style="background:#e8f5e9; color:#2e7d32; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #4caf50; font-size:0.85rem;">${pancatan.info} <br> Hari ini dipercaya sebagai waktu untuk memulai langkah besar.</div>`;
-    }
+    const zodiak = getZodiak(date);
 
     detailDiv.style.display = 'block';
     detailDiv.innerHTML = `
         <div class="card-result" style="background:#fff; padding:20px; border-radius:12px; border:1px solid #eee; color:#000; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-            ${pancatanHtml}
+            ${pancatan.html}
             <h2 style="color:#D30000; border-bottom:2px solid #D30000; display:inline-block; margin:0;">${wetonKey}</h2>
-            <p style="margin:10px 0; font-weight:bold;">📅 ${tglMasehi}</p>
+            <p style="margin:10px 0; font-weight:bold;">📅 ${date.getDate()} ${["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"][date.getMonth()]} ${date.getFullYear()}</p>
             
             <div style="background:#f1f8e9; padding:10px; border-radius:8px; margin:10px 0; border:1px solid #c5e1a5;">
-                <p style="margin:0;"><b>🏮 Lunar:</b> ${lunar.full} | <b>Shio:</b> ${lunar.shio}</p>
+                <p style="margin:0;">🏮 <b>Lunar:</b> ${lunar.full} | <b>Shio:</b> ${lunar.shio} | <b>Zodiak:</b> ${zodiak}</p>
                 <p style="margin:5px 0; font-size:12px; color:#1b5e20;"><i>Ramalan: ${lunar.ramalan}</i></p>
             </div>
 
@@ -587,13 +583,19 @@ function updateDetail(date, pasaran) {
             </div>
 
             <div style="background:#fff9f9; padding:10px; border-radius:8px; margin:10px 0; border:1px solid #ffeded;">
-                <p style="margin:0;"><b>🌙 Kalender Jawa:</b> ${infoJawa.tanggal} ${infoJawa.bulan.nama} ${infoJawa.tahun} AJ</p>
-                <p style="margin:5px 0; font-size:0.85rem;">Status: ${infoJawa.bulan.status}</p>
+                <p style="margin:0;">🌙 <b>Kalender Jawa:</b> ${infoJawa.tanggal} ${infoJawa.bulan.nama} ${infoJawa.tahun} AJ</p>
+                <p style="margin:5px 0; font-size:0.85rem;">Status: <b>${infoJawa.bulan.status}</b></p>
+            </div>
+            
+            <div style="margin-top:15px; font-size:0.8rem; color:#666;">
+                <p><b>Karakter ${h}:</b> ${DATA_SIFAT_HARI[h] || "-"}</p>
+                <p><b>Karakter ${pasaran}:</b> ${DATA_SIFAT_PASARAN[pasaran.toUpperCase()] || "-"}</p>
             </div>
         </div>`;
 }
 
-// PASTIKAN INI ADA DI PALING BAWAH
+// ==========================================
+// 3. INISIALISASI AKHIR (AGAR GRID MUNCUL)
+// ==========================================
+// Panggil fungsi ini di paling bawah agar grid kalender langsung digambar
 generateCalendar();
-
-
