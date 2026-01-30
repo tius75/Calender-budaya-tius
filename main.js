@@ -146,7 +146,6 @@ function getLunarShio(date) {
 
 
 
-
 function getWuku(date) {
     const wukuList = ["Sinta", "Landep", "Wukir", "Kurantil", "Tolu", "Gumbreg", "Warigalit", "Wariagung", "Julungwangi", "Sungsang", "Galungan", "Kuningan", "Langkir", "Mandasiya", "Julungpujut", "Pahang", "Kuruwelut", "Marakeh", "Tambir", "Medangkungan", "Maktal", "Wuye", "Manahil", "Prangbakat", "Bala", "Wugu", "Wayang", "Kulawu", "Dukut", "Watugunung"];
     const refDate = new Date(2026, 0, 25); 
@@ -171,17 +170,8 @@ function getTanggalJawa(date) {
     return { tanggal: tglJawa, bulan: DATA_BULAN_JAWA[bulanIdx], tahun: tahunJawa };
 }
 
-// Definisikan variabel global untuk data siklus
-const DATA_SIKLUS_TAHUN = [
-    "Alip", "Ehe", "Jimawal", "Je", 
-    "Dal", "Be", "Wawu", "Jimakir"
-];
-
-const WINDU_LIST = [
-    "Adi", "Kuntara", "Sancaya", "Sancala"
-];
-
 function getSiklusBesar(tahunJawa) {
+
     if (typeof tahunJawa !== "number" || tahunJawa < 2000 || tahunJawa > 3000) {
         tahunJawa = 2576;
     }
@@ -191,24 +181,12 @@ function getSiklusBesar(tahunJawa) {
     const REF_WINDU_IDX = 2; // Sancaya
 
     const diffYears = tahunJawa - REF_TAHUN_JAWA;
-    
-    // Hitung indeks tahun (0-7)
+
     let tahunIdx = (REF_TAHUN_IDX + diffYears) % 8;
     if (tahunIdx < 0) tahunIdx += 8;
-    if (tahunIdx >= 8) tahunIdx %= 8;
-    
-    // PERBAIKAN UTAMA: Hitung windu dengan benar
-    // Total tahun sejak awal siklus (termasuk posisi tahun referensi)
-    const totalTahunDariAwal = REF_TAHUN_IDX + diffYears;
-    
-    // Hitung berapa windu yang telah berlalu
-    // Windu berubah setiap 8 tahun
-    const winduTerlewat = Math.floor(totalTahunDariAwal / 8);
-    
-    // Hitung indeks windu (0-3)
-    let winduIdx = (REF_WINDU_IDX + winduTerlewat) % 4;
+
+    let winduIdx = (REF_WINDU_IDX + Math.floor(diffYears / 8)) % 4;
     if (winduIdx < 0) winduIdx += 4;
-    if (winduIdx >= 4) winduIdx %= 4;
 
     return {
         tahun: DATA_SIKLUS_TAHUN[tahunIdx],
@@ -216,14 +194,6 @@ function getSiklusBesar(tahunJawa) {
     };
 }
 
-// Untuk integrasi dengan kalender yang sudah ada
-// Fungsi ini bisa langsung menggantikan fungsi lama Anda
-// Contoh konversi
-console.log("\n=== KONVERSI TAHUN MASEHI KE JAWA ===");
-const tahunMasehi = 2024;
-const tahunJawa = konversiMasehiKeJawa(tahunMasehi);
-console.log(`${tahunMasehi} Masehi = ${tahunJawa} Jawa`);
-tampilkanHasil(tahunJawa);
 function getMangsaInfo(date) {
     const d = date.getDate();
     const m = date.getMonth() + 1;
