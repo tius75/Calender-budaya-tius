@@ -247,6 +247,7 @@ function hitungUsiaLengkap(birthDate) {
     return `${years} Tahun, ${months} Bulan, ${days} Hari`;
 }
 
+
 // ==========================================
 // FUNGSI CARI WETON
 // ==========================================
@@ -305,6 +306,30 @@ function generateCalendar() {
         grid.appendChild(cell);
     }
 }
+
+function cekPancatan(date) {
+    const getNeptuVal = (d) => {
+        const h = HARI[d.getDay()];
+        const p = getPasaran(d);
+        return (NEPTU_HARI[h] || 0) + (NEPTU_PASARAN[p] || 0);
+    };
+
+    const d0 = new Date(date);
+    const d1 = new Date(date); d1.setDate(d0.getDate() - 1);
+    const d2 = new Date(date); d2.setDate(d0.getDate() - 2);
+
+    const totalNeptu3Hari = getNeptuVal(d0) + getNeptuVal(d1) + getNeptuVal(d2);
+
+    if (totalNeptu3Hari === 40) {
+        return {
+            isPancatan: true,
+            total: totalNeptu3Hari,
+            info: `⚠️ <strong>Hari Pancatan:</strong> Akumulasi neptu 3 hari berjumlah 40 (${getNeptuVal(d2)}+${getNeptuVal(d1)}+${getNeptuVal(d0)}). Hari ini baik untuk memulai langkah besar.`
+        };
+    }
+    return { isPancatan: false, total: totalNeptu3Hari };
+}
+
 
 function updateDetail(date, pasaran) {
     const detailDiv = document.getElementById('detail');
