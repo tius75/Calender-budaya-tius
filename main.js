@@ -109,7 +109,6 @@ function getLunarShio(date) {
     const m = date.getMonth() + 1;
     const d = date.getDate();
     
-    // 1. Tentukan Tanggal Imlek tahun tersebut (Estimasi jika DB tidak ada)
     let imlekM, imlekD, shioTahunIni;
     
     if (DB_IMLEK[y]) {
@@ -117,27 +116,30 @@ function getLunarShio(date) {
         imlekD = DB_IMLEK[y].d;
         shioTahunIni = DB_IMLEK[y].shio;
     } else {
-        // Algoritma Cadangan jika data tahun tsb tidak diketik di DB
         const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
         shioTahunIni = shios[y % 12];
-        imlekM = 2; imlekD = 5; // Estimasi rata-rata
+        imlekM = 2; imlekD = 5;
     }
 
     const tglImlek = new Date(y, imlekM - 1, imlekD);
     const isSudahImlek = date >= tglImlek;
 
-    // 2. Hitung Lunar Day (Agar tidak muncul angka negatif/undefined)
     const diffTime = Math.abs(date - tglImlek);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     
+    // PERBAIKAN: Mendefinisikan lunarDay dan lunarMonth agar tidak undefined
     let lunarDay = isSudahImlek ? (diffDays % 30) + 1 : 30 - (diffDays % 30);
+    let lunarMonth = isSudahImlek ? Math.floor(diffDays / 30) + 1 : 12;
+    
     let shioFinal = isSudahImlek ? shioTahunIni : (DB_IMLEK[y-1] ? DB_IMLEK[y-1].shio : "Transisi");
 
     return {
-    full: `${lunarDay} - ${lunarMonth} - ${y + 541}`, // Menggunakan 541 agar jadi 2567
-    shio: shioFinal,
-    ramalan: "Gunakan energi hari ini dengan bijaksana."
+        full: `${lunarDay} - ${lunarMonth} - ${y + 541}`, // Hasil: 2567
+        shio: shioFinal,
+        ramalan: "Gunakan energi hari ini dengan bijaksana."
+    }; // Pastikan ada tutup kurung kurawal ini
 }
+
 
 
 
