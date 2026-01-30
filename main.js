@@ -172,31 +172,27 @@ function getTanggalJawa(date) {
 }
 
 function getSiklusBesar(tahunJawa) {
-    // Hapus batasan 2000 karena tahun Jawa saat ini adalah 1959 AJ
-    if (typeof tahunJawa !== "number" || tahunJawa < 1000) {
-        tahunJawa = 1959; 
-    }
-
-    // Referensi: 1959 AJ adalah tahun Be, Windu Sancaya
+    // Pastikan tahunJawa ada nilainya, jika tidak pakai tahun saat ini
+    let thn = parseInt(tahunJawa) || 1959;
+    
     const REF_TAHUN_JAWA = 1959;
-    const REF_TAHUN_IDX = 5; // Indeks untuk tahun 'Be'
-    const REF_WINDU_IDX = 2; // Sancaya
+    const REF_TAHUN_IDX = 5; // Tahun Be
+    const REF_WINDU_IDX = 2; // Windu Sancaya
 
-    const diffYears = tahunJawa - REF_TAHUN_JAWA;
+    const diffYears = thn - REF_TAHUN_JAWA;
 
-    // Hitung Siklus 8 Tahun (Windu)
     let tahunIdx = (REF_TAHUN_IDX + diffYears) % 8;
     if (tahunIdx < 0) tahunIdx += 8;
 
-    // Hitung Perpindahan Windu (4 Windu: Adi, Kuntara, Sangara, Sancaya)
     let winduIdx = (REF_WINDU_IDX + Math.floor(diffYears / 8)) % 4;
     if (winduIdx < 0) winduIdx += 4;
 
     return {
-        tahun: DATA_SIKLUS_TAHUN[tahunIdx], // Mengambil nama Dal, Be, dsb.
-        windu: WINDU_LIST[winduIdx]
+        tahun: DATA_SIKLUS_TAHUN[tahunIdx] || "Dal",
+        windu: WINDU_LIST[winduIdx] || "Sancaya"
     };
 }
+
 
 
 function getMangsaInfo(date) {
