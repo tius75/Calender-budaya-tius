@@ -367,13 +367,16 @@ function updateDetail(date, pasaran) {
             </div>
         
  <div style="background:#f1f8e9; padding:10px; border-radius:8px; margin:10px 0;">
-                <p><b>🏮 Lunar:</b> ${lunar.full} | <b>Shio:</b> ${lunar.shio}</p>
+             
+  <p style="margin:10px 0 0; font-size:1.15rem; font-weight:bold;">📅 ${tglMasehiLengkap}</p>
+            
+            <div style="background:#fff3e0; padding:12px; border-radius:8px; margin:10px 0; border:1px solid #ffe0b2;">
+
+   <p><b>🏮 Lunar:</b> ${lunar.full} | <b>Shio:</b> ${lunar.shio}</p>
                 <p style="font-size:12px;"><i>Ramalan: ${lunar.ramalan}</i></p>
             </div>
     
-            <p style="margin:10px 0 0; font-size:1.15rem; font-weight:bold;">📅 ${tglMasehiLengkap}</p>
-            
-            <div style="background:#fff3e0; padding:12px; border-radius:8px; margin:10px 0; border:1px solid #ffe0b2;">
+          
                 <p style="margin:0; color:#e65100; font-weight:bold; font-size:1rem;">✨ Siklus Tahun & Windu</p>
                 <p style="margin:5px 0; font-size:0.9rem;"><strong>Tahun:</strong> ${siklusBesar.tahun.nama} (${siklusBesar.tahun.makna})</p>
                 <p style="margin:5px 0; font-size:0.9rem;"><strong>Windu:</strong> ${siklusBesar.windu} </p>
