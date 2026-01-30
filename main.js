@@ -171,21 +171,22 @@ function getTanggalJawa(date) {
 }
 
 function getSiklusBesar(tahunJawa) {
-    // Referensi: Tahun 1959 Jawa (2026 Masehi) adalah Tahun "Be", Windu "Sancaya"
-    const REF_TAHUN_JAWA = 1959;
-    const REF_TAHUN_IDX = 5; // Indeks untuk "Be"
-    const REF_WINDU_IDX = 2; // Indeks untuk "Sancaya"
+
+    if (typeof tahunJawa !== "number" || tahunJawa < 2000 || tahunJawa > 3000) {
+        tahunJawa = 2576;
+    }
+
+    const REF_TAHUN_JAWA = 2576;
+    const REF_TAHUN_IDX = 4; // Dal
+    const REF_WINDU_IDX = 2; // Sancaya
 
     const diffYears = tahunJawa - REF_TAHUN_JAWA;
 
-    // Hitung Indeks Tahun (Siklus 8)
     let tahunIdx = (REF_TAHUN_IDX + diffYears) % 8;
-    while (tahunIdx < 0) tahunIdx += 8;
+    if (tahunIdx < 0) tahunIdx += 8;
 
-    // Hitung Indeks Windu (Siklus 32 tahun / 4 Windu)
-    let winduOffset = Math.floor(diffYears / 8);
-    let winduIdx = (REF_WINDU_IDX + winduOffset) % 4;
-    while (winduIdx < 0) winduIdx += 4;
+    let winduIdx = (REF_WINDU_IDX + Math.floor(diffYears / 8)) % 4;
+    if (winduIdx < 0) winduIdx += 4;
 
     return {
         tahun: DATA_SIKLUS_TAHUN[tahunIdx],
