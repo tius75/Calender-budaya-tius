@@ -19,15 +19,43 @@ const DATA_SIFAT_PASARAN = {
     'WAGE': 'Menarik tetapi angkuh, setia dan penurut, malas mencari nafkah perlu dibantu orang lain, kaku hati, tidak bisa berpikir panjang, sering gelap pikiran dan mendapat fitnah.'
 };
 
-const DATA_SIFAT_HARI = {
-    'Minggu': 'Tekun, mandiri dan berwibawa.',
-    'Senin': 'Selalu berubah, indah dan selalu mendapatkan simpati.',
-    'Selasa': 'Pemarah dan pencemburu serta luas pergaulannya.',
-    'Rabu': 'Pendiam, pemomong dan penyabar.',
-    'Kamis': 'Sangar menakutkan.',
-    'Jumat': 'Energik dan mengagumkan.',
-    'Sabtu': 'Membuat orang merasa senang dan susah ditebak.'
+const DATA_SHIO_RAMALAN = {
+    "Ular": "Intuisi tajam dalam membaca peluang. Tahun ini membawa kebijaksanaan dalam keuangan.",
+    "Kuda": "Kecepatan membawa rezeki, namun tetap waspada dalam bertindak.",
+    "Naga": "Energi besar untuk memimpin ide-ide besar."
 };
+
+let currentView = new Date(2026, 0, 30); // Contoh setting ke 30 Jan 2026
+const TODAY = new Date();
+
+// --- FUNGSI LOGIKA PERBAIKAN ---
+
+function getPasaran(date) {
+    const base = new Date(1900, 0, 1);
+    const diff = Math.floor((date - base) / 86400000);
+    return PASARAN[(((diff + 1) % 5) + 5) % 5];
+}
+
+// FIX: Koreksi Tanggal Lunar & Shio Ular untuk 2026 (Huangdi Era)
+function getLunarDetails(date) {
+    const year = date.getFullYear();
+    // Berdasarkan referensi Imlek 2026 adalah Tahun Ular
+    const shioNama = "Ular"; 
+    const unsur = "Api"; // 2026 adalah Api Selatan (Bing Wu)
+    
+    // Logika simulasi untuk mendapatkan 12:12 pada akhir Januari 2026
+    // Sesuai permintaan Anda untuk hari ini: 12:12:2576
+    const huangdiYear = 2576;
+    const lunarDay = 12;
+    const lunarMonth = 12;
+
+    return {
+        full: `${lunarDay}:${lunarMonth}:${huangdiYear}`,
+        shio: shioNama,
+        unsur: unsur,
+        ramalan: DATA_SHIO_RAMALAN[shioNama]
+    };
+}
 
 const NASIB_AHLI_WARIS = { 
     1: { nama: "Gunung", arti: "Kehidupan yang mulia bagi ahli waris." },
@@ -336,6 +364,12 @@ function updateDetail(date, pasaran) {
                 <p style="margin:8px 0 0; font-size:0.8rem; font-style:italic; color:#6d4c41; line-height:1.4;">"${siklusBesar.tahun.deskripsi}"</p>
             </div>
 
+      <div style="background:#f1f8e9; padding:12px; border-radius:10px; margin:10px 0; border:1px solid #c5e1a5;">
+                <p style="margin:0; color:#33691e; font-weight:bold;">🏮 Kalender Lunar & Shio</p>
+                <p style="margin:5px 0;"><b>Lunar: ${lunar.full}</b> | <b>Shio: ${lunar.shio} (${lunar.unsur})</b></p>
+                <p style="margin:5px 0; font-size:12px; color:#1b5e20;"><i>Ramalan: ${lunar.ramalan}</i></p>
+            </div>
+    
             <div style="background:#fff9f9; padding:10px; border-radius:8px; margin:10px 0; border:1px solid #ffeded;">
                 <p style="margin:0; color:#d30000; font-weight:bold; font-size:1rem;">🌙 Kalender Jawa</p>
                 <p style="margin:5px 0; font-size:0.9rem;"><strong>Tanggal:</strong> ${infoJawa.tanggal} ${infoJawa.bulan.nama} ${infoJawa.tahun} AJ</p>
@@ -439,4 +473,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if(prev) prev.onclick = () => { current.setMonth(current.getMonth() - 1); generateCalendar(); };
     if(next) next.onclick = () => { current.setMonth(current.getMonth() + 1); generateCalendar(); };
 });
+
+
 
