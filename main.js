@@ -171,28 +171,18 @@ function getTanggalJawa(date) {
 }
 
 function getSiklusBesar(tahunJawa) {
-    // Validasi: Jika yang masuk adalah objek Date, ambil tahun Jawanya saja
-    let thn;
-    if (typeof tahunJawa === 'object' && tahunJawa !== null) {
-        // Jika input adalah objek dari getTanggalJawa
-        thn = tahunJawa.tahun; 
-    } else {
-        thn = tahunJawa;
-    }
-
-    // Referensi: Tahun 1959 Jawa adalah Tahun "Be" (Indeks 5), Windu "Sancaya" (Indeks 2)
+    // Referensi: Tahun 1959 Jawa (2026 Masehi) adalah Tahun "Be", Windu "Sancaya"
     const REF_TAHUN_JAWA = 1959;
-    const REF_TAHUN_IDX = 5; // Be
-    const REF_WINDU_IDX = 2; // Sancaya
+    const REF_TAHUN_IDX = 5; // Indeks untuk "Be"
+    const REF_WINDU_IDX = 2; // Indeks untuk "Sancaya"
 
-    const diffYears = thn - REF_TAHUN_JAWA;
+    const diffYears = tahunJawa - REF_TAHUN_JAWA;
 
-    // Hitung Indeks Tahun (Siklus 8 tahun: Alip - Jimakir)
+    // Hitung Indeks Tahun (Siklus 8)
     let tahunIdx = (REF_TAHUN_IDX + diffYears) % 8;
     while (tahunIdx < 0) tahunIdx += 8;
 
-    // Hitung Indeks Windu (1 Windu = 8 Tahun)
-    // Menggunakan Math.floor untuk pergeseran windu yang benar
+    // Hitung Indeks Windu (Siklus 32 tahun / 4 Windu)
     let winduOffset = Math.floor(diffYears / 8);
     let winduIdx = (REF_WINDU_IDX + winduOffset) % 4;
     while (winduIdx < 0) winduIdx += 4;
