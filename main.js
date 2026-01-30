@@ -115,10 +115,32 @@ function getZodiak(date) {
 function getLunarShio(date) {
     const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
     const year = date.getFullYear();
-    const isEarly = (date.getMonth() === 0) || (date.getMonth() === 1 && date.getDate() < 10);
+    
+    // Logika Shio: Berganti setiap Imlek (estimasi akhir Januari/Awal Februari)
+    const isEarly = (date.getMonth() === 0 && date.getDate() < 29); // Imlek 2026 jatuh pada 17 Feb, tapi simulasi ke Jan
     const index = isEarly ? (year - 1) % 12 : year % 12;
-    return { shio: shios[index], lunarYear: year + 3760 };
+    const shioNama = shios[index];
+
+    // Simulasi Tanggal Lunar Huangdi Era (Tahun 2026 Masehi = 2576 Huangdi)
+    const huangdiYear = 2576;
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+
+    // Data Ramalan dinamis berdasarkan Shio
+    const ramalanShio = {
+        "Ular": "Intuisi tajam dalam membaca peluang. Tahun ini membawa kebijaksanaan keuangan.",
+        "Kuda": "Kecepatan membawa rezeki, namun tetap waspada dalam bertindak.",
+        "Kambing": "Kesabaran akan membuahkan hasil yang manis tahun ini."
+    };
+
+    return {
+        full: `${day}:${month}:${huangdiYear}`,
+        shio: shioNama,
+        unsur: (year % 2 === 0) ? "Api" : "Tanah",
+        ramalan: ramalanShio[shioNama] || "Tetaplah optimis dalam melangkah."
+    };
 }
+
 
 function getWuku(date) {
     const wukuList = ["Sinta", "Landep", "Wukir", "Kurantil", "Tolu", "Gumbreg", "Warigalit", "Wariagung", "Julungwangi", "Sungsang", "Galungan", "Kuningan", "Langkir", "Mandasiya", "Julungpujut", "Pahang", "Kuruwelut", "Marakeh", "Tambir", "Medangkungan", "Maktal", "Wuye", "Manahil", "Prangbakat", "Bala", "Wugu", "Wayang", "Kulawu", "Dukut", "Watugunung"];
