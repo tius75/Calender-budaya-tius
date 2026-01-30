@@ -182,84 +182,36 @@ const WINDU_LIST = [
 ];
 
 function getSiklusBesar(tahunJawa) {
-    // Validasi input
-    if (typeof tahunJawa !== "number" || tahunJawa < 1000 || tahunJawa > 3000) {
-        console.warn("Tahun Jawa tidak valid, menggunakan tahun default 2576");
+    if (typeof tahunJawa !== "number" || tahunJawa < 2000 || tahunJawa > 3000) {
         tahunJawa = 2576;
     }
 
-    // Metode perhitungan yang benar
-    // Tahun Jawa dimulai dari 1, jadi kita kurangi 1 untuk perhitungan
-    const tahunIndex = (tahunJawa - 1) % 8;
-    const winduIndex = Math.floor((tahunJawa - 1) / 8) % 4;
-
-    // Pastikan indeks valid
-    const tahunNama = DATA_SIKLUS_TAHUN[tahunIndex] || "Tidak Diketahui";
-    const winduNama = WINDU_LIST[winduIndex] || "Tidak Diketahui";
+    const DATA_SIKLUS_TAHUN = ["Alip", "Ehe", "Jimawal", "Je", "Dal", "Be", "Wawu", "Jimakir"];
+    const WINDU_LIST = ["Adi", "Kuntara", "Sancaya", "Sancala"];
+    
+    // Jika ingin tetap pakai referensi 2576 (Dal, Sancaya)
+    const REF_TAHUN = 2576;
+    const REF_TAHUN_IDX = 4; // Dal (indeks 4)
+    const REF_WINDU_IDX = 2; // Sancaya (indeks 2)
+    
+    // Hitung perbedaan tahun
+    const diff = tahunJawa - REF_TAHUN;
+    
+    // Hitung indeks tahun
+    let tahunIdx = (REF_TAHUN_IDX + diff) % 8;
+    if (tahunIdx < 0) tahunIdx += 8;
+    
+    // PERBAIKAN: Hitung windu dengan benar
+    // Jumlah windu yang berlalu sejak referensi
+    const winduTerlewat = Math.floor((REF_TAHUN_IDX + diff) / 8);
+    let winduIdx = (REF_WINDU_IDX + winduTerlewat) % 4;
+    if (winduIdx < 0) winduIdx += 4;
 
     return {
-        tahun: tahunNama,
-        windu: winduNama,
-        tahunJawa: tahunJawa,
-        indeksTahun: tahunIndex,
-        indeksWindu: winduIndex,
-        penjelasan: `Tahun Jawa ${tahunJawa} = ${tahunNama}, Windu ${winduNama}`
+        tahun: DATA_SIKLUS_TAHUN[tahunIdx],
+        windu: WINDU_LIST[winduIdx]
     };
 }
-
-// Fungsi untuk menampilkan hasil
-function tampilkanHasil(tahun) {
-    const hasil = getSiklusBesar(tahun);
-    console.log(`Tahun Jawa: ${hasil.tahunJawa}`);
-    console.log(`Tahun: ${hasil.tahun} (indeks: ${hasil.indeksTahun})`);
-    console.log(`Windu: ${hasil.windu} (indeks: ${hasil.indeksWindu})`);
-    console.log("=".repeat(40));
-}
-
-// Test dengan berbagai tahun
-console.log("=== HASIL PERHITUNGAN SIKLUS BESAR ===");
-
-// Tahun-tahun penting untuk test perubahan windu
-tampilkanHasil(2575); // Tahun sebelum referensi
-tampilkanHasil(2576); // Tahun referensi - Dal, Sancaya
-tampilkanHasil(2577); // Tahun berikutnya - Be, Sancaya
-tampilkanHasil(2583); // Tahun terakhir windu Sancaya - Jimakir, Sancaya
-tampilkanHasil(2584); // Tahun pertama windu baru - Alip, Sancala (WINDU BERUBAH!)
-tampilkanHasil(2591); // Tahun terakhir windu Sancala - Wawu, Sancala
-tampilkanHasil(2592); // Tahun pertama windu Adi - Jimakir, Adi (WINDU BERUBAH!)
-
-// Test tahun yang Anda sebutkan
-console.log("\n=== TEST TAHUN YANG ANDA SEBUTKAN ===");
-tampilkanHasil(2024);
-tampilkanHasil(2000);
-tampilkanHasil(2100);
-
-// Verifikasi perubahan windu
-console.log("\n=== VERIFIKASI PERUBAHAN WINDU ===");
-console.log("1. Windu Sancaya: tahun 2576-2583");
-for (let i = 2576; i <= 2583; i++) {
-    const hasil = getSiklusBesar(i);
-    console.log(`  ${i}: ${hasil.tahun} - ${hasil.windu}`);
-}
-
-console.log("\n2. Windu Sancala: tahun 2584-2591");
-for (let i = 2584; i <= 2591; i++) {
-    const hasil = getSiklusBesar(i);
-    console.log(`  ${i}: ${hasil.tahun} - ${hasil.windu}`);
-}
-
-console.log("\n3. Windu Adi: tahun 2592-2599");
-for (let i = 2592; i <= 2599; i++) {
-    const hasil = getSiklusBesar(i);
-    console.log(`  ${i}: ${hasil.tahun} - ${hasil.windu}`);
-}
-
-// Fungsi untuk konversi Masehi ke Jawa (jika diperlukan)
-function konversiMasehiKeJawa(tahunMasehi) {
-    // Tahun Jawa = Tahun Masehi + 512
-    return tahunMasehi + 512;
-}
-
 // Contoh konversi
 console.log("\n=== KONVERSI TAHUN MASEHI KE JAWA ===");
 const tahunMasehi = 2024;
