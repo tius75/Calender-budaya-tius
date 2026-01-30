@@ -106,34 +106,39 @@ function getZodiak(date) {
 
 function getLunarShio(date) {
     const y = date.getFullYear();
-
-    if (!DB_IMLEK[y]) {
-        return {
-            full: "Data lunar tidak tersedia",
-            shio: "-",
-            ramalan: "-"
-        };
+    const m = date.getMonth() + 1;
+    const d = date.getDate();
+    
+    // 1. Tentukan Tanggal Imlek tahun tersebut (Estimasi jika DB tidak ada)
+    let imlekM, imlekD, shioTahunIni;
+    
+    if (DB_IMLEK[y]) {
+        imlekM = DB_IMLEK[y].m;
+        imlekD = DB_IMLEK[y].d;
+        shioTahunIni = DB_IMLEK[y].shio;
+    } else {
+        // Algoritma Cadangan jika data tahun tsb tidak diketik di DB
+        const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
+        shioTahunIni = shios[y % 12];
+        imlekM = 2; imlekD = 5; // Estimasi rata-rata
     }
 
-    const { m, d, shio, lunarYear } = DB_IMLEK[y];
+    const tglImlek = new Date(y, imlekM - 1, imlekD);
+    const isSudahImlek = date >= tglImlek;
 
-    const tglImlek = new Date(y, m - 1, d);
-    const selisihHari = Math.floor((date - tglImlek) / 86400000);
-
-    // Hari lunar (aman, tidak +1 palsu)
-    const lunarDay = selisihHari >= 0 ? selisihHari + 1 : null;
+    // 2. Hitung Lunar Day (Agar tidak muncul angka negatif/undefined)
+    const diffTime = Math.abs(date - tglImlek);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    let lunarDay = isSudahImlek ? (diffDays % 30) + 1 : 30 - (diffDays % 30);
+    let shioFinal = isSudahImlek ? shioTahunIni : (DB_IMLEK[y-1] ? DB_IMLEK[y-1].shio : "Transisi");
 
     return {
-        full: lunarDay
-            ? `${lunarDay}-${DB_IMLEK[y].bulanLunar}-${lunarYear}`
-            : `Akhir-${DB_IMLEK[y - 1]?.lunarYear}`,
-        shio: selisihHari >= 0 ? shio : DB_IMLEK[y - 1]?.shio,
+        full: `${lunarDay} - ${isSudahImlek ? Math.floor(diffDays/30)+1 : 12} - ${y + 551}`,
+        shio: shioFinal,
         ramalan: "Gunakan energi hari ini dengan bijaksana."
     };
 }
-
-
-
 
 
 
@@ -188,10 +193,6 @@ function getSiklusBesar(tahunJawa) {
         windu: WINDU_LIST[winduIdx]
     };
 }
-
-
-
-
 
 function getMangsaInfo(date) {
     const d = date.getDate();
