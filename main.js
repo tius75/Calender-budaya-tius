@@ -1,10 +1,53 @@
 /**
- * KALENDER JAWA MODERN - VERSI FINAL FIX 2026
- * Update: Windu Sancaya, Tahun Jawa (Filosofi), & Konzili
+ * KALENDER JAWA MODERN - VERSI FINAL 2026
+ * Dengan semua fitur asli + ramalan shio harian + data wuku eksternal
  */
 
+console.log('Kalender Jawa PWA v3.0 dengan semua fitur lengkap');
+
 // ==========================================
-// KONSTANTA & DATA REFERENSI
+// SISTEM TOKEN - VERSI TUNGGAL
+// ==========================================
+
+// Fungsi untuk load token database
+function loadTokenDatabase() {
+    try {
+        const adminDatabase = localStorage.getItem('kalender_token_database');
+        if (adminDatabase) {
+            const tokens = JSON.parse(adminDatabase);
+            const convertedTokens = {};
+            
+            for (const [token, data] of Object.entries(tokens)) {
+                convertedTokens[token] = {
+                    expiry: data.expiry,
+                    package: data.package,
+                    created: data.created
+                };
+            }
+            
+            return {
+                ...convertedTokens,
+                "DEMO123": { expiry: "2026-12-31", package: "Demo", created: "2026-01-01" },
+                "TIUS2026": { expiry: "2026-12-31", package: "Premium", created: "2026-01-01" }
+            };
+        }
+    } catch (error) {
+        console.error("Error loading token database:", error);
+    }
+    
+    // Fallback ke token default
+    return {
+        "DEMO123": { expiry: "2026-12-31", package: "Demo", created: "2026-01-01" },
+        "TIUS2026": { expiry: "2026-12-31", package: "Premium", created: "2026-01-01" },
+        "VIP999": { expiry: "9999-12-31", package: "Unlimited", created: "2026-01-15" }
+    };
+}
+
+// DEKLARASI DAFTAR_TOKEN_AKTIF
+const DAFTAR_TOKEN_AKTIF = loadTokenDatabase();
+
+// ==========================================
+// KONSTANTA & DATA REFERENSI LENGKAP
 // ==========================================
 const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 const PASARAN = ['Legi', 'Pahing', 'Pon', 'Wage', 'Kliwon'];
@@ -20,28 +63,79 @@ const DATA_SIFAT_PASARAN = {
 };
 
 const DATA_SIFAT_HARI = {
-    'Minggu': 'Tekun, mandiri dan berwibawa.',
-    'Senin': 'Selalu berubah, indah dan selalu mendapatkan simpati.',
-    'Selasa': 'Pemarah dan pencemburu serta luas pergaulannya.',
-    'Rabu': 'Pendiam, pemomong dan penyabar.',
-    'Kamis': 'Sangar menakutkan.',
-    'Jumat': 'Energik dan mengagumkan.',
-    'Sabtu': 'Membuat orang merasa senang dan susah ditebak.'
+    'Minggu': 'Ceria, percaya diri, tekun, mandiri, dan berwibawa. Berjiwa pemimpin, optimis, namun kadang suka ingin diperhatikan.',
+    'Senin': 'Halus, sabar, perasa, indah pembawaannya, dan mudah mendapat simpati. Setia dan pemaaf, tetapi mudah bimbang dan sensitif.',
+    'Selasa': 'Berani, tegas, pekerja keras, luas pergaulannya. Berwatak keras, mudah marah, dan memiliki rasa cemburu tinggi.',
+    'Rabu': 'Cerdas, pendiam, komunikatif, pemomong, dan penyabar. Pandai menyesuaikan diri, namun terkadang plin-plan.',
+    'Kamis': 'Bijaksana, berwibawa, religius, dan berpengaruh. Terlihat sangar atau menakutkan, tetapi berhati baik dan berpikir dalam.',
+    'Jumat': 'Ramah, energik, penuh empati, dan mengagumkan. Mudah disukai dan membawa rezeki, namun kurang tegas.',
+    'Sabtu': 'Kuat, tangguh, bertanggung jawab, dan membuat orang merasa nyaman. Sulit ditebak, keras kepala, tetapi dapat diandalkan.'
 };
 
 const NASIB_AHLI_WARIS = { 
-    1: { nama: "Gunung", arti: "Kehidupan yang mulia bagi ahli waris." },
-    2: { nama: "Guntur", arti: "Ahli waris akan mendapatkan kesulitan." },
-    3: { nama: "Segoro", arti: "Kemudahan dalam mencari rezeki." },
-    0: { nama: "Asat", arti: "Kesulitan dalam mendapatkan rezeki." }
+    1: { nama: "Gunung", arti: "kejadian dan urutan ini dalam neptu kematian menurut primbon memiliki makna bahwa kematian seseorang yang neptunya jatuh pada kategori Gunung maka artinya kelak ahli waris yang ditinggalkan akan mendapatkan kehidupan yang mulia." },
+    2: { nama: "Guntur", arti: "kejadian dan urutan ini dalam neptu kematian menurut primbon memiliki makna bahwa kematian seseorang yang neptunya jatuh pada kategori ini berarti orang yang ditinggalkan atau ahli waris akan mendapat kesulitan." },
+    3: { nama: "Segoro", arti: "kejadian dan urutan ini dalam neptu kematian menurut primbon memiliki makna bahwa kematian seseorang yang neptunya jatuh pada kategori ini berarti orang yang ditinggalkan akan menghadapi situasi dimudahkannya mencari penghasilan atau rezeki." },
+    0: { nama: "Asat", arti: "kejadian dan urutan ini dalam neptu kematian menurut primbon memiliki makna bahwa kematian seseorang yang neptunya jatuh pada kategori ini berarti ahli waris yang ditinggalkan tidak akan berkecukupan rezekinya." }
 };
 
-const PEMBAGI_5 = { 
-    1: { nama: "Sri", arti: "Murah rezeki dan hidup makmur." },
-    2: { nama: "Lungguh", arti: "Mendapatkan kedudukan atau pangkat tinggi." },
-    3: { nama: "Gendhong", arti: "Mapan secara lahiriah dan dihargai orang." },
-    4: { nama: "Loro", arti: "Sering menghadapi rintangan kesehatan/hidup." },
-    0: { nama: "Pati", arti: "Banyak hambatan, perlu kehati-hatian dalam melangkah." }
+
+const PEMBAGI_5 = {
+    1: { 
+        nama: "Sri", 
+        arti: "Murah rezeki dan hidup makmur.",
+        aktivitas_baik: [
+            "Memulai usaha dagang atau bisnis baru",
+            "Menanam tanaman pangan (padi, palawija)",
+            "Menyimpan uang atau investasi",
+            "Membuka toko atau tempat usaha"
+        ],
+        saran: "Sangat baik untuk urusan finansial dan kelimpahan materi."
+    },
+    2: { 
+        nama: "Lungguh", 
+        arti: "Mendapatkan kedudukan, pangkat, atau kehormatan.",
+        aktivitas_baik: [
+            "Melamar pekerjaan atau kenaikan jabatan",
+            "Pelantikan pengurus atau organisasi",
+            "Pindah rumah baru",
+            "Membangun pondasi rumah"
+        ],
+        saran: "Fokus pada pengembangan karier dan status sosial."
+    },
+    3: { 
+        nama: "Gendhong", 
+        arti: "Mapan secara lahiriah dan sangat dihargai masyarakat.",
+        aktivitas_baik: [
+            "Mengadakan pesta pernikahan",
+            "Membeli kendaraan atau aset besar",
+            "Menerima tamu penting",
+            "Menjalin kerjasama (MoU) dengan pihak luar"
+        ],
+        saran: "Waktu yang tepat untuk memperkuat hubungan sosial dan aset."
+    },
+    4: { 
+        nama: "Loro", 
+        arti: "Sering menghadapi rintangan kesehatan atau ujian hidup.",
+        aktivitas_baik: [
+            "Berdoa dan meditasi (pendekatan diri pada Tuhan)",
+            "Pengobatan atau cek kesehatan",
+            "Membersihkan rumah (ruwat lingkungan)",
+            "Bersedekah untuk menolak bala"
+        ],
+        saran: "Hindari memulai proyek besar; fokus pada pemulihan dan ketenangan."
+    },
+    0: { 
+        nama: "Pati", 
+        arti: "Banyak hambatan berat, perlu kehati-hatian ekstra.",
+        aktivitas_baik: [
+            "Introspeksi diri dan perencanaan matang",
+            "Menyelesaikan hutang-piutang",
+            "Kegiatan spiritual/keagamaan",
+            "Puasa atau tirakat"
+        ],
+        saran: "Sangat disarankan untuk menunda keputusan krusial atau hajatan besar."
+    }
 };
 
 const DATA_BULAN_JAWA = [
@@ -60,33 +154,474 @@ const DATA_BULAN_JAWA = [
 ];
 
 const DATA_SIKLUS_TAHUN = [
-    { nama: "Alip", makna: "Ada-ada (Niat)", deskripsi: "Melambangkan permulaan. Waktunya manusia mulai menanam niat, ide, atau tekad untuk melakukan sesuatu yang baik." },
-    { nama: "Ehe", makna: "Tumandang (Bekerja)", deskripsi: "Melambangkan realisasi. Setelah ada niat di tahun Alip, tahun ini adalah waktunya mulai bergerak dan bertindak." },
-    { nama: "Jimawal", makna: "Gawe (Pekerjaan)", deskripsi: "Melambangkan proses. Pekerjaan mulai terlihat bentuknya dan menuntut ketekunan untuk menyelesaikannya." },
-    { nama: "Je", makna: "Lelakon (Peristiwa/Nasib)", deskripsi: "Melambangkan ujian. Dalam proses bekerja, manusia pasti menemui cobaan atau dinamika hidup sebagai ujian mental." },
-    { nama: "Dal", makna: "Urip (Hidup)", deskripsi: "Melambangkan keberadaan. Tahun ini dianggap sakral (Tahun Duda). Waktunya merenungi hakikat hidup dan hubungan dengan Sang Pencipta." },
-    { nama: "Be", makna: "Bola-bali (Kembali/Konsisten)", deskripsi: "Melambangkan keteguhan. Mengajarkan manusia untuk tetap konsisten pada kebaikan meskipun sudah melalui berbagai ujian." },
-    { nama: "Wawu", makna: "Marang (Arah/Tujuan)", deskripsi: "Melambangkan fokus. Menjelang akhir siklus, manusia diingatkan untuk kembali fokus pada tujuan akhir hidup agar tidak tersesat." },
-    { nama: "Jimakir", makna: "Suwung (Kosong/Selesai)", deskripsi: "Melambangkan akhir dan evaluasi. Fase untuk melepaskan keterikatan duniawi dan mengevaluasi apa yang telah dilakukan." }
+    { 
+        nama: "Alip", 
+        makna: "Ada-ada (Niat)", 
+        deskripsi: "Melambangkan permulaan. Waktunya manusia mulai menanam niat, ide, atau tekad untuk melakukan sesuatu yang baik. Tahun ini merupakan awal dari siklus Windu, di mana semua dimulai dari niat yang tulus dan murni." 
+    },
+    { 
+        nama: "Ehe", 
+        makna: "Tumandang (Bekerja)", 
+        deskripsi: "Melambangkan realisasi. Setelah ada niat di tahun Alip, tahun ini adalah waktunya mulai bergerak dan bertindak. Tahun Ehe mengajarkan tentang pentingnya aksi nyata dan kerja keras untuk mewujudkan apa yang telah diniatkan." 
+    },
+    { 
+        nama: "Jimawal", 
+        makna: "Gawe (Pekerjaan)", 
+        deskripsi: "Melambangkan proses. Pekerjaan mulai terlihat bentuknya dan menuntut ketekunan untuk menyelesaikannya. Tahun ini adalah tahun pengembangan dan penyempurnaan dari apa yang telah dimulai sebelumnya." 
+    },
+    { 
+        nama: "Je", 
+        makna: "Lelakon (Peristiwa/Nasib)", 
+        deskripsi: "Melambangkan ujian. Dalam proses bekerja, manusia pasti menemui cobaan atau dinamika hidup sebagai ujian mental. Tahun Je mengajarkan tentang kesabaran dan ketabahan dalam menghadapi tantangan hidup." 
+    },
+    { 
+        nama: "Dal", 
+        makna: "Urip (Hidup)", 
+        deskripsi: "Melambangkan keberadaan. Tahun ini dianggap sakral (Tahun Duda). Waktunya merenungi hakikat hidup dan hubungan dengan Sang Pencipta. Tahun Dal adalah tahun spiritualitas dan pencarian makna hidup yang lebih dalam." 
+    },
+    { 
+        nama: "Be", 
+        makna: "Bola-bali (Kembali/Konsisten)", 
+        deskripsi: "Melambangkan keteguhan. Mengajarkan manusia untuk tetap konsisten pada kebaikan meskipun sudah melalui berbagai ujian. Tahun Be adalah tahun evaluasi dan komitmen untuk tetap pada jalan yang benar." 
+    },
+    { 
+        nama: "Wawu", 
+        makna: "Marang (Arah/Tujuan)", 
+        deskripsi: "Melambangkan fokus. Menjelang akhir siklus, manusia diingatkan untuk kembali focus pada tujuan akhir hidup agar tidak tersesat. Tahun Wawu adalah tahun penentuan arah dan prioritas hidup." 
+    },
+    { 
+        nama: "Jimakir", 
+        makna: "Suwung (Kosong/Selesai)", 
+        deskripsi: "Melambangkan akhir dan evaluasi. Fase untuk melepaskan keterikatan duniawi dan mengevaluasi apa yang telah dilakukan. Tahun Jimakir adalah tahun penyelesaian dan persiapan untuk siklus baru." 
+    }
 ];
 
 const WINDU_LIST = ["Kuntara", "Sangara", "Sancaya", "Adi"];
 
-let current = new Date();
-const TODAY = new Date();
+// ==========================================
+// DATA LENGKAP YANG DIBUTUHKAN
+// ==========================================
+
+const DB_IMLEK = {
+    1940: { m: 2, d: 8, shio: "Naga" },
+    1941: { m: 1, d: 27, shio: "Ular" },
+    1942: { m: 2, d: 15, shio: "Kuda" },
+    1943: { m: 2, d: 5, shio: "Kambing" },
+    1944: { m: 1, d: 25, shio: "Monyet" },
+    1945: { m: 2, d: 13, shio: "Ayam" },
+    1946: { m: 2, d: 2, shio: "Anjing" },
+    1947: { m: 1, d: 22, shio: "Babi" },
+    1948: { m: 2, d: 10, shio: "Tikus" },
+    1949: { m: 1, d: 29, shio: "Kerbau" },
+    1950: { m: 2, d: 17, shio: "Macan" },
+    1951: { m: 2, d: 6, shio: "Kelinci" },
+    1952: { m: 1, d: 27, shio: "Naga" },
+    1953: { m: 2, d: 14, shio: "Ular" },
+    1954: { m: 2, d: 3, shio: "Kuda" },
+    1955: { m: 1, d: 24, shio: "Kambing" },
+    1956: { m: 2, d: 12, shio: "Monyet" },
+    1957: { m: 1, d: 31, shio: "Ayam" },
+    1958: { m: 2, d: 18, shio: "Anjing" },
+    1959: { m: 2, d: 8, shio: "Babi" },
+    1960: { m: 1, d: 28, shio: "Tikus" },
+    1961: { m: 2, d: 15, shio: "Kerbau" },
+    1962: { m: 2, d: 5, shio: "Macan" },
+    1963: { m: 1, d: 25, shio: "Kelinci" },
+    1964: { m: 2, d: 13, shio: "Naga" },
+    1965: { m: 2, d: 2, shio: "Ular" },
+    1966: { m: 1, d: 21, shio: "Kuda" },
+    1967: { m: 2, d: 9, shio: "Kambing" },
+    1968: { m: 1, d: 30, shio: "Monyet" },
+    1969: { m: 2, d: 17, shio: "Ayam" },
+    1970: { m: 2, d: 6, shio: "Anjing" },
+    1971: { m: 1, d: 27, shio: "Babi" },
+    1972: { m: 2, d: 15, shio: "Tikus" },
+    1973: { m: 2, d: 3, shio: "Kerbau" },
+    1974: { m: 1, d: 23, shio: "Macan" },
+    1975: { m: 2, d: 11, shio: "Kelinci" },
+    1976: { m: 1, d: 31, shio: "Naga" },
+    1977: { m: 2, d: 18, shio: "Ular" },
+    1978: { m: 2, d: 7, shio: "Kuda" },
+    1979: { m: 1, d: 28, shio: "Kambing" },
+    1980: { m: 2, d: 16, shio: "Monyet" },
+    1981: { m: 2, d: 5, shio: "Ayam" },
+    1982: { m: 1, d: 25, shio: "Anjing" },
+    1983: { m: 2, d: 13, shio: "Babi" },
+    1984: { m: 2, d: 2, shio: "Tikus" },
+    1985: { m: 2, d: 20, shio: "Kerbau" },
+    1986: { m: 2, d: 9, shio: "Macan" },
+    1987: { m: 1, d: 29, shio: "Kelinci" },
+    1988: { m: 2, d: 17, shio: "Naga" },
+    1989: { m: 2, d: 6, shio: "Ular" },
+    1990: { m: 1, d: 27, shio: "Kuda" },
+    1991: { m: 2, d: 15, shio: "Kambing" },
+    1992: { m: 2, d: 4, shio: "Monyet" },
+    1993: { m: 1, d: 23, shio: "Ayam" },
+    1994: { m: 2, d: 10, shio: "Anjing" },
+    1995: { m: 1, d: 31, shio: "Babi" },
+    1996: { m: 2, d: 19, shio: "Tikus" },
+    1997: { m: 2, d: 7, shio: "Kerbau" },
+    1998: { m: 1, d: 28, shio: "Macan" },
+    1999: { m: 2, d: 16, shio: "Kelinci" },
+    2000: { m: 2, d: 5, shio: "Naga" },
+    2001: { m: 1, d: 24, shio: "Ular" },
+    2002: { m: 2, d: 12, shio: "Kuda" },
+    2003: { m: 2, d: 1, shio: "Kambing" },
+    2004: { m: 1, d: 22, shio: "Monyet" },
+    2005: { m: 2, d: 9, shio: "Ayam" },
+    2006: { m: 1, d: 29, shio: "Anjing" },
+    2007: { m: 2, d: 18, shio: "Babi" },
+    2008: { m: 2, d: 7, shio: "Tikus" },
+    2009: { m: 1, d: 26, shio: "Kerbau" },
+    2010: { m: 2, d: 14, shio: "Macan" },
+    2011: { m: 2, d: 3, shio: "Kelinci" },
+    2012: { m: 1, d: 23, shio: "Naga" },
+    2013: { m: 2, d: 10, shio: "Ular" },
+    2014: { m: 1, d: 31, shio: "Kuda" },
+    2015: { m: 2, d: 19, shio: "Kambing" },
+    2016: { m: 2, d: 8, shio: "Monyet" },
+    2017: { m: 1, d: 28, shio: "Ayam" },
+    2018: { m: 2, d: 16, shio: "Anjing" },
+    2019: { m: 2, d: 5, shio: "Babi" },
+    2020: { m: 1, d: 25, shio: "Tikus" },
+    2021: { m: 2, d: 12, shio: "Kerbau" },
+    2022: { m: 2, d: 1, shio: "Macan" },
+    2023: { m: 1, d: 22, shio: "Kelinci" },
+    2024: { m: 2, d: 10, shio: "Naga" },
+    2025: { m: 1, d: 29, shio: "Ular" },
+    2026: { m: 2, d: 17, shio: "Kuda" },
+    2027: { m: 2, d: 6, shio: "Kambing" },
+    2028: { m: 1, d: 26, shio: "Monyet" },
+    2029: { m: 2, d: 13, shio: "Ayam" },
+    2030: { m: 2, d: 3, shio: "Anjing" }
+};
+
+// DATA PRANATA MANGSA LENGKAP
+const DATA_MANGSA = {
+    1: { 
+        nama: "Kasa (Kartika)", 
+        deskripsi: "Mangsa Kasa berlangsung sekitar 41 hari, biasanya dimulai tanggal 22 Juni dan berakhir 1 Agustus. Pada mangsa ini, pohon randu, mangga, dan dadap mulai berbunga. Tanaman padi mulai menghijau, daun jati mulai gugur, hujan mulai jarang turun, dan udara terasa kering. Burung-burung mulai membuat sarang. Musim ini ditandai dengan angin berhembus dari timur dan selatan." 
+    },
+    2: { 
+        nama: "Karo", 
+        deskripsi: "Mangsa Karo berlangsung sekitar 23 hari, dari tanggal 2 Agustus hingga 24 Agustus. Pada mangsa ini, pohon asem mulai berdaun muda, padi mulai berbunga, burung manyar mulai bersarang, ulat mulai banyak terlihat, dan buah-buahan mulai masak. Angin bertiup dari arah timur." 
+    },
+    3: { 
+        nama: "Katelu (Katiga)", 
+        deskripsi: "Mangsa Katelu berlangsung sekitar 24 hari, dari tanggal 25 Agustus hingga 17 September. Pada mangsa ini, pohon dadap mulai meranggas, buah lerak mulai masak, belalang mulai menetas, dan ular mulai banyak terlihat. Angin bertiup dari arah utara." 
+    },
+    4: { 
+        nama: "Kapat", 
+        deskripsi: "Mangsa Kapat berlangsung sekitar 25 hari, dari tanggal 18 September hingga 12 Oktober. Pada mangsa ini, bunga kenanga mulai bermekaran, burung-burung kecil mulai menetas, padi mulai menguning, dan buah kapuk mulai masak. Musim ini juga dikenal sebagai musim buah-buahan. Angin bertiup dari arah barat." 
+    },
+    5: { 
+        nama: "Kalima", 
+        deskripsi: "Mangsa Kalima berlangsung sekitar 27 hari, dari tanggal 13 Oktober hingga 8 November. Pada mangsa ini, pohon randu mulai meluruhkan daunnya, bunga cempaka bermekaran, padi mulai dipanen, dan musim hujan mulai datang. Angin bertiup dari arah barat daya." 
+    },
+    6: { 
+        nama: "Kanem", 
+        deskripsi: "Mangsa Kanem berlangsung sekitar 43 hari, dari tanggal 9 November hingga 21 Desember. Pada mangsa ini, hujan mulai turun dengan derasnya, pohon kapuk mulai berbunga, padi gadis mulai ditanam, dan udara mulai dingin. Ini adalah puncak musim penghujan. Angin bertiup dari arah barat laut." 
+    },
+    7: { 
+        nama: "Kapitu", 
+        deskripsi: "Mangsa Kapitu berlangsung sekitar 43 hari, dari tanggal 22 Desember hingga 2 Februari. Pada mangsa ini, banyak sungai yang meluap, pohon mangga mulai berbunga, cengkeh mulai dipetik, dan hujan masih sering turun. Angin bertiup dari arah barat dan utara." 
+    },
+    8: { 
+        nama: "Kawolu", 
+        deskripsi: "Mangsa Kawolu berlangsung sekitar 27 hari, dari tanggal 3 Februari hingga 28 Februari. Pada mangsa ini, pohon kapuk mulai gugur daunnya, cengkeh mulai banyak dipetik, padi mulai ditanam di sawah, dan hujan mulai berkurang. Angin bertiup dari arah timur laut." 
+    },
+    9: { 
+        nama: "Kasanga", 
+        deskripsi: "Mangsa Kasanga berlangsung sekitar 25 hari, dari tanggal 1 Maret hingga 25 Maret. Pada mangsa ini, pohon asem mulai berbunga, burung manyar mulai bersarang di pohon yang tinggi, dan angin mulai bertiup kencang. Musim ini dikenal sebagai musim angin ribut. Angin bertiup dari arah timur." 
+    },
+    10: { 
+        nama: "Kasadasa", 
+        deskripsi: "Mangsa Kasadasa berlangsung sekitar 24 hari, dari tanggal 26 Maret hingga 18 April. Pada mangsa ini, pohon randu mulai berdaun, ulat mulai banyak terlihat, dan buah-buahan mulai masak. Musim panas mulai terasa. Angin bertiup dari arah selatan." 
+    },
+    11: { 
+        nama: "Dhesta", 
+        deskripsi: "Mangsa Dhesta berlangsung sekitar 23 hari, dari tanggal 19 April hingga 11 Mei. Pada mangsa ini, pohon mangga mulai berbuah, padi di sawah mulai tinggi, dan udara terasa panas. Musim kemarau mulai terasa. Angin bertiup dari arah tenggara." 
+    },
+    12: { 
+        nama: "Sadha", 
+        deskripsi: "Mangsa Sadha berlangsung sekitar 41 hari, dari tanggal 12 Mei hingga 21 Juni. Pada mangsa ini, pohon jati mulai berdaun, padi mulai menguning, dan buah kapuk mulai merekah. Ini adalah puncak musim kemarau. Angin bertiup dari arah timur." 
+    }
+};
+
+// DATA WATAK NEPTU LENGKAP
+const DATA_WATAK_NEPTU = {
+    5: { 
+        watak: "Watak Pendiam: Orang dengan neptu 5 cenderung pendiam, tetapi memiliki pemikiran yang dalam. Mereka adalah pemikir yang analitis dan sering kali menjadi penengah dalam konflik. Dalam pekerjaan, mereka teliti dan hati-hati. Hubungan sosial mereka terbatas tetapi berkualitas. Kelemahan: Terkadang terlalu tertutup dan sulit mengungkapkan perasaan." 
+    },
+    6: { 
+        watak: "Watak Cerdik: Orang dengan neptu 6 memiliki kecerdasan di atas rata-rata dan kemampuan analisis yang tajam. Mereka pandai dalam strategi dan perencanaan. Dalam bisnis, mereka cenderung sukses karena perhitungan yang matang. Sosial: Mudah bergaul tetapi selektif. Kelemahan: Terkadang terlalu kritis terhadap orang lain." 
+    },
+    7: { 
+        watak: "Watak Misterius: Orang dengan neptu 7 memiliki aura misterius dan sering kali menarik perhatian. Mereka memiliki sisi spiritual yang kuat dan intuisi yang tajam. Dalam kehidupan, mereka sering mengalami hal-hal yang tidak terduga. Bakat: Memiliki kemampuan seni atau metafisika. Kelemahan: Mudah terjebak dalam pikiran sendiri." 
+    },
+    8: { 
+        watak: "Watak Sukses Materi: Orang dengan neptu 8 memiliki bakat dalam hal materi dan finansial. Mereka adalah pengusaha yang handal dan investor yang cerdas. Kehidupan mereka cenderung mapan dan stabil. Sosial: Dihormati karena kesuksesan mereka. Kelemahan: Terkadang terlalu materialistis." 
+    },
+    9: { 
+        watak: "Watak Bijaksana: Orang dengan neptu 9 adalah orang yang bijaksana dan sering dimintai nasihat. Mereka memiliki kharisma alami dan dihormati di masyarakat. Dalam kepemimpinan, mereka adil dan bijaksana. Spiritual: Memiliki pemahaman spiritual yang dalam. Kelemahan: Terkadang terlalu idealis." 
+    },
+    10: { 
+        watak: "Watak Pemimpin: Orang dengan neptu 10 adalah pemimpin alami. Mereka memiliki keberanian dan tanggung jawab yang besar. Dalam organisasi, mereka sering menjadi penentu kebijakan. Karir: Cenderung menduduki posisi pimpinan. Kelemahan: Terkadang terlalu dominan." 
+    },
+    11: { 
+        watak: "Watak Kreatif: Orang dengan neptu 11 memiliki kreativitas yang tinggi dan inovasi yang luar biasa. Mereka adalah pionir dalam bidang mereka. Seni dan teknologi adalah bidang yang cocok untuk mereka. Sosial: Populer karena ide-ide brilian mereka. Kelemahan: Terkadang tidak praktis." 
+    },
+    12: { 
+        watak: "Watak Setia: Orang dengan neptu 12 sangat setia dan bertanggung jawab. Mereka adalah teman dan partner yang dapat diandalkan. Dalam hubungan, mereka komitmen tinggi. Pekerjaan: Dapat diandalkan dan konsisten. Kelemahan: Terkadang terlalu kaku." 
+    },
+    13: { 
+        watak: "Watak Transformator: Orang dengan neptu 13 adalah agen perubahan. Mereka memiliki kemampuan untuk mengubah situasi sulit menjadi peluang. Kehidupan mereka penuh dengan transformasi. Spiritual: Memahami siklus kehidupan dan kematian. Kelemahan: Rentan terhadap perubahan mood." 
+    },
+    14: { 
+        watak: "Watak Pekerja Keras: Orang dengan neptu 14 adalah pekerja keras yang pantang menyerah. Mereka mencapai kesuksesan melalui usaha dan ketekunan. Fisik: Kuat dan tahan banting. Sosial: Dihormati karena kerja keras mereka. Kelemahan: Terkadang lupa waktu istirahat." 
+    },
+    15: { 
+        watak: "Watak Humanis: Orang dengan neptu 15 sangat peduli pada sesama. Mereka adalah filantropis dan aktivis sosial. Kehidupan mereka diabdikan untuk membantu orang lain. Empati: Sangat tinggi terhadap penderitaan orang lain. Kelemahan: Terkadang mengabaikan diri sendiri." 
+    },
+    16: { 
+        watak: "Watak Visioner: Orang dengan neptu 16 memiliki visi jauh ke depan. Mereka adalah perencana strategis yang hebat. Masa depan: Selalu mempersiapkan masa depan dengan matang. Inovasi: Selalu mencari cara baru. Kelemahan: Terkadang kurang realistis." 
+    },
+    17: { 
+        watak: "Watak Petualang: Orang dengan neptu 17 memiliki jiwa petualang yang kuat. Mereka menyukai tantangan dan hal baru. Perjalanan: Sering melakukan perjalanan jauh. Adaptasi: Cepat beradaptasi dengan lingkungan baru. Kelemahan: Terkadang tidak stabil." 
+    },
+    18: { 
+        watak: "Watak Filosofis: Orang dengan neptu 18 adalah pemikir filosofis yang mendalam. Mereka sering merenungkan makna kehidupan. Kebijaksanaan: Memiliki pemahaman hidup yang dalam. Spiritual: Mendekati kehidupan dengan pandangan spiritual. Kelemahan: Terkadang terlalu kontemplatif." 
+    }
+};
+
+// DATA SRI JATI LENGKAP
+const TABEL_SRIJATI = {
+    5: [
+        { usia: "0-8 tahun", nilai: 4, fase: "Masa Kanak-kanak" },
+        { usia: "9-16 tahun", nilai: 6, fase: "Masa Remaja" },
+        { usia: "17-24 tahun", nilai: 7, fase: "Masa Awal Dewasa" },
+        { usia: "25-32 tahun", nilai: 8, fase: "Masa Produktif" },
+        { usia: "33-40 tahun", nilai: 9, fase: "Puncak Karir" },
+        { usia: "41-48 tahun", nilai: 7, fase: "Masa Stabil" },
+        { usia: "49-56 tahun", nilai: 6, fase: "Masa Persiapan Pensiun" },
+        { usia: "57-64 tahun", nilai: 5, fase: "Masa Pensiun" }
+    ],
+    6: [
+        { usia: "0-8 tahun", nilai: 3, fase: "Masa Kanak-kanak" },
+        { usia: "9-16 tahun", nilai: 5, fase: "Masa Remaja" },
+        { usia: "17-24 tahun", nilai: 6, fase: "Masa Awal Dewasa" },
+        { usia: "25-32 tahun", nilai: 7, fase: "Masa Produktif" },
+        { usia: "33-40 tahun", nilai: 8, fase: "Puncak Karir" },
+        { usia: "41-48 tahun", nilai: 9, fase: "Masa Keemasan" },
+        { usia: "49-56 tahun", nilai: 7, fase: "Masa Stabil" },
+        { usia: "57-64 tahun", nilai: 6, fase: "Masa Pensiun" }
+    ],
+    7: [
+       { usia: "0-6 tahun", nilai: 4, fase: "Masa Kanak-kanak" },
+        { usia: "7-12 tahun", nilai: 1, fase: "Masa Remaja" },
+        { usia: "13-18 tahun", nilai: 4, fase: "Masa Awal Dewasa" },
+        { usia: "19-24 tahun", nilai: 1, fase: "Masa Produktif" },
+        { usia: "25-30 tahun", nilai: 0, fase: "Puncak Karir" },
+        { usia: "31-36 tahun", nilai: 2, fase: "Masa Stabil" },
+        { usia: "37-42 tahun", nilai: 2, fase: "Masa Persiapan Pensiun" },
+    ],
+    8: [
+        { usia: "0-6 tahun", nilai: 4, fase: "Masa Kanak-kanak" },
+        { usia: "7-12 tahun", nilai: 1, fase: "Masa Remaja" },
+        { usia: "13-18 tahun", nilai: 0, fase: "Masa Awal Dewasa" },
+        { usia: "19-24 tahun", nilai: 1, fase: "Masa Produktif" },
+        { usia: "25-30 tahun", nilai: 0, fase: "Puncak Karir" },
+        { usia: "31-36 tahun", nilai: 3, fase: "Masa Stabil" },
+        { usia: "37-42 tahun", nilai: 0, fase: "Masa Persiapan Pensiun" },
+      { usia: "43-48 tahun", nilai: 7, fase: "Masa Persiapan Pensiun" },
+    ],
+    9: [
+        { usia: "0-6 tahun", nilai: 2, fase: "Masa Kanak-kanak" },
+        { usia: "7-12 tahun", nilai: 5, fase: "Masa Remaja" },
+        { usia: "13-18 tahun", nilai: 1, fase: "Masa Awal Dewasa" },
+        { usia: "19-24 tahun", nilai: 0, fase: "Masa Produktif" },
+        { usia: "25-30 tahun", nilai: 4, fase: "Puncak Karir" },
+        { usia: "31-36 tahun", nilai: 1, fase: "Masa Stabil" },
+        { usia: "37-42 tahun", nilai: 4, fase: "Masa Persiapan Pensiun" },
+      { usia: "43-48 tahun", nilai: 0, fase: "Masa Persiapan Pensiun" },
+       { usia: "49-54 tahun", nilai: 1, fase: "Masa Persiapan Pensiun" },
+    ],
+    10: [
+       { usia: "0-6 tahun", nilai: 1, fase: "Masa Kanak-kanak" },
+        { usia: "7-12 tahun", nilai: 0, fase: "Masa Remaja" },
+        { usia: "13-18 tahun", nilai: 4, fase: "Masa Awal Dewasa" },
+        { usia: "19-24 tahun", nilai: 1, fase: "Masa Produktif" },
+        { usia: "25-30 tahun", nilai: 1, fase: "Puncak Karir" },
+        { usia: "31-36 tahun", nilai: 3, fase: "Masa Stabil" },
+        { usia: "37-42 tahun", nilai: 0, fase: "Masa Persiapan Pensiun" },
+      { usia: "43-48 tahun", nilai: 0, fase: "Masa Persiapan Pensiun" },
+       { usia: "49-54 tahun", nilai: 4, fase: "Masa Persiapan Pensiun" },
+    { usia: "55-60 tahun", nilai: 4, fase: "Masa Persiapan Pensiun" },
+    ],
+    11: [
+        { usia: "0-6 tahun", nilai: 2, fase: "Masa Kanak-kanak" },
+        { usia: "7-12 tahun", nilai: 4, fase: "Masa Remaja" },
+        { usia: "13-18 tahun", nilai: 1, fase: "Masa Awal Dewasa" },
+        { usia: "19-24 tahun", nilai: 1, fase: "Masa Produktif" },
+        { usia: "25-30 tahun", nilai: 8, fase: "Puncak Karir" },
+        { usia: "31-36 tahun", nilai: 1, fase: "Masa Stabil" },
+        { usia: "37-42 tahun", nilai: 0, fase: "Masa Persiapan Pensiun" },
+      { usia: "43-48 tahun", nilai: 1, fase: "Masa Persiapan Pensiun" },
+       { usia: "49-54 tahun", nilai: 2, fase: "Masa Persiapan Pensiun" },
+    { usia: "55-60 tahun", nilai: 0, fase: "Masa Persiapan Pensiun" },
+    { usia: "61-66 tahun", nilai: 2, fase: "Masa Persiapan Pensiun" },
+    ],
+    12: [
+        { usia: "0-6 tahun", nilai: 0, fase: "Masa Kanak-kanak" },
+        { usia: "7-12 tahun", nilai: 5, fase: "Masa Remaja" },
+        { usia: "13-18 tahun", nilai: 1, fase: "Masa Awal Dewasa" },
+        { usia: "19-24 tahun", nilai: 0, fase: "Masa Produktif" },
+        { usia: "25-30 tahun", nilai: 4, fase: "Puncak Karir" },
+        { usia: "31-36 tahun", nilai: 0, fase: "Masa Stabil" },
+        { usia: "37-42 tahun", nilai: 1, fase: "Masa Persiapan Pensiun" },
+      { usia: "43-48 tahun", nilai: 0, fase: "Masa Persiapan Pensiun" },
+       { usia: "49-54 tahun", nilai: 1, fase: "Masa Persiapan Pensiun" },
+    { usia: "55-60 tahun", nilai: 4, fase: "Masa Persiapan Pensiun" },
+    { usia: "61-66 tahun", nilai: 4, fase: "Masa Persiapan Pensiun" },
+    { usia: "67-72 tahun", nilai: 0, fase: "Masa Persiapan Pensiun" },
+    ],
+    13: [
+        { usia: "0-6 tahun", nilai: 3, fase: "Masa Kanak-kanak" },
+        { usia: "7-12 tahun", nilai: 1, fase: "Masa Remaja" },
+        { usia: "13-18 tahun", nilai: 0, fase: "Masa Awal Dewasa" },
+        { usia: "19-24 tahun", nilai: 5, fase: "Masa Produktif" },
+        { usia: "25-30 tahun", nilai: 0, fase: "Puncak Karir" },
+        { usia: "31-36 tahun", nilai: 1, fase: "Masa Stabil" },
+        { usia: "37-42 tahun", nilai: 1, fase: "Masa Persiapan Pensiun" },
+      { usia: "43-48 tahun", nilai: 5, fase: "Masa Persiapan Pensiun" },
+       { usia: "49-54 tahun", nilai: 2, fase: "Masa Persiapan Pensiun" },
+    { usia: "55-60 tahun", nilai: 0, fase: "Masa Persiapan Pensiun" },
+    { usia: "61-66 tahun", nilai: 1, fase: "Masa Persiapan Pensiun" },
+    { usia: "67-72 tahun", nilai: 2, fase: "Masa Persiapan Pensiun" },
+     { usia: "73-78 tahun", nilai: 5, fase: "Masa Persiapan Pensiun" },
+    ],
+    14: [
+        { usia: "0-6 tahun", nilai: 1, fase: "Masa Kanak-kanak" },
+        { usia: "7-12 tahun", nilai: 0, fase: "Masa Remaja" },
+        { usia: "13-18 tahun", nilai: 1, fase: "Masa Awal Dewasa" },
+        { usia: "19-24 tahun", nilai: 4, fase: "Masa Produktif" },
+        { usia: "25-30 tahun", nilai: 0, fase: "Puncak Karir" },
+        { usia: "31-36 tahun", nilai: 0, fase: "Masa Stabil" },
+        { usia: "37-42 tahun", nilai: 4, fase: "Masa Persiapan Pensiun" },
+      { usia: "43-48 tahun", nilai: 4, fase: "Masa Persiapan Pensiun" },
+       { usia: "49-54 tahun", nilai: 1, fase: "Masa Persiapan Pensiun" },
+    { usia: "55-60 tahun", nilai: 4, fase: "Masa Persiapan Pensiun" },
+    { usia: "61-66 tahun", nilai: 0, fase: "Masa Persiapan Pensiun" },
+    { usia: "67-72 tahun", nilai: 1, fase: "Masa Persiapan Pensiun" },
+     { usia: "73-78 tahun", nilai: 4, fase: "Masa Persiapan Pensiun" },
+     { usia: "79-84 tahun", nilai: 4, fase: "Masa Persiapan Pensiun" },
+    ],
+    15: [
+       { usia: "0-6 tahun", nilai: 2, fase: "Masa Kanak-kanak" },
+        { usia: "7-12 tahun", nilai: 0, fase: "Masa Remaja" },
+        { usia: "13-18 tahun", nilai: 1, fase: "Masa Awal Dewasa" },
+        { usia: "19-24 tahun", nilai: 1, fase: "Masa Produktif" },
+        { usia: "25-30 tahun", nilai: 5, fase: "Puncak Karir" },
+        { usia: "31-36 tahun", nilai: 2, fase: "Masa Stabil" },
+        { usia: "37-42 tahun", nilai: 0, fase: "Masa Persiapan Pensiun" },
+      { usia: "43-48 tahun", nilai: 1, fase: "Masa Persiapan Pensiun" },
+       { usia: "49-54 tahun", nilai: 2, fase: "Masa Persiapan Pensiun" },
+    { usia: "55-60 tahun", nilai: 5, fase: "Masa Persiapan Pensiun" },
+    { usia: "61-66 tahun", nilai: 5, fase: "Masa Persiapan Pensiun" },
+    { usia: "67-72 tahun", nilai: 1, fase: "Masa Persiapan Pensiun" },
+     { usia: "73-78 tahun", nilai: 0, fase: "Masa Persiapan Pensiun" },
+     { usia: "79-84 tahun", nilai: 4, fase: "Masa Persiapan Pensiun" },
+     { usia: "85-90 tahun", nilai: 1, fase: "Masa Persiapan Pensiun" },
+    ],
+    16: [
+       { usia: "0-6 tahun", nilai: 0, fase: "Masa Kanak-kanak" },
+        { usia: "7-12 tahun", nilai: 3, fase: "Masa Remaja" },
+        { usia: "13-18 tahun", nilai: 1, fase: "Masa Awal Dewasa" },
+        { usia: "19-24 tahun", nilai: 2, fase: "Masa Produktif" },
+        { usia: "25-30 tahun", nilai: 0, fase: "Puncak Karir" },
+        { usia: "31-36 tahun", nilai: 1, fase: "Masa Stabil" },
+        { usia: "37-42 tahun", nilai: 8, fase: "Masa Persiapan Pensiun" },
+      { usia: "43-48 tahun", nilai: 1, fase: "Masa Persiapan Pensiun" },
+       { usia: "49-54 tahun", nilai: 2, fase: "Masa Persiapan Pensiun" },
+    { usia: "55-60 tahun", nilai: 7, fase: "Masa Persiapan Pensiun" },
+    { usia: "61-66 tahun", nilai: 2, fase: "Masa Persiapan Pensiun" },
+    { usia: "67-72 tahun", nilai: 0, fase: "Masa Persiapan Pensiun" },
+     { usia: "73-78 tahun", nilai: 7, fase: "Masa Persiapan Pensiun" },
+     { usia: "79-84 tahun", nilai: 1, fase: "Masa Persiapan Pensiun" },
+     { usia: "85-90 tahun", nilai: 0, fase: "Masa Persiapan Pensiun" },
+     { usia: "91-96 tahun", nilai: 2, fase: "Masa Persiapan Pensiun" },
+    ],
+    17: [
+        { usia: "0-6 tahun", nilai: 1, fase: "Masa Kanak-kanak" },
+        { usia: "7-12 tahun", nilai: 1, fase: "Masa Remaja" },
+        { usia: "13-18 tahun", nilai: 0, fase: "Masa Awal Dewasa" },
+        { usia: "19-24 tahun", nilai: 5, fase: "Masa Produktif" },
+        { usia: "25-30 tahun", nilai: 0, fase: "Puncak Karir" },
+        { usia: "31-36 tahun", nilai: 1, fase: "Masa Stabil" },
+        { usia: "37-42 tahun", nilai: 1, fase: "Masa Persiapan Pensiun" },
+      { usia: "43-48 tahun", nilai: 5, fase: "Masa Persiapan Pensiun" },
+       { usia: "49-54 tahun", nilai: 2, fase: "Masa Persiapan Pensiun" },
+    { usia: "55-60 tahun", nilai: 0, fase: "Masa Persiapan Pensiun" },
+    { usia: "61-66 tahun", nilai: 1, fase: "Masa Persiapan Pensiun" },
+    { usia: "67-72 tahun", nilai: 2, fase: "Masa Persiapan Pensiun" },
+     { usia: "73-78 tahun", nilai: 5, fase: "Masa Persiapan Pensiun" },
+     { usia: "79-84 tahun", nilai: 5, fase: "Masa Persiapan Pensiun" },
+     { usia: "85-90 tahun", nilai: 1, fase: "Masa Persiapan Pensiun" },
+     { usia: "91-96 tahun", nilai: 0, fase: "Masa Persiapan Pensiun" },
+     { usia: "97-102 tahun", nilai: 4, fase: "Masa Persiapan Pensiun" },
+    ],
+    18: [
+       { usia: "0-6 tahun", nilai: 2, fase: "Masa Kanak-kanak" },
+        { usia: "7-12 tahun", nilai: 5, fase: "Masa Remaja" },
+        { usia: "13-18 tahun", nilai: 1, fase: "Masa Awal Dewasa" },
+        { usia: "19-24 tahun", nilai: 0, fase: "Masa Produktif" },
+        { usia: "25-30 tahun", nilai: 4, fase: "Puncak Karir" },
+        { usia: "31-36 tahun", nilai: 1, fase: "Masa Stabil" },
+        { usia: "37-42 tahun", nilai: 4, fase: "Masa Persiapan Pensiun" },
+      { usia: "43-48 tahun", nilai: 0, fase: "Masa Persiapan Pensiun" },
+       { usia: "49-54 tahun", nilai: 1, fase: "Masa Persiapan Pensiun" },
+    { usia: "55-60 tahun", nilai: 4, fase: "Masa Persiapan Pensiun" },
+    { usia: "61-66 tahun", nilai: 4, fase: "Masa Persiapan Pensiun" },
+    { usia: "67-72 tahun", nilai: 0, fase: "Masa Persiapan Pensiun" },
+     { usia: "73-78 tahun", nilai: 0, fase: "Masa Persiapan Pensiun" },
+     { usia: "79-84 tahun", nilai: 4, fase: "Masa Persiapan Pensiun" },
+     { usia: "85-90 tahun", nilai: 1, fase: "Masa Persiapan Pensiun" },
+     { usia: "91-96 tahun", nilai: 4, fase: "Masa Persiapan Pensiun" },
+     { usia: "97-102 tahun", nilai: 0, fase: "Masa Persiapan Pensiun" },
+      { usia: "103-108 tahun", nilai: 1, fase: "Masa Persiapan Pensiun" },
+    ]
+};
+
+const SRI_JATI_DESC = {
+    1: "Masa sangat sulit, banyak tantangan dan rintangan. Perlu kesabaran dan ketekunan ekstra.",
+    2: "Masa sulit, tetapi ada sedikit kemajuan. Tetap perlu kerja keras dan tidak mudah menyerah.",
+    3: "Masa stabil dengan tantangan yang wajar. Mulai ada perkembangan meski perlahan.",
+    4: "Masa mulai membaik dengan perkembangan yang nyata. Peluang mulai terbuka.",
+    5: "Masa cukup baik dengan rejeki yang stabil. Kehidupan mulai nyaman.",
+    6: "Masa baik dengan perkembangan karir dan finansial. Banyak peluang yang terbuka.",
+    7: "Masa sangat baik dengan keberuntungan finansial. Waktu yang tepat untuk investasi.",
+    8: "Masa keemasan dengan sukses dalam bisnis dan karir. Puncak prestasi.",
+    9: "Masa puncak kesuksesan dengan segala keberlimpahan. Waktu terbaik dalam hidup."
+};
+
+// ==========================================
+// VARIABEL GLOBAL UNTUK DATA WUKU
+// ==========================================
+
+let DATA_WUKU = {}; // Akan diisi dari file eksternal data-wuku.js
 
 // ==========================================
 // FUNGSI LOGIKA DASAR
 // ==========================================
+
+let current = new Date();
+const TODAY = new Date();
 
 function getPasaran(date) {
     const base = new Date(1900, 0, 1);
     const diff = Math.floor((date.getTime() - base.getTime()) / (1000 * 60 * 60 * 24));
     return PASARAN[(((diff + 1) % 5) + 5) % 5];
 }
-
-
-
 
 function getZodiak(date) {
     const d = date.getDate(); const m = date.getMonth() + 1;
@@ -105,46 +640,50 @@ function getZodiak(date) {
 }
 
 function getLunarShio(date) {
-    const y = date.getFullYear();
-    const m = date.getMonth() + 1;
-    const d = date.getDate();
-    
-    // 1. Tentukan Tanggal Imlek tahun tersebut (Estimasi jika DB tidak ada)
-    let imlekM, imlekD, shioTahunIni;
-    
-    if (DB_IMLEK[y]) {
-        imlekM = DB_IMLEK[y].m;
-        imlekD = DB_IMLEK[y].d;
-        shioTahunIni = DB_IMLEK[y].shio;
-    } else {
-        // Algoritma Cadangan jika data tahun tsb tidak diketik di DB
-        const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
-        shioTahunIni = shios[y % 12];
-        imlekM = 2; imlekD = 5; // Estimasi rata-rata
+    try {
+        const y = date.getFullYear();
+        const m = date.getMonth() + 1;
+        const d = date.getDate();
+        
+        let imlekM, imlekD, shioTahunIni;
+        
+        if (DB_IMLEK && DB_IMLEK[y]) {
+            imlekM = DB_IMLEK[y].m;
+            imlekD = DB_IMLEK[y].d;
+            shioTahunIni = DB_IMLEK[y].shio;
+        } else {
+            const shios = ["Monyet", "Ayam", "Anjing", "Babi", "Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing"];
+            shioTahunIni = shios[y % 12];
+            imlekM = 2; imlekD = 5;
+        }
+
+        const tglImlek = new Date(y, imlekM - 1, imlekD);
+        const isSudahImlek = date >= tglImlek;
+
+        const diffTime = Math.abs(date - tglImlek);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        let lunarDay = isSudahImlek ? (diffDays % 30) + 1 : 30 - (diffDays % 30);
+        if (lunarDay < 1) lunarDay = 1;
+        if (lunarDay > 30) lunarDay = 30;
+        
+        let shioFinal = isSudahImlek ? shioTahunIni : 
+                       (DB_IMLEK && DB_IMLEK[y-1] ? DB_IMLEK[y-1].shio : shioTahunIni);
+
+        return {
+            full: `${lunarDay} - ${isSudahImlek ? Math.floor(diffDays/30)+1 : 12} - ${y + 551}`,
+            shio: shioFinal,
+            ramalan: "Gunakan energi hari ini dengan bijaksana."
+        };
+    } catch (error) {
+        console.error("Error in getLunarShio:", error);
+        return {
+            full: "1 - 1 - 2575",
+            shio: "Tikus",
+            ramalan: "Data lunar sedang diproses."
+        };
     }
-
-    const tglImlek = new Date(y, imlekM - 1, imlekD);
-    const isSudahImlek = date >= tglImlek;
-
-    // 2. Hitung Lunar Day (Agar tidak muncul angka negatif/undefined)
-    const diffTime = Math.abs(date - tglImlek);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    let lunarDay = isSudahImlek ? (diffDays % 30) + 1 : 30 - (diffDays % 30);
-    let shioFinal = isSudahImlek ? shioTahunIni : (DB_IMLEK[y-1] ? DB_IMLEK[y-1].shio : "Transisi");
-
-    return {
-        full: `${lunarDay} - ${isSudahImlek ? Math.floor(diffDays/30)+1 : 12} - ${y + 551}`,
-        shio: shioFinal,
-        ramalan: "Gunakan energi hari ini dengan bijaksana."
-    };
 }
-
-
-
-
-
-
 
 function getWuku(date) {
     const wukuList = ["Sinta", "Landep", "Wukir", "Kurantil", "Tolu", "Gumbreg", "Warigalit", "Wariagung", "Julungwangi", "Sungsang", "Galungan", "Kuningan", "Langkir", "Mandasiya", "Julungpujut", "Pahang", "Kuruwelut", "Marakeh", "Tambir", "Medangkungan", "Maktal", "Wuye", "Manahil", "Prangbakat", "Bala", "Wugu", "Wayang", "Kulawu", "Dukut", "Watugunung"];
@@ -171,22 +710,17 @@ function getTanggalJawa(date) {
 }
 
 function getSiklusBesar(tahunJawa) {
-
-    if (typeof tahunJawa !== "number" || tahunJawa < 2000 || tahunJawa > 3000) {
-        tahunJawa = 2576;
-    }
-
-    const REF_TAHUN_JAWA = 2576;
-    const REF_TAHUN_IDX = 4; // Dal
-    const REF_WINDU_IDX = 2; // Sancaya
+    const REF_TAHUN_JAWA = 1959; 
+    const REF_TAHUN_IDX = 4;
+    const REF_WINDU_IDX = 2;
 
     const diffYears = tahunJawa - REF_TAHUN_JAWA;
 
     let tahunIdx = (REF_TAHUN_IDX + diffYears) % 8;
-    if (tahunIdx < 0) tahunIdx += 8;
+    while (tahunIdx < 0) tahunIdx += 8;
 
     let winduIdx = (REF_WINDU_IDX + Math.floor(diffYears / 8)) % 4;
-    if (winduIdx < 0) winduIdx += 4;
+    while (winduIdx < 0) winduIdx += 4;
 
     return {
         tahun: DATA_SIKLUS_TAHUN[tahunIdx],
@@ -209,7 +743,7 @@ function getMangsaInfo(date) {
     else if (m == 3 && d <= 26) id = 9;
     else if ((d >= 27 && m == 3) || (d <= 19 && m == 4)) id = 10;
     else if ((d >= 20 && m == 4) || (d <= 12 && m == 5)) id = 11;
-    return (typeof DATA_MANGSA !== 'undefined') ? DATA_MANGSA[id] : null;
+    return DATA_MANGSA[id] || { nama: "Tidak Diketahui", deskripsi: "Data mangsa tidak tersedia" };
 }
 
 function getArahMeditasi(neptu) {
@@ -239,25 +773,179 @@ function hitungUsiaLengkap(birthDate) {
 }
 
 // ==========================================
-// FUNGSI CARI WETON
+// FUNGSI LOAD DATA WUKU DARI EKSTERNAL
 // ==========================================
-function searchWeton() {
-    const input = document.getElementById('dateInput');
-    if (!input || !input.value) return alert("Silakan pilih tanggal terlebih dahulu!");
-    
-    const target = new Date(input.value);
-    current = new Date(target.getFullYear(), target.getMonth(), 1);
-    
-    generateCalendar();
-    updateDetail(target, getPasaran(target));
+
+async function loadWukuData() {
+    return new Promise((resolve, reject) => {
+        // Cek apakah data sudah ada di window
+        if (window.DATA_WUKU && Object.keys(window.DATA_WUKU).length > 0) {
+            DATA_WUKU = window.DATA_WUKU;
+            console.log('✅ Data Wuku ditemukan di window.DATA_WUKU');
+            resolve(DATA_WUKU);
+            return;
+        }
+        
+        // Jika belum ada, load file eksternal
+        const script = document.createElement('script');
+        script.src = 'data-wuku.js?v=' + Date.now(); // Cache buster
+        script.onload = function() {
+            if (window.DATA_WUKU) {
+                DATA_WUKU = window.DATA_WUKU;
+                console.log('✅ Data Wuku berhasil dimuat dari file eksternal:', Object.keys(DATA_WUKU).length, 'wuku');
+                resolve(DATA_WUKU);
+            } else {
+                console.error('❌ Data Wuku tidak ditemukan setelah script dimuat');
+                reject(new Error('Data Wuku tidak ditemukan'));
+            }
+        };
+        script.onerror = function() {
+            console.error('❌ Gagal memuat file data-wuku.js');
+            reject(new Error('Gagal memuat file data-wuku.js'));
+        };
+        
+        document.head.appendChild(script);
+    });
+}
+
+// Fungsi untuk mendapatkan deskripsi wuku
+async function getWukuDescription(wukuName) {
+    try {
+        // Pastikan data wuku sudah dimuat
+        if (Object.keys(DATA_WUKU).length === 0) {
+            await loadWukuData();
+        }
+        
+        // Cari deskripsi wuku
+        if (DATA_WUKU[wukuName]) {
+            return DATA_WUKU[wukuName];
+        } else {
+            // Fallback description
+            return `Wuku ${wukuName} adalah salah satu dari 30 wuku dalam kalender Jawa. Setiap wuku memiliki karakteristik, pengaruh, dan makna filosofis tersendiri yang mempengaruhi berbagai aspek kehidupan manusia.`;
+        }
+    } catch (error) {
+        console.error('Error getting wuku description:', error);
+        return `Wuku ${wukuName} membawa energi khusus hari ini. Dalam tradisi Jawa, wuku merupakan siklus 30 minggu yang masing-masing memiliki karakteristik dan pengaruh tersendiri terhadap kehidupan manusia.`;
+    }
 }
 
 // ==========================================
-// RENDER UI KALENDER
+// FUNGSI RAMALAN SHIO HARIAN
 // ==========================================
+
+// 1. Fungsi untuk menghasilkan angka unik berdasarkan tanggal (Seed)
+function getDailySeed(date) {
+    const d = new Date(date);
+    return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+}
+
+async function getRamalanShioHarian(date) {
+    try {
+        const seed = getDailySeed(date);
+        const lunarData = getLunarShio(date);
+        const shioName = lunarData.shio;
+
+        // Pastikan variabel RAMALAN_SHIO (dari file ramalan-shio.js) sudah ada
+        if (typeof RAMALAN_SHIO === 'undefined') {
+            throw new Error("Data ramalan-shio.js belum dimuat");
+        }
+
+        // Cari data shio yang sesuai di dalam file JS Anda
+        const shioData = RAMALAN_SHIO.shio.find(s => s.nama === shioName);
+        
+        if (!shioData) return getFallbackRamalanShio();
+
+        // 2. LOGIKA PEMILIHAN HARIAN (Index Selector)
+        // Kita gunakan modulo (%) agar index tidak melebihi jumlah array yang ada
+        const selectIndex = (arr) => arr[seed % arr.length];
+
+        const elemenHarian = RAMALAN_SHIO.siklusElemenHarian[seed % RAMALAN_SHIO.siklusElemenHarian.length];
+
+        return {
+            shio: shioName,
+            elemen: shioData.elemen,
+            elemenHarian: elemenHarian,
+            kecocokan: shioData.kecocokan,
+            ramalan: {
+                // Mengambil salah satu kalimat dari array secara acak tapi tetap (berdasarkan tanggal)
+                karier: selectIndex(shioData.kategori.karier),
+                keuangan: selectIndex(shioData.kategori.keuangan),
+                asmara: selectIndex(shioData.kategori.asmara),
+                kesehatan: selectIndex(shioData.kategori.kesehatan),
+                umum: shioData.kategori.umum,
+                hoki: shioData.kategori.hoki,
+                tips: shioData.kategori.tips
+            }
+        };
+
+    } catch (error) {
+        console.error("Error:", error);
+        return getFallbackRamalanShio();
+    }
+}
+
+
+// ==========================================
+// LOGIKA TOKEN
+// ==========================================
+
+function checkTokenLogic(token) {
+    if (!token) return false;
+
+    const tokenData = DAFTAR_TOKEN_AKTIF[token];
+    
+    if (!tokenData) {
+        return false;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const expiryDate = new Date(tokenData.expiry);
+
+    return today <= expiryDate;
+}
+
+// ==========================================
+// TOKEN MODAL FUNCTIONS
+// ==========================================
+
+function showTokenModal() {
+    document.getElementById('tokenModal').style.display = 'flex';
+    document.getElementById('tokenInput').focus();
+}
+
+function closeTokenModal() {
+    document.getElementById('tokenModal').style.display = 'none';
+}
+
+function validateToken() {
+    const tokenInput = document.getElementById('tokenInput');
+    const token = tokenInput.value.trim().toUpperCase();
+    
+    if (!token) {
+        alert('⚠️ Masukkan token terlebih dahulu');
+        return;
+    }
+    
+    // Always accept token for demo
+    localStorage.setItem('kalender_token_tius', token);
+    
+    alert('✅ Token berhasil disimpan!\n\nReload halaman untuk melihat detail lengkap.');
+    closeTokenModal();
+    
+    setTimeout(() => {
+        location.reload();
+    }, 1000);
+}
+
+// ==========================================
+// GENERATE CALENDAR
+// ==========================================
+
 function generateCalendar() {
     const grid = document.getElementById('calendar');
     const mNav = document.getElementById('monthYearNav');
+    
     if (!grid) return;
     
     grid.innerHTML = '';
@@ -266,6 +954,7 @@ function generateCalendar() {
     const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
     mNav.innerText = `${namaBulan[m]} ${y}`;
 
+    // Header hari
     HARI.forEach((h, i) => {
         const el = document.createElement('div');
         el.innerText = h.substring(0, 3);
@@ -288,146 +977,434 @@ function generateCalendar() {
         if (dateObj.toDateString() === TODAY.toDateString()) cell.classList.add('today-highlight');
         
         cell.innerHTML = `<div class="date-num">${d}</div><div class="pasaran-text">${p}</div>`;
+        
         cell.onclick = () => {
-            document.querySelectorAll('.calendar-day').forEach(c => c.classList.remove('selected-day'));
-            cell.classList.add('selected-day');
-            updateDetail(dateObj, p);
+            const savedToken = localStorage.getItem('kalender_token_tius');
+            
+            if (savedToken && checkTokenLogic(savedToken)) {
+                document.querySelectorAll('.calendar-day').forEach(c => c.classList.remove('selected-day'));
+                cell.classList.add('selected-day');
+                updateDetail(dateObj, p);
+            } else {
+                showTokenModal();
+            }
         };
         grid.appendChild(cell);
     }
 }
 
-function updateDetail(date, pasaran) {
-    const detailDiv = document.getElementById('detail');
-    if (!detailDiv) return;
+// ==========================================
+// SEARCH DATE FUNCTION
+// ==========================================
 
-    const h = HARI[date.getDay()];
-    const wetonKey = `${h} ${pasaran}`;
-    const nHari = NEPTU_HARI[h];
-    const nPasaran = NEPTU_PASARAN[pasaran];
-    const neptu = nHari + nPasaran;
-    
-    const wukuName = getWuku(date);
-    const infoJawa = getTanggalJawa(date); 
-
-    const siklusBesar = getSiklusBesar(date);
-    const mangsa = getMangsaInfo(date);
-    const zodiak = getZodiak(date);
-    const lunar = getLunarShio(date);
-    const nasibKematian = NASIB_AHLI_WARIS[neptu % 4];
-    const nasib5 = PEMBAGI_5[neptu % 5];
-    const arahMeditasi = getArahMeditasi(neptu);
-    const usia = hitungUsiaLengkap(date);
-    
-    const sifatHariIni = DATA_SIFAT_HARI[h] || "-";
-    const sifatPasaranIni = DATA_SIFAT_PASARAN[pasaran.toUpperCase()] || "-";
-
-    const watakNeptu = (typeof DATA_WATAK_NEPTU !== 'undefined') ? DATA_WATAK_NEPTU[neptu] : null;
-    const namaBulanMasehi = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    const tglMasehiLengkap = `${date.getDate()} ${namaBulanMasehi[date.getMonth()]} ${date.getFullYear()}`;
-
-    const teksWuku = (typeof DATA_WUKU !== 'undefined') ? (DATA_WUKU[wukuName] || "Detail wuku belum tersedia.") : "Data Wuku tidak ditemukan.";
-    const dataSriJati = (typeof TABEL_SRIJATI !== 'undefined') ? (TABEL_SRIJATI[neptu] || []) : [];
-
-    const isNaas = infoJawa.bulan.naas.includes(infoJawa.tanggal);
-    const isTaliWangke = (wetonKey === infoJawa.bulan.taliWangke);
-
-    let warningNaas = "";
-    if (isNaas || isTaliWangke) {
-        warningNaas = `<div style="background:#ffebee; color:#c62828; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #d32f2f; font-size:0.85rem;">
-            <strong>⚠️ PERINGATAN HARI NAAS</strong><br>
-            ${isNaas ? `• Tanggal ${infoJawa.tanggal} ${infoJawa.bulan.nama} dilarang untuk hajat.<br>` : ""}
-            ${isTaliWangke ? `• Hari ini Tali Wangke (${infoJawa.bulan.taliWangke}).` : ""}
-        </div>`;
+function searchDate() {
+    const searchInput = document.getElementById('dateSearchInput');
+    if (!searchInput || !searchInput.value) {
+        alert("Silakan pilih tanggal terlebih dahulu!");
+        return;
     }
-
-
-
-    let tabelHtml = `<table style="width:100%; border-collapse: collapse; margin-top:10px; font-size:0.85rem; border:1px solid #ddd;">
-        <thead><tr style="background:#f9f9f9;"><th style="border:1px solid #ddd; padding:8px;">Usia</th><th style="border:1px solid #ddd; padding:8px;">Nilai</th><th style="border:1px solid #ddd; padding:8px;">Nasib</th></tr></thead><tbody>`;
-
-    if (dataSriJati.length > 0) {
-        dataSriJati.forEach(item => {
-            const skor = item.nilai !== undefined ? item.nilai : (item.v !== undefined ? item.v : 0);
-            const rangeUsia = item.usia || item.age || "-";
-            const deskripsi = (typeof SRI_JATI_DESC !== 'undefined') ? (SRI_JATI_DESC[skor] || "Data tidak ada") : "Deskripsi Error";
-            tabelHtml += `<tr><td style="border:1px solid #ddd; padding:8px; text-align:center;">${rangeUsia} Thn</td><td style="border:1px solid #ddd; padding:8px; text-align:center; color:#D30000; font-weight:bold;">${skor}</td><td style="border:1px solid #ddd; padding:8px;">${deskripsi}</td></tr>`;
-        });
+    
+    const selectedDate = new Date(searchInput.value + 'T00:00:00');
+    if (isNaN(selectedDate.getTime())) {
+        alert("Tanggal yang dimasukkan tidak valid!");
+        return;
+    }
+    
+    // Set calendar ke bulan yang dicari
+    current = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+    generateCalendar();
+    
+    // Highlight tanggal yang dicari
+    highlightSearchedDate(selectedDate);
+    
+    // Tampilkan detail jika token valid
+    const savedToken = localStorage.getItem('kalender_token_tius');
+    if (savedToken && checkTokenLogic(savedToken)) {
+        updateDetail(selectedDate, getPasaran(selectedDate));
     } else {
-        tabelHtml += `<tr><td colspan="3" style="text-align:center; padding:10px;">Data tidak ditemukan</td></tr>`;
+        showTokenModal();
     }
-    tabelHtml += `</tbody></table>`;
+    
+    // Scroll ke detail section
+    const detailSection = document.getElementById('detail');
+    if (detailSection) {
+        detailSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
 
-    detailDiv.style.display = 'block';
-    detailDiv.innerHTML = `
-        <div id="printableArea" class="card-result" style="background:#fff; padding:20px; border-radius:12px; border:1px solid #eee; box-shadow: 0 4px 6px rgba(0,0,0,0.05); color:#000;">
-            ${warningNaas}
-            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                <h2 style="color:#D30000; margin:0 0 5px 0; border-bottom:2px solid #D30000; display:inline-block;">${wetonKey}</h2>
-                <button onclick="copyToClipboard()" style="background:#D30000; color:#fff; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">📋 Salin Hasil</button>
-            </div>
-        
- <div style="background:#f1f8e9; padding:10px; border-radius:8px; margin:10px 0;">
-             
-  <p style="margin:10px 0 0; font-size:1.15rem; font-weight:bold;">📅 ${tglMasehiLengkap}</p>
+function highlightSearchedDate(date) {
+    // Hapus highlight sebelumnya
+    document.querySelectorAll('.calendar-day').forEach(cell => {
+        cell.classList.remove('searched-date');
+    });
+    
+    // Highlight tanggal yang dicari
+    const y = date.getFullYear();
+    const m = date.getMonth();
+    const d = date.getDate();
+    
+    // Cari cell yang sesuai dengan tanggal yang dicari
+    const cells = document.querySelectorAll('.calendar-day');
+    cells.forEach(cell => {
+        const cellDateNum = parseInt(cell.querySelector('.date-num')?.textContent);
+        if (cellDateNum === d && 
+            current.getFullYear() === y && 
+            current.getMonth() === m) {
+            cell.classList.add('searched-date');
             
-            <div style="background:#fff3e0; padding:12px; border-radius:8px; margin:10px 0; border:1px solid #ffe0b2;">
+            // Tambahkan indikator visual
+            const indicator = document.createElement('div');
+            indicator.className = 'search-indicator';
+            indicator.innerHTML = '🔍';
+            indicator.style.cssText = `
+                position: absolute;
+                top: 2px;
+                right: 2px;
+                font-size: 10px;
+                background: #D30000;
+                color: white;
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            cell.style.position = 'relative';
+            cell.appendChild(indicator);
+        }
+    });
+}
 
-   <p><b>🏮 Lunar:</b> ${lunar.full} | <b>Shio:</b> ${lunar.shio}</p>
-                <p style="font-size:12px;"><i>Ramalan: ${lunar.ramalan}</i></p>
-            </div>
-    
-          
-                <p style="margin:0; color:#e65100; font-weight:bold; font-size:1rem;">✨ Siklus Tahun & Windu</p>
-                <p style="margin:5px 0; font-size:0.9rem;"><strong>Tahun:</strong> ${siklusBesar.tahun.nama} (${siklusBesar.tahun.makna})</p>
-                <p style="margin:5px 0; font-size:0.9rem;"><strong>Windu:</strong> ${siklusBesar.windu} </p>
-                <p style="margin:8px 0 0; font-size:0.8rem; font-style:italic; color:#6d4c41; line-height:1.4;">"${siklusBesar.tahun.deskripsi}"</p>
-            </div>
+// ==========================================
+// UPDATE DETAIL LENGKAP DENGAN RAMALAN SHIO & WUKU
+// ==========================================
 
-     
-    
-            <div style="background:#fff9f9; padding:10px; border-radius:8px; margin:10px 0; border:1px solid #ffeded;">
-                <p style="margin:0; color:#d30000; font-weight:bold; font-size:1rem;">🌙 Kalender Jawa</p>
-                <p style="margin:5px 0; font-size:0.9rem;"><strong>Tanggal:</strong> ${infoJawa.tanggal} ${infoJawa.bulan.nama} ${infoJawa.tahun} AJ</p>
-                <p style="margin:5px 0; font-size:0.9rem;"><strong>Status Bulan:</strong> <span style="color:${infoJawa.bulan.status === 'Baik' || infoJawa.bulan.status === 'Sangat Baik' ? '#2e7d32' : '#c62828'}">${infoJawa.bulan.status}</span></p>
-                <p style="margin:5px 0; font-size:0.85rem; color:#666;"><strong>Tanggal Naas:</strong> ${infoJawa.bulan.naas.join(', ')}</p>
-                <p style="margin:5px 0; font-size:0.85rem; color:#666;"><strong>Tali Wangke:</strong> ${infoJawa.bulan.taliWangke}</p>
-            </div>
+async function updateDetail(date, pasaran) {
+    try {
+        const detailDiv = document.getElementById('detail');
+        if (!detailDiv) {
+            console.error("Element #detail tidak ditemukan");
+            return;
+        }
 
-            <div style="background:#f8f9fa; padding:12px; border-radius:8px; margin:10px 0; border:1px solid #e9ecef;">
-                <h4 style="margin:0 0 8px 0; color:#333; font-size:0.95rem;">🔢 Perhitungan Neptu</h4>
-                <p style="margin:0; font-family: monospace; font-size:0.9rem;">
-                    Hari ${h} = ${nHari}<br>
-                    Pasaran ${pasaran} = ${nPasaran}<br>
-                    --------------------- +<br>
-                    <strong>Total Neptu = ${neptu}</strong>
-                </p>
-            </div>
+        const h = HARI[date.getDay()];
+        const wetonKey = `${h} ${pasaran}`;
+        
+        const nHari = NEPTU_HARI[h] || 0;
+        const nPasaran = NEPTU_PASARAN[pasaran] || 0;
+        const neptu = nHari + nPasaran;
+        
+        const infoJawa = getTanggalJawa(date);
+        const siklusBesar = getSiklusBesar(infoJawa.tahun);
+        const mangsa = getMangsaInfo(date);
+        const zodiak = getZodiak(date);
+        const lunar = getLunarShio(date);
+        const nasibKematian = NASIB_AHLI_WARIS[neptu % 4] || NASIB_AHLI_WARIS[0];
+        const nasib5 = PEMBAGI_5[neptu % 5] || PEMBAGI_5[0];
+        const arahMeditasi = getArahMeditasi(neptu);
+        const usia = hitungUsiaLengkap(date);
+        const wukuName = getWuku(date);
+        
+        // Get wuku description from external data
+        const wukuDescription = await getWukuDescription(wukuName);
+        
+        const sifatHariIni = DATA_SIFAT_HARI[h] || "-";
+        const sifatPasaranIni = DATA_SIFAT_PASARAN[pasaran.toUpperCase()] || "-";
+        const watakNeptu = DATA_WATAK_NEPTU[neptu] || null;
 
-            <div style="margin:15px 0; padding:12px; border:1px solid #ffe0b2; background:#fff8e1; border-radius:8px;">
-                <h4 style="margin:0 0 5px 0; color:#e65100; font-size:0.95rem;">🎭 Karakter Hari & Pasaran</h4>
-                <p style="font-size:0.85rem; margin:0;"><strong>Sifat ${h}:</strong> ${sifatHariIni}</p>
-                <p style="font-size:0.85rem; margin:5px 0 0 0;"><strong>Sifat ${pasaran}:</strong> ${sifatPasaranIni}</p>
-            </div>
+        const namaBulanMasehi = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        const tglMasehiLengkap = `${date.getDate()} ${namaBulanMasehi[date.getMonth()]} ${date.getFullYear()}`;
 
-            <p style="margin:5px 0; font-size:0.9rem;"><strong>Lunar:</strong> (Shio ${lunar.shio}) | <strong>Zodiak:</strong> ${zodiak}</p>
-            <div style="background:#f0f7ff; border:1px solid #cfe2ff; padding:10px; border-radius:8px; margin:10px 0;">
-                <p style="margin:0; font-size:0.9rem;"><strong>⏳ Usia Saat Ini:</strong> ${usia}</p>
-                <p style="margin:5px 0 0; font-size:0.9rem;"><strong>🧘 Arah Meditasi:</strong> ${arahMeditasi}</p>
+        // Get shio ramalan
+        const ramalanShio = await getRamalanShioHarian(date);
+        
+        // Data Sri Jati
+        const dataSriJati = TABEL_SRIJATI[neptu] || [];
+
+        const isNaas = infoJawa.bulan.naas.includes(infoJawa.tanggal);
+        const isTaliWangke = (wetonKey === infoJawa.bulan.taliWangke);
+
+        // Warning Naas
+        let warningNaas = "";
+        if (isNaas || isTaliWangke) {
+            warningNaas = `<div style="background:#ffebee; color:#c62828; padding:12px; border-radius:8px; margin-bottom:15px; border-left:5px solid #d32f2f; font-size:0.85rem;">
+                <strong>⚠️ PERINGATAN HARI NAAS</strong><br>
+                ${isNaas ? `• Tanggal ${infoJawa.tanggal} ${infoJawa.bulan.nama} dilarang untuk hajat.<br>` : ""}
+                ${isTaliWangke ? `• Hari ini Tali Wangke (${infoJawa.bulan.taliWangke}).` : ""}
+            </div>`;
+        }
+
+        // Tabel Sri Jati
+        let tabelHtml = `<table style="width:100%; border-collapse: collapse; margin-top:10px; font-size:0.85rem; border:1px solid #ddd;">
+            <thead><tr style="background:#f9f9f9;">
+                <th style="border:1px solid #ddd; padding:8px; text-align:center;">Usia</th>
+                <th style="border:1px solid #ddd; padding:8px; text-align:center;">Fase</th>
+                <th style="border:1px solid #ddd; padding:8px; text-align:center;">Nilai</th>
+                <th style="border:1px solid #ddd; padding:8px; text-align:center;">Keterangan</th>
+            </tr></thead><tbody>`;
+
+        if (dataSriJati.length > 0) {
+            dataSriJati.forEach(item => {
+                const skor = item.nilai || 0;
+                const rangeUsia = item.usia || "-";
+                const fase = item.fase || "-";
+                const deskripsi = SRI_JATI_DESC[skor] || "Data tidak tersedia";
+                
+                let color = "#333";
+                if (skor >= 7) color = "#2e7d32";
+                else if (skor >= 5) color = "#ff9800";
+                else color = "#d32f2f";
+                
+                tabelHtml += `<tr>
+                    <td style="border:1px solid #ddd; padding:8px; text-align:center; font-weight:bold;">${rangeUsia}</td>
+                    <td style="border:1px solid #ddd; padding:8px;">${fase}</td>
+                    <td style="border:1px solid #ddd; padding:8px; text-align:center; color:${color}; font-weight:bold; font-size:1.1em;">${skor}</td>
+                    <td style="border:1px solid #ddd; padding:8px;">${deskripsi}</td>
+                </tr>`;
+            });
+        } else {
+            tabelHtml += `<tr><td colspan="4" style="text-align:center; padding:15px; color:#999;">Data siklus Sri Jati untuk neptu ${neptu} tidak tersedia</td></tr>`;
+        }
+        tabelHtml += `</tbody></table>`;
+
+        // Detail lengkap dengan ramalan shio
+        detailDiv.style.display = 'block';
+        detailDiv.innerHTML = `
+            <div id="printableArea" class="card-result" style="background:#fff; padding:25px; border-radius:12px; border:1px solid #eee; box-shadow: 0 4px 15px rgba(0,0,0,0.08); color:#000; max-width:800px; margin:0 auto;">
+                ${warningNaas}
+                
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:15px; margin-bottom:20px;">
+                    <div>
+                        <h2 style="color:#D30000; margin:0 0 5px 0; border-bottom:2px solid #D30000; display:inline-block; font-size:1.8em;">${wetonKey}</h2>
+                        <p style="margin:5px 0 0; font-size:1.15rem; font-weight:bold; color:#333;">📅 ${tglMasehiLengkap}</p>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button onclick="copyToClipboard()" style="background:#D30000; color:#fff; border:none; padding:10px 20px; border-radius:6px; cursor:pointer; font-weight:bold; display:flex; align-items:center; gap:8px;">
+                            📋 Salin Hasil
+                        </button>
+                        <button onclick="shareWhatsApp()" style="background:#25D366; color:#fff; border:none; padding:10px 20px; border-radius:6px; cursor:pointer; font-weight:bold; display:flex; align-items:center; gap:8px;">
+                            📱 Share WA
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- RAMALAN SHIO HARIAN -->
+                <div class="shio-ramalan-card">
+                    <h3 style="margin-top:0; border-bottom:2px solid rgba(255,255,255,0.3); padding-bottom:8px; display:flex; align-items:center; gap:10px;">
+                        <span style="font-size:1.5em;">🐉</span>
+                        Ramalan Shio ${ramalanShio.shio} Hari Ini
+                    </h3>
+                    
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px; margin-top:15px;">
+                        <div class="shio-category">
+                            <h4>🎯 Karir & Pekerjaan</h4>
+                            <p style="margin:0; font-size:0.9rem;">${ramalanShio.ramalan.karier}</p>
+                        </div>
+                        
+                        <div class="shio-category">
+                            <h4>💰 Keuangan</h4>
+                            <p style="margin:0; font-size:0.9rem;">${ramalanShio.ramalan.keuangan}</p>
+                        </div>
+                        
+                        <div class="shio-category">
+                            <h4>💖 Asmara & Hubungan</h4>
+                            <p style="margin:0; font-size:0.9rem;">${ramalanShio.ramalan.asmara}</p>
+                        </div>
+                        
+                        <div class="shio-category">
+                            <h4>🏥 Kesehatan</h4>
+                            <p style="margin:0; font-size:0.9rem;">${ramalanShio.ramalan.kesehatan}</p>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top:15px; padding-top:15px; border-top:1px solid rgba(255,255,255,0.3);">
+                        <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+                            <div>
+                                <p style="margin:5px 0; font-size:0.9rem;"><strong>Elemen Shio:</strong> ${ramalanShio.elemen}</p>
+                                <p style="margin:5px 0; font-size:0.9rem;"><strong>Elemen Harian:</strong> ${ramalanShio.elemenHarian}</p>
+                            </div>
+                            <div>
+ <p style="margin:5px 0; font-size:0.9rem;">
+    <strong>Angka Hoki:</strong> ${ramalanShio.ramalan.hoki.angka.join(', ')}
+</p>
+
+<p style="margin:5px 0; font-size:0.9rem; border-top: 1px dotted rgba(255,255,255,0.3); padding-top: 5px;">
+    <strong>Kecocokan Shio:</strong> ${ramalanShio.kecocokan ? ramalanShio.kecocokan.join(', ') : '-'}
+</p>
+</div>
+
+                        </div>
+                        
+                        <div style="background:rgba(0,0,0,0.2); padding:12px; border-radius:6px; margin-top:10px;">
+                            <p style="margin:0; font-size:0.9rem; font-style:italic;">
+                                <strong>💡 Tips Hari Ini:</strong> ${ramalanShio.ramalan.tips}
+                            </p>
+                        </div>
+                        
+                        <p style="margin:10px 0 0; font-size:0.8rem; opacity:0.8; text-align:center;">
+                            🔄 Ramalan diperbarui setiap hari berdasarkan energi harian
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Informasi Dasar -->
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:15px; margin-bottom:20px;">
+                    <div style="background:#fff3e0; padding:15px; border-radius:8px; border:1px solid #ffe0b2;">
+                        <h3 style="margin-top:0; color:#e65100; font-size:1em;">🏮 Kalender Imlek</h3>
+                        <p style="margin:8px 0; font-size:0.9rem;"><strong>Tanggal:</strong> ${lunar.full}</p>
+                        <p style="margin:8px 0; font-size:0.9rem;"><strong>Shio:</strong> ${lunar.shio}</p>
+                        <p style="margin:8px 0; font-size:0.85rem; font-style:italic; color:#666;">${lunar.ramalan}</p>
+                    </div>
+                    
+                    <div style="background:#e8f5e9; padding:15px; border-radius:8px; border:1px solid #c8e6c9;">
+                        <h3 style="margin-top:0; color:#2e7d32; font-size:1em;">✨ Siklus Windu</h3>
+                        <p style="margin:8px 0; font-size:0.9rem;"><strong>Tahun:</strong> ${siklusBesar.tahun.nama}</p>
+                        <p style="margin:8px 0; font-size:0.9rem;"><strong>Makna:</strong> ${siklusBesar.tahun.makna}</p>
+                        <p style="margin:8px 0; font-size:0.9rem;"><strong>Windu:</strong> ${siklusBesar.windu}</p>
+                    </div>
+                    
+                    <div style="background:#f0f7ff; padding:15px; border-radius:8px; border:1px solid #cfe2ff;">
+                        <h3 style="margin-top:0; color:#084298; font-size:1em;">⏳ Usia & Meditasi</h3>
+                        <p style="margin:8px 0; font-size:0.9rem;"><strong>Usia Saat Ini:</strong> ${usia}</p>
+                        <p style="margin:8px 0; font-size:0.9rem;"><strong>Arah Meditasi:</strong> ${arahMeditasi}</p>
+                        <p style="margin:8px 0; font-size:0.9rem;"><strong>Zodiak:</strong> ${zodiak}</p>
+                    </div>
+                </div>
+                
+                <!-- Kalender Jawa -->
+                <div style="background:#fff9f9; padding:20px; border-radius:10px; margin-bottom:20px; border:1px solid #ffeded;">
+                    <h3 style="color:#d30000; margin-top:0; border-bottom:2px solid #ffcccc; padding-bottom:8px;">🌙 Kalender Jawa</h3>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:15px;">
+                        <div>
+                            <p style="margin:10px 0; font-size:0.95rem;"><strong>Tanggal:</strong> ${infoJawa.tanggal} ${infoJawa.bulan.nama} ${infoJawa.tahun} AJ</p>
+                            <p style="margin:10px 0; font-size:0.95rem;"><strong>Status Bulan:</strong> 
+                                <span style="color:${infoJawa.bulan.status.includes('Baik') ? '#2e7d32' : '#c62828'}; font-weight:bold;">
+                                    ${infoJawa.bulan.status}
+                                </span>
+                            </p>
+                        </div>
+                        <div>
+                            <p style="margin:10px 0; font-size:0.9rem;"><strong>Tanggal Naas:</strong> ${infoJawa.bulan.naas.join(', ')}</p>
+                            <p style="margin:10px 0; font-size:0.9rem;"><strong>Tali Wangke:</strong> ${infoJawa.bulan.taliWangke}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Perhitungan Neptu -->
+                <div style="background:#f8f9fa; padding:20px; border-radius:10px; margin-bottom:20px; border:1px solid #e9ecef;">
+                    <h3 style="color:#333; margin-top:0; border-bottom:2px solid #ddd; padding-bottom:8px;">🔢 Perhitungan Neptu</h3>
+                    <div style="font-family: monospace; font-size:1rem; background:#fff; padding:15px; border-radius:8px; border:1px solid #ddd;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                            <span>Hari ${h}</span>
+                            <span>= ${nHari}</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                            <span>Pasaran ${pasaran}</span>
+                            <span>= ${nPasaran}</span>
+                        </div>
+                        <div style="border-top:2px solid #333; margin:10px 0; padding-top:10px; display:flex; justify-content:space-between; font-weight:bold; font-size:1.1em;">
+                            <span>TOTAL NEPTU</span>
+                            <span>= ${neptu}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Karakter Hari & Pasaran -->
+                <div style="margin-bottom:20px;">
+                    <h3 style="color:#e65100; margin-top:0; border-bottom:2px solid #ffe0b2; padding-bottom:8px;">🎭 Karakter Hari & Pasaran</h3>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px;">
+                        <div style="background:#fff8e1; padding:15px; border-radius:8px; border:1px solid #ffe0b2;">
+                            <h4 style="margin-top:0; color:#e65100; font-size:0.95rem;">Sifat Hari ${h}</h4>
+                            <p style="margin:0; font-size:0.9rem; line-height:1.5;">${sifatHariIni}</p>
+                        </div>
+                        <div style="background:#fff8e1; padding:15px; border-radius:8px; border:1px solid #ffe0b2;">
+                            <h4 style="margin-top:0; color:#e65100; font-size:0.95rem;">Sifat Pasaran ${pasaran}</h4>
+                            <p style="margin:0; font-size:0.9rem; line-height:1.5;">${sifatPasaranIni}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Watak Neptu -->
+                ${watakNeptu ? `
+                <div style="margin-bottom:20px; padding:20px; border:1px solid #e1bee7; border-radius:10px; background:#f3e5f5;">
+                    <h3 style="color:#7b1fa2; margin-top:0; border-bottom:2px solid #d1c4e9; padding-bottom:8px;">🌟 Watak Neptu ${neptu}</h3>
+                    <p style="font-size:0.95rem; line-height:1.6; color:#4a148c; margin:0;">${watakNeptu.watak}</p>
+                </div>
+                ` : ""}
+                
+                <!-- Nasib Pembagi 5 -->
+                <div style="background:#e8f5e9; padding:20px; border-radius:10px; margin-bottom:20px; border:1px solid #c8e6c9;">
+                    <h3 style="color:#2e7d32; margin-top:0; border-bottom:2px solid #a5d6a7; padding-bottom:8px;">
+                        💎 Nasib Hidup: ${nasib5.nama}
+                    </h3>
+                    
+                    <p style="font-weight:bold; margin-bottom:5px; color:#1b5e20;">Makna:</p>
+                    <p style="font-size:0.95rem; line-height:1.6; margin:0 0 15px;">${nasib5.arti}</p>
+
+                    <p style="font-weight:bold; margin-bottom:5px; color:#1b5e20;">Aktivitas yang Disarankan:</p>
+                    <ul style="font-size:0.9rem; line-height:1.5; margin:0 0 15px; padding-left:20px;">
+                        ${nasib5.aktivitas_baik.map(item => `<li>${item}</li>`).join('')}
+                    </ul>
+
+                    <div style="background:rgba(255,255,255,0.5); padding:10px; border-radius:5px; border-left:4px solid #2e7d32;">
+                        <p style="font-size:0.9rem; font-style:italic; margin:0;"><strong>Saran:</strong> ${nasib5.saran}</p>
+                    </div>
+                </div>
+                
+                <!-- Nasib Kematian -->
+                <div style="background:#fffcf0; padding:20px; border-radius:10px; margin-bottom:20px; border-left:4px solid #f1c40f;">
+                    <h3 style="color:#856404; margin-top:0; border-bottom:2px solid #ffecb5; padding-bottom:8px;">🪦 Nasib Kematian (Ahli Waris)</h3>
+                    <p style="font-size:1.1rem; font-weight:bold; margin:10px 0 5px; color:#d30000;">${nasibKematian.nama}</p>
+                    <p style="font-size:0.95rem; font-style:italic; margin:0; color:#666;">"${nasibKematian.arti}"</p>
+                </div>
+                
+                <!-- Pranata Mangsa -->
+                ${mangsa ? `
+                <div style="background:#f0f7ff; padding:20px; border-radius:10px; margin-bottom:20px; border:1px solid #cfe2ff;">
+                    <h3 style="color:#084298; margin-top:0; border-bottom:2px solid #b3d7ff; padding-bottom:8px;">🌾 Pranata Mangsa: ${mangsa.nama}</h3>
+                    <p style="font-size:0.95rem; line-height:1.6; margin:10px 0 0;">${mangsa.deskripsi}</p>
+                </div>
+                ` : ""}
+                
+                <!-- Analisis Wuku -->
+                <div style="margin-bottom:20px; padding:20px; border:1px solid #d1c4e9; border-radius:10px; background:#f5f2ff;">
+                    <h3 style="color:#5e35b1; margin-top:0; border-bottom:2px solid #b39ddb; padding-bottom:8px;">🛡️ Analisis Wuku ${wukuName}</h3>
+                    <div style="font-size:0.95rem; line-height:1.6; margin:10px 0 0;">${wukuDescription}</div>
+                </div>
+                
+                <!-- Siklus Sri Jati -->
+                <div style="margin-bottom:10px;">
+                    <h3 style="color:#D30000; margin-top:0; border-bottom:2px solid #ffcccc; padding-bottom:8px;">📈 Siklus Sri Jati (Rejeki & Nasib)</h3>
+                    <p style="font-size:0.9rem; color:#666; margin-bottom:15px;">Berikut adalah perjalanan rejeki dan nasib berdasarkan neptu ${neptu}:</p>
+                    ${dataSriJati.length > 0 ? tabelHtml : `<p style='color:#999; padding:20px; text-align:center; background:#f9f9f9; border-radius:8px;'>Data siklus Sri Jati untuk neptu ${neptu} tidak tersedia</p>`}
+                </div>
+                
+                <!-- Deskripsi Siklus Tahun -->
+                <div style="margin-top:25px; padding:20px; background:#f8f9fa; border-radius:10px; border:1px solid #e9ecef;">
+                    <h3 style="color:#333; margin-top:0; border-bottom:2px solid #ddd; padding-bottom:8px;">📖 Filosofi Siklus Tahun ${siklusBesar.tahun.nama}</h3>
+                    <p style="font-size:0.95rem; line-height:1.6; margin:10px 0 0; font-style:italic;">"${siklusBesar.tahun.deskripsi}"</p>
+                </div>
             </div>
-            <div style="background:#e8f5e9; border:1px solid #c8e6c9; padding:12px; border-radius:8px; margin:15px 0;">
-                <h4 style="margin:0; color:#2e7d32; font-size:0.95rem;">💎 Nasib Pembagi 5: ${nasib5.nama}</h4>
-                <p style="font-size:0.85rem; margin-top:5px;">${nasib5.arti}</p>
-            </div>
-            <p style="margin:10px 0;"><strong>Neptu:</strong> ${neptu} | <strong>Wuku:</strong> ${wukuName}</p>
-            ${watakNeptu ? `<div style="margin:15px 0; padding:12px; border:1px solid #e1bee7; border-radius:8px; background:#f3e5f5;"><h4 style="color:#7b1fa2; margin:0 0 5px 0; border-bottom:1px solid #d1c4e9; font-size:0.95rem;">🌟 Watak Neptu ${neptu}</h4><p style="font-size:0.85rem; line-height:1.5; color:#4a148c;">${watakNeptu.watak}</p></div>` : ""}
-            <div style="margin:15px 0; padding:10px; background:#fffcf0; border-left:4px solid #f1c40f; border-radius:4px;"><h4 style="margin:0; color:#856404; font-size:0.9rem;">🪦 Nasib Kematian (Ahli Waris)</h4><p style="margin:5px 0 0; font-weight:bold;">${nasibKematian.nama}</p><p style="margin:2px 0 0; font-size:0.85rem; font-style:italic;">"${nasibKematian.arti}"</p></div>
-            ${mangsa ? `<div style="margin:15px 0; padding:12px; border:1px solid #cfe2ff; background:#f0f7ff; border-radius:8px;"><h4 style="margin:0; color:#084298; font-size:0.95rem;">🌾 Pranata Mangsa: ${mangsa.nama}</h4><p style="font-size:0.85rem; margin-top:5px; line-height:1.4;">${mangsa.deskripsi}</p></div>` : ""}
-            <div style="margin-top:20px;"><h4 style="color:#D30000; border-bottom:1px solid #eee; padding-bottom:5px;">🛡️ Analisis Wuku ${wukuName}</h4><div style="font-size:0.85rem; line-height:1.5;">${teksWuku}</div></div>
-            <div style="margin-top:20px;"><h4 style="color:#D30000; border-bottom:1px solid #eee; padding-bottom:5px;">📈 Siklus Sri Jati (Rejeki)</h4>${dataSriJati.length > 0 ? tabelHtml : "<p style='color:#999;'>Data tidak tersedia.</p>"}</div>
-        </div>
-    `;
-    detailDiv.scrollIntoView({ behavior: 'smooth' });
+        `;
+        
+        detailDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (error) {
+        console.error("Error in updateDetail:", error);
+        const detailDiv = document.getElementById('detail');
+        if (detailDiv) {
+            detailDiv.innerHTML = `
+                <div style="color:#d32f2f; padding:30px; text-align:center; background:#ffebee; border-radius:10px; border:1px solid #ffcdd2;">
+                    <h3 style="margin-top:0;">⚠️ Terjadi Kesalahan</h3>
+                    <p>Error: ${error.message}</p>
+                    <p>Silakan refresh halaman atau coba lagi nanti.</p>
+                    <button onclick="location.reload()" style="margin-top:15px; padding:10px 20px; background:#D30000; color:white; border:none; border-radius:5px; cursor:pointer;">
+                        🔄 Refresh Halaman
+                    </button>
+                </div>
+            `;
+        }
+    }
 }
 
 // ==========================================
@@ -439,19 +1416,19 @@ function copyToClipboard() {
     if (!detailArea) return alert("Data tidak ditemukan!");
 
     const clone = detailArea.cloneNode(true);
-    const button = clone.querySelector('button');
-    if (button) button.remove();
+    const buttons = clone.querySelectorAll('button');
+    buttons.forEach(btn => btn.remove());
 
     const textToCopy = "*HASIL LENGKAP CEK WETON JAWA*\n" + 
-                       "━━━━━━━━━━━━━━━━━━━━━━\n\n" + 
+                       "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" + 
                        clone.innerText.trim() + 
-                       "\n\n━━━━━━━━━━━━━━━━━━━━━━\n" +
-                       "_Kalender Jawa by Tius_";
+                       "\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                       "_Kalender Jawa Modern - by Tius_";
 
     navigator.clipboard.writeText(textToCopy).then(() => {
-        alert("Hasil berhasil disalin ke clipboard!");
+        alert("✅ Hasil berhasil disalin ke clipboard!");
     }).catch(err => {
-        alert("Gagal menyalin teks.");
+        alert("❌ Gagal menyalin teks.");
     });
 }
 
@@ -463,32 +1440,209 @@ function shareWhatsApp() {
     }
 
     let content = detailArea.innerText
-        .replace(/📋 Salin Hasil/g, "")
+        .replace(/📋 Salin Hasil|📱 Share WA/g, "")
         .replace(/\r\n/g, "\n")
-        .replace(/Wuku\s*:/gi, "\nWuku : ")
-        .replace(/Pal\.?\s*Jati\s*:/gi, "\n\nPal. Jati : ")
-        .replace(/(📈\s*)?Siklus\s+Sri\s+Jati/gi, "\n\n📈 *Siklus Sri Jati (Rejeki)*\n")
         .replace(/\n{3,}/g, "\n\n")
         .trim();
 
-    const header = "*HASIL LENGKAP CEK WETON JAWA*\n" + "━━━━━━━━━━━━━━━━━━━━━━\n\n";
-    const footer = "\n\n━━━━━━━━━━━━━━━━━━━━━━\n" + "_Kalender Jawa by Tius_";
+    const header = "*HASIL LENGKAP CEK WETON JAWA*\n" + 
+                   "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
+    const footer = "\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" + 
+                   "_Kalender Jawa Modern - by Tius_\n" +
+                   "www.kalenderjawa.com";
+    
     const finalText = header + content + footer;
 
     window.open("https://wa.me/?text=" + encodeURIComponent(finalText), "_blank");
 }
 
 // ==========================================
-// INITIAL START
+// INITIAL START DENGAN LOAD DATA WUKU
 // ==========================================
-document.addEventListener("DOMContentLoaded", () => {
+
+document.addEventListener("DOMContentLoaded", async () => {
+    console.log('Kalender Jawa initialized with all features');
+    
+    // Preload data wuku di background
+    loadWukuData().then(() => {
+        console.log('✅ Data Wuku siap digunakan');
+    }).catch(error => {
+        console.error('❌ Gagal memuat data wuku:', error);
+    });
+    
+    // Inisialisasi kalender
     generateCalendar();
-    updateDetail(TODAY, getPasaran(TODAY));
+    
+    // Setup navigation
     const prev = document.getElementById('prevMonth');
     const next = document.getElementById('nextMonth');
-    if(prev) prev.onclick = () => { current.setMonth(current.getMonth() - 1); generateCalendar(); };
-    if(next) next.onclick = () => { current.setMonth(current.getMonth() + 1); generateCalendar(); };
+    
+    if(prev) prev.onclick = () => { 
+        current.setMonth(current.getMonth() - 1); 
+        generateCalendar(); 
+    };
+    
+    if(next) next.onclick = () => { 
+        current.setMonth(current.getMonth() + 1); 
+        generateCalendar(); 
+    };
+    
+    // Setup search button
+    const searchBtn = document.getElementById('searchDateBtn');
+    if (searchBtn) {
+        searchBtn.onclick = searchDate;
+    }
+    
+    // Setup search input
+    const searchInput = document.getElementById('dateSearchInput');
+    if (searchInput) {
+        // Set today's date
+        const today = new Date();
+        const todayStr = today.toISOString().split('T')[0];
+        searchInput.value = todayStr;
+        
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchDate();
+            }
+        });
+    }
+    
+    // Tampilkan detail untuk hari ini jika token valid
+    const savedToken = localStorage.getItem('kalender_token_tius');
+    if (savedToken && checkTokenLogic(savedToken)) {
+        // Tunggu sebentar lalu show today's detail
+        setTimeout(() => {
+            updateDetail(TODAY, getPasaran(TODAY));
+            
+            // Highlight today's cell
+            const cells = document.querySelectorAll('.calendar-day');
+            cells.forEach(cell => {
+                const dateNum = parseInt(cell.querySelector('.date-num')?.textContent);
+                if (dateNum === TODAY.getDate() && 
+                    current.getMonth() === TODAY.getMonth() &&
+                    current.getFullYear() === TODAY.getFullYear()) {
+                    cell.classList.add('selected-day');
+                }
+            });
+        }, 800);
+    } else {
+        // Tampilkan info token
+        const detailDiv = document.getElementById('detail');
+        if (detailDiv) {
+            detailDiv.innerHTML = `
+                <div style="text-align:center; padding:40px 20px; background:#f8f9fa; border-radius:12px; border:2px dashed #ddd;">
+                    <h3 style="color:#D30000; margin-top:0;">🔐 Akses Premium Kalender Jawa</h3>
+                    <p style="margin-bottom:20px;">Untuk melihat detail lengkap weton, Anda perlu mengaktifkan token.</p>
+                    <button onclick="showTokenModal()" style="
+                        background:#D30000; 
+                        color:white; 
+                        border:none; 
+                        padding:12px 30px; 
+                        border-radius:8px; 
+                        font-weight:bold; 
+                        cursor:pointer;
+                        font-size:1em;
+                    ">
+                        🔑 Aktifkan Token
+                    </button>
+                    <p style="margin-top:20px; color:#666; font-size:0.9em;">
+                        Klik tanggal di kalender untuk mulai menggunakan.
+                    </p>
+                </div>
+            `;
+            detailDiv.style.display = 'block';
+        }
+    }
+    
+    console.log('✅ Kalender Jawa siap digunakan dengan semua fitur lengkap!');
+    console.log('📊 Fitur yang aktif:');
+    console.log('   • Kalender Jawa lengkap');
+    console.log('   • Ramalan Shio harian');
+    console.log('   • Data Wuku eksternal');
+    console.log('   • Sistem Token');
+    console.log('   • Pencarian tanggal');
+    console.log('   • Semua perhitungan Neptu dan Primbon');
 });
 
+// --- KODE BARU UNTUK RAMALAN SHIO ---
 
+function getDailySeed(date) {
+    const d = new Date(date);
+    return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+}
 
+async function getRamalanShioHarian(date) {
+    try {
+        const seed = getDailySeed(date);
+        const lunarData = getLunarShio(date); // Fungsi ini harus ada di file logic shio Anda
+        const shioName = lunarData.shio;
+
+        if (typeof RAMALAN_SHIO === 'undefined') {
+            throw new Error("Data ramalan-shio.js belum dimuat");
+        }
+
+        const shioData = RAMALAN_SHIO.shio.find(s => s.nama === shioName);
+        if (!shioData) return null;
+
+        const selectIndex = (arr) => arr[seed % arr.length];
+        const elemenHarian = RAMALAN_SHIO.siklusElemenHarian[seed % RAMALAN_SHIO.siklusElemenHarian.length];
+
+        return {
+            shio: shioName,
+            elemen: shioData.elemen,
+            elemenHarian: elemenHarian,
+            kecocokan: shioData.kecocokan, 
+            ramalan: {
+                karier: selectIndex(shioData.kategori.karier),
+                keuangan: selectIndex(shioData.kategori.keuangan),
+                asmara: selectIndex(shioData.kategori.asmara),
+                kesehatan: selectIndex(shioData.kategori.kesehatan),
+                hoki: shioData.kategori.hoki,
+                tips: shioData.kategori.tips
+            }
+        };
+    } catch (error) {
+        console.error("Error Shio:", error);
+        return null;
+    }
+}
+
+// Ini adalah fungsi update UI yang Anda cari tadi
+function updateShioUI(data) {
+    if(!data) return;
+
+    // Menampilkan data ke elemen HTML
+    if(document.getElementById('shio-harian-title')) {
+        document.getElementById('shio-harian-title').innerText = `Ramalan Shio ${data.shio} Hari Ini`;
+    }
+    
+    // Update data teks (Pastikan ID ini ada di HTML Anda)
+    const ids = {
+        'shio-elemen-text': data.elemen,
+        'elemen-harian-text': data.elemenHarian,
+        'ramalan-karier-text': data.ramalan.karier,
+        'ramalan-keuangan-text': data.ramalan.keuangan,
+        'ramalan-asmara-text': data.ramalan.asmara,
+        'ramalan-kesehatan-text': data.ramalan.kesehatan,
+        'tips-harian-text': data.ramalan.tips
+    };
+
+    for (const [id, value] of Object.entries(ids)) {
+        const el = document.getElementById(id);
+        if(el) el.innerText = value;
+    }
+
+    // Menampilkan Kecocokan Shio secara otomatis
+    const hokiContainer = document.querySelector('.shio-hoki-info');
+    if (hokiContainer && data.kecocokan) {
+        let cocokElem = document.getElementById('shio-cocok-row');
+        if (!cocokElem) {
+            cocokElem = document.createElement('p');
+            cocokElem.id = 'shio-cocok-row';
+            cocokElem.style.marginTop = "8px"; 
+            hokiContainer.appendChild(cocokElem);
+        }
+        cocokElem.innerHTML = `<strong>Kecocokan Shio:</strong> ${data.kecocokan.join(", ")}`;
+    }
+}
